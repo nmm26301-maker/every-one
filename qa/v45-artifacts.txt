@@ -1,0 +1,4 @@
+PASS: APK CRC, original signer, version 45/4.5.0, minSDK23/target33, 16KB ZIP alignment.
+PASS: 212 old model/reference/audio/native files byte-identical to 4.4.
+APK SHA256: 590d8d3ac13bf0ce68cd930c0d853e17afa4505998bd41fe240edfcba5024627
+APK bytes: 427637246

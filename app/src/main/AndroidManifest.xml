@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.openenglish.reader" android:versionCode="47" android:versionName="4.6.1">
+ <uses-permission android:name="android.permission.INTERNET" />
+ <uses-permission android:name="android.permission.RECORD_AUDIO" />
+ <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+ <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+ <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+ <uses-feature android:name="android.hardware.microphone" android:required="false" />
+ <queries><intent><action android:name="android.speech.RecognitionService" /></intent><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent><intent><action android:name="android.speech.action.RECOGNIZE_SPEECH" /></intent></queries>
+ <application android:label="Everyone 英语" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="false" android:icon="@drawable/icon" android:supportsRtl="true">
+  <activity android:name=".StudioActivity" android:exported="true" android:launchMode="singleTop" android:configChanges="orientation|screenSize" android:windowSoftInputMode="adjustResize">
+   <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+   <intent-filter><action android:name="android.intent.action.SEND" /><category android:name="android.intent.category.DEFAULT" /><data android:mimeType="text/plain" /></intent-filter>
+  </activity>
+  <activity android:name=".DuplexActivity" android:exported="false" android:configChanges="orientation|screenSize" />
+  <activity android:name=".MagicDuplexActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+  <activity android:name=".IslandModelActivity" android:exported="false" />
+  <activity android:name=".LanguageActivity" android:exported="false" />
+  <activity android:name=".IslandMemoryActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+  <activity android:name=".LocalModelActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+  <activity android:name=".ReadingActivity" android:exported="false" />
+  <activity android:name=".MainActivity" android:exported="false" android:configChanges="orientation|screenSize" android:windowSoftInputMode="adjustResize" />
+ </application>
+</manifest>

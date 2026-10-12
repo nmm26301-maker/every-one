@@ -1,0 +1,57 @@
+PASS silence causes no turn
+PASS short transient does not interrupt
+PASS four neural speech frames trigger onset
+PASS utterance not ended before rounded silence interval
+PASS utterance ends at twelve 32ms quiet frames
+PASS pre-roll preserves audio before onset
+PASS utterance memory bounded
+PASS brief hesitation retains a single turn
+PASS short Yes/No answers are submitted to ASR
+PASS long speech clips at eighteen seconds without buffer growth
+PASS pause resets partial utterance
+PASS loud audio rejected when neural detector says non-speech
+PASS real PCM meter calculation
+PASS incomplete word group waits
+PASS finished sentence speaks before generation ends
+PASS spoken prefix is not repeated
+PASS final sentence only once
+PASS duplicate final callback does not repeat speech
+PASS early complete-word chunk reduces first speech wait
+PASS chunking preserves every word once
+PASS incomplete UTF-8 token is not spoken
+PASS Unicode survives TTS chunking
+PASS barge-in clears previous stream cursor
+PASS streamed decimal waits for its next token
+PASS decimal remains in one spoken phrase
+PASS revision of spoken prefix never emits an unrelated suffix
+PASS stable spoken prefix resumes after a temporary revision
+PASS balanced endpoint silence is trimmed to 160 ms too
+PASS single greeting waits for a useful first spoken phrase
+PASS greeting and following phrase stay together
+PASS final greeting stream does not replay its first chunk
+PASS legitimate final one-word answer still plays
+PASS late recognition and tokens invalidated immediately
+PASS interrupted reply cannot enter conversation memory
+PASS completed current reply commits once
+PASS commit boundary entered
+PASS invalidation competes with write
+PASS write and invalidation finish in a consistent order
+PASS concurrent turn epochs never collide
+VOICE_FLOW_CHECKS: 39
+PASS speaker input is available before a reply starts
+PASS AEC enabled flag does not let speaker echo cancel the reply
+PASS speaker stays protected without AEC
+PASS headphone duplex remains available during playback
+PASS explicit speaker duplex remains available with AEC
+PASS speaker opt-in without AEC still protects playback
+PASS protection survives a long gap between streamed chunks
+PASS stale completion cannot release the current reply
+PASS speaker reverberation tail is protected
+PASS automatic input resumes after full reply and tail
+PASS manual interruption clears reply but protects remaining speaker tail
+PASS input resumes after interruption tail
+PASS old callback cannot release new turn
+PASS diagnostics history is bounded
+PASS diagnostics retain recent control events
+PLAYBACK_GUARD_CHECKS: 15
+PASS: 8 cancellation/commit boundary checks (host Java)

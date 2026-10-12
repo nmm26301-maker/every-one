@@ -1,0 +1,1 @@
+package android.media.audiofx;public class NoiseSuppressor {public static boolean isAvailable(){return false;}public static NoiseSuppressor create(int id){return null;}public void setEnabled(boolean v){}public void release(){}}

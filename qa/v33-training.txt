@@ -1,0 +1,2 @@
+PASS: 33 training feedback, CSV, search and local-date checks
+PASS: 13 production-SQL filtering, pagination and daily-count checks (host SQLite)

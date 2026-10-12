@@ -1,0 +1,75 @@
+CMake Warning (deprecated) at /tmp/english32/Everyone-AI-English-3.1/vendor/whisper.cpp/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- whisper.cpp version: 1.9.5-dev
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2 GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2
+-- ggml version: 0.26.0
+-- ggml commit:  unknown
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/english32/Everyone-AI-English-3.1/build/native-whisper-host
+ninja: no work to do.
+-- llama.cpp version: 0.6.0-dev
+CMAKE_BUILD_TYPE=Release
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2 GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2
+-- ggml version: 0.26.0
+-- ggml commit:  unknown
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/english32/Everyone-AI-English-3.1/build/native-llama-host
+[1/2] Building CXX object CMakeFiles/english_llama.dir/llama/bridge.cpp.o
+[2/2] Linking CXX shared library libenglish_llama.so
+PASS 16 kHz JFK audio decoded
+PASS silence has no signal
+PASS malformed WAV rejected
+PASS quoted model tokens escaped, Unicode retained
+PASS long material keeps final question
+PASS reasoning hidden
+PASS unfinished reasoning hidden
+PASS real segment timestamps/text
+PASS real segment timestamps/text
+WHISPER:  And so my fellow Americans ask not what your country can do for you ask what you can do for your country.
+HOST_ASR_MS: 851
+PASS real Whisper recognizes JFK phrase
+PASS real Whisper segments fit audio
+PASS Whisper cancellation before inference
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+DEEPSEEK: I went to school yesterday.
+HOST_CHAT_MS: 2553
+PASS real DeepSeek generates streamed text
+PASS real DeepSeek corrects goed to went
+PASS final streamed response matches result
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+PASS overlong token context trims while retaining final question
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+graph_compute: ggml_backend_sched_graph_compute_async failed with error 1
+process_ubatch: failed to compute graph, compute status: 1
+decode: removing memory module entries for seq_id = 0, pos = [58, +inf)
+llama_decode: failed to decode, ret = 2
+PASS DeepSeek cancellation stops active generation
+gguf_init_from_file: failed to open GGUF file '/no-such-local-model.gguf' (No such file or directory)
+llama_model_load: error loading model: llama_model_loader: failed to load model from /no-such-local-model.gguf
+llama_model_load_from_file_impl: failed to load model
+PASS missing model fails honestly
+LOCAL_NATIVE_CHECKS: 18

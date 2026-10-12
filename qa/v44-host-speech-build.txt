@@ -1,0 +1,26 @@
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/vendor/espeak-ng/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Configuration:
+--   shared: OFF
+--   mbrola: OFF (MBROLA_BIN-NOTFOUND)
+--   libsonic: OFF (sonic /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-host/_deps/sonic-git-src)
+--   libpcaudio: OFF (PCAUDIO_LIB-NOTFOUND PCAUDIO_INC-NOTFOUND)
+--   klatt: ON
+--   speech-player: ON
+--   async: OFF
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-host
+[1/5] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/klatt.c.o
+[2/5] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/wavegen.c.o
+[3/5] Linking CXX static library speech-vendor/src/libespeak-ng/libespeak-ng.a
+[4/5] Building CXX object CMakeFiles/english_speech.dir/speech/bridge.cpp.o
+[5/5] Linking CXX shared library libenglish_speech.so

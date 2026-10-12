@@ -1,0 +1,13 @@
+PASS completed pair saved
+PASS languages isolated
+PASS memory survives store reopening
+PASS old conversation contributes context
+PASS current utterance follows completed pairs
+PASS bounded durable memory
+PASS only two complete pairs in live history
+PASS prompt memory bounded
+PASS latest complete pair visible
+PASS clear stops old context from reappearing
+PASS clear scoped to one language
+PASS review due state durable
+ISLAND_MEMORY_CHECKS: 12

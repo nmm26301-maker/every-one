@@ -1,0 +1,246 @@
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- The C compiler identification is Clang 18.0.3
+-- The CXX compiler identification is Clang 18.0.3
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting C compiler ABI info
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-QNrMHu/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-QNrMHu/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-QNrMHu/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-3f2FMV/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-3f2FMV/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-3f2FMV/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/vendor/espeak-ng/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Looking for mkstemp
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-FEbJ1w/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-FEbJ1w/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/sdk44/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/CMakeFiles/CMakeScratch/TryCompile-FEbJ1w/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Looking for mkstemp - found
+-- Configuration:
+--   shared: OFF
+--   mbrola: OFF (MBROLA_BIN-NOTFOUND)
+--   libsonic: OFF (sonic /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64/_deps/sonic-git-src)
+--   libpcaudio: OFF (PCAUDIO_LIB-NOTFOUND PCAUDIO_INC-NOTFOUND)
+--   klatt: ON
+--   speech-player: ON
+--   async: OFF
+-- Configuring done (8.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/scratch/d5a79aab803e/work44/Everyone-AI-English-4.3/build/native-speech-arm64
+[1/43] Building C object speech-vendor/src/ucd-tools/CMakeFiles/ucd.dir/src/ctype.c.o
+[2/43] Building C object speech-vendor/src/ucd-tools/CMakeFiles/ucd.dir/src/case.c.o
+[3/43] Building C object speech-vendor/src/ucd-tools/CMakeFiles/ucd.dir/src/categories.c.o
+[4/43] Building C object speech-vendor/src/ucd-tools/CMakeFiles/ucd.dir/src/tostring.c.o
+[5/43] Building C object speech-vendor/src/ucd-tools/CMakeFiles/ucd.dir/src/scripts.c.o
+[6/43] Building C object speech-vendor/src/ucd-tools/CMakeFiles/ucd.dir/src/proplist.c.o
+[7/43] Linking C static library speech-vendor/src/ucd-tools/libucd.a
+[8/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/common.c.o
+[9/43] Building CXX object speech-vendor/src/speechPlayer/CMakeFiles/speechPlayer.dir/src/speechPlayer.cpp.o
+[10/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/mnemonics.c.o
+[11/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/ieee80.c.o
+[12/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/error.c.o
+[13/43] Building CXX object speech-vendor/src/speechPlayer/CMakeFiles/speechPlayer.dir/src/speechWaveGenerator.cpp.o
+[14/43] Building CXX object speech-vendor/src/speechPlayer/CMakeFiles/speechPlayer.dir/src/frame.cpp.o
+[15/43] Linking CXX static library speech-vendor/src/speechPlayer/libspeechPlayer.a
+[16/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/encoding.c.o
+[17/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/compiledict.c.o
+[18/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/langopts.c.o
+[19/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/compiledata.c.o
+[20/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/phoneme.c.o
+[21/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/intonation.c.o
+[22/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/numbers.c.o
+[23/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/phonemelist.c.o
+[24/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/dictionary.c.o
+[25/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/soundicon.c.o
+[26/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/setlengths.c.o
+[27/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/readclause.c.o
+[28/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/spect.c.o
+[29/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/ssml.c.o
+[30/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/synthdata.c.o
+[31/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/tr_languages.c.o
+[32/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/synthesize.c.o
+[33/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/translateword.c.o
+[34/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/speech.c.o
+[35/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/translate.c.o
+[36/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/voices.c.o
+[37/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/espeak_api.c.o
+[38/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/sPlayer.c.o
+[39/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/klatt.c.o
+[40/43] Building C object speech-vendor/src/libespeak-ng/CMakeFiles/espeak-ng.dir/wavegen.c.o
+[41/43] Linking CXX static library speech-vendor/src/libespeak-ng/libespeak-ng.a
+[42/43] Building CXX object CMakeFiles/english_speech.dir/speech/bridge.cpp.o
+[43/43] Linking CXX shared library libenglish_speech.so

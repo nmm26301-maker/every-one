@@ -1,0 +1,4 @@
+Signer #1 certificate DN: CN=Everyone English, O=Local Build
+Signer #1 certificate SHA-256 digest: 716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887
+Signer #1 certificate SHA-1 digest: 5c703d585dea554aa0d1c0211f2364e8ba1024de
+Signer #1 certificate MD5 digest: e11d818f390483e2efeb49795c3ae29b

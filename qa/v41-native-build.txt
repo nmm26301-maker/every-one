@@ -1,0 +1,1343 @@
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake:152 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake:152 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- The C compiler identification is Clang 18.0.3
+-- The CXX compiler identification is Clang 18.0.3
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting C compiler ABI info
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-YCxhyJ/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-YCxhyJ/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-YCxhyJ/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-RELRJq/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-RELRJq/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-RELRJq/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/vendor/whisper.cpp/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- whisper.cpp version: 1.9.5-dev
+-- Found Git: /usr/local/bin/git (found version "2.51.1")
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang
+-- Setting GGML_NATIVE_DEFAULT to OFF
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-6oQSft/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-6oQSft/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-6oQSft/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Check if compiler accepts -pthread
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-nrE6Nr/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-nrE6Nr/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-nrE6Nr/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Check if compiler accepts -pthread - yes
+-- Found Threads: TRUE
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: aarch64
+-- GGML_SYSTEM_ARCH: ARM
+-- Including CPU backend
+-- ARM detected
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-JptRsr/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-JptRsr/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-JptRsr/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E - Failed
+-- Checking for ARM features using flags:
+-- Performing Test HAVE_DOTPROD
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-WuJWLP/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-WuJWLP/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-WuJWLP/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_DOTPROD - Failed
+-- Performing Test HAVE_SVE
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-3AEmxJ/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-3AEmxJ/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-3AEmxJ/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_SVE - Failed
+-- Performing Test HAVE_MATMUL_INT8
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-HvVKUk/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-HvVKUk/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-HvVKUk/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_MATMUL_INT8 - Failed
+-- Performing Test HAVE_FMA
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-utM0hD/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-utM0hD/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-utM0hD/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_FMA - Success
+-- Performing Test HAVE_FP16_VECTOR_ARITHMETIC
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-WYOydg/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-WYOydg/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-WYOydg/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_FP16_VECTOR_ARITHMETIC - Failed
+-- Performing Test HAVE_SME
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-Y5tpR0/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-Y5tpR0/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-Y5tpR0/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_SME - Failed
+-- Adding CPU backend variant ggml-cpu:  
+-- ggml version: 0.26.0
+-- ggml commit:  unknown
+-- Looking for pthread_create in pthreads
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-7vNln3/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-7vNln3/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-7vNln3/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-PuzyK3/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-PuzyK3/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64/CMakeFiles/CMakeScratch/TryCompile-PuzyK3/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Looking for pthread_create in pthread - not found
+-- Configuring done (0.7s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-whisper-arm64
+[1/35] Building C object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[2/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[3/35] Building C object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[5/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[6/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/35] Building C object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[8/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[9/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[10/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[11/35] Building C object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[12/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[13/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[14/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[15/35] Building C object whisper-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[16/35] Linking CXX static library whisper-vendor/ggml/src/libggml-base.a
+[17/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[18/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled-kernel.cpp.o
+[19/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled.cpp.o
+[20/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+[21/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[22/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[23/35] Building C object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o
+[24/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[25/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
+[26/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[27/35] Building CXX object whisper-vendor/src/CMakeFiles/whisper.dir/aneforge/whisper-aneforge.cpp.o
+[28/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[29/35] Building CXX object CMakeFiles/english_whisper.dir/whisper/bridge.cpp.o
+[30/35] Building CXX object whisper-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+[31/35] Linking CXX static library whisper-vendor/ggml/src/libggml-cpu.a
+[32/35] Linking CXX static library whisper-vendor/ggml/src/libggml.a
+[33/35] Building CXX object whisper-vendor/src/CMakeFiles/whisper.dir/whisper.cpp.o
+[34/35] Linking CXX static library whisper-vendor/src/libwhisper.a
+[35/35] Linking CXX shared library libenglish_whisper.so
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake:152 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake:152 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- The C compiler identification is Clang 18.0.3
+-- The CXX compiler identification is Clang 18.0.3
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting C compiler ABI info
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-E6ftMQ/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-E6ftMQ/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-E6ftMQ/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-C7NG4e/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-C7NG4e/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-C7NG4e/CMakeLists.txt:5 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- llama.cpp version: 0.6.0-dev
+CMAKE_BUILD_TYPE=Release
+-- Found Git: /usr/local/bin/git (found version "2.51.1")
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang
+-- Setting GGML_NATIVE_DEFAULT to OFF
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ZcasSF/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ZcasSF/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ZcasSF/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Check if compiler accepts -pthread
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ucDXaK/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ucDXaK/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ucDXaK/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Check if compiler accepts -pthread - yes
+-- Found Threads: TRUE
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: aarch64
+-- GGML_SYSTEM_ARCH: ARM
+-- Including CPU backend
+-- ARM detected
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-WA5vlZ/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-WA5vlZ/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-WA5vlZ/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E - Failed
+-- Checking for ARM features using flags:
+-- Performing Test HAVE_DOTPROD
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-qiVw2g/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-qiVw2g/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-qiVw2g/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_DOTPROD - Failed
+-- Performing Test HAVE_SVE
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-boiNmT/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-boiNmT/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-boiNmT/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_SVE - Failed
+-- Performing Test HAVE_MATMUL_INT8
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-thX9u2/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-thX9u2/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-thX9u2/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_MATMUL_INT8 - Failed
+-- Performing Test HAVE_FMA
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-b1ZLX2/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-b1ZLX2/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-b1ZLX2/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_FMA - Success
+-- Performing Test HAVE_FP16_VECTOR_ARITHMETIC
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ZSUypn/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ZSUypn/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-ZSUypn/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_FP16_VECTOR_ARITHMETIC - Failed
+-- Performing Test HAVE_SME
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-lbnocE/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/android.toolchain.cmake:55 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/4.4.4/CMakeSystem.cmake:6 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-lbnocE/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+CMake Warning (deprecated) at /workspace/scratch/d5a79aab803e/toolchain41/android-ndk-r27c/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang.cmake:23 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/Platform/Android-Clang-CXX.cmake:1 (include)
+  /root/.local/lib/python3.12/site-packages/cmake/data/share/cmake-4.4/Modules/CMakeCXXInformation.cmake:48 (include)
+  /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64/CMakeFiles/CMakeScratch/TryCompile-lbnocE/CMakeLists.txt:4 (project)
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Performing Test HAVE_SME - Failed
+-- Adding CPU backend variant ggml-cpu:  
+-- ggml version: 0.26.0
+-- ggml commit:  unknown
+-- Configuring done (0.7s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/scratch/d5a79aab803e/work41/Everyone-AI-English-4.0/build/native-llama-arm64
+[1/75] Building C object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[2/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[3/75] Building C object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[5/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[6/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/75] Building C object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[8/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[9/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[10/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[11/75] Building C object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[12/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[13/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[14/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[15/75] Building C object llama-vendor/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[16/75] Linking CXX static library llama-vendor/ggml/src/libggml-base.a
+[17/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[18/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled.cpp.o
+[19/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled-kernel.cpp.o
+[20/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+[21/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[22/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[23/75] Building C object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o
+[24/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
+[25/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[26/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[27/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[28/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_9_cxx.cxx.o
+[29/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_7_cxx.cxx.o
+[30/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_6_cxx.cxx.o
+[31/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_8_cxx.cxx.o
+[32/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_5_cxx.cxx.o
+[33/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_4_cxx.cxx.o
+[34/75] Building CXX object llama-vendor/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+[35/75] Linking CXX static library llama-vendor/ggml/src/libggml-cpu.a
+[36/75] Linking CXX static library llama-vendor/ggml/src/libggml.a
+[37/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_3_cxx.cxx.o
+[38/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_2_cxx.cxx.o
+[39/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama.cpp.o
+[40/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_0_cxx.cxx.o
+[41/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/Unity/unity_1_cxx.cxx.o
+[42/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-arch.cpp.o
+[43/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-adapter.cpp.o
+[44/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-cparams.cpp.o
+[45/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-chat.cpp.o
+[46/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-batch.cpp.o
+[47/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-hparams.cpp.o
+[48/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-impl.cpp.o
+[49/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-io.cpp.o
+[50/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-graph.cpp.o
+[51/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-context.cpp.o
+[52/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-kv-cache-iswa.cpp.o
+[53/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-grammar.cpp.o
+[54/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-kv-cache-dsa.cpp.o
+[55/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-kv-cache-dsa-iswa.cpp.o
+[56/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-kv-cache-msa.cpp.o
+[57/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-memory.cpp.o
+[58/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-memory-hybrid.cpp.o
+[59/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-memory-hybrid-iswa.cpp.o
+[60/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-kv-cache-dsv4.cpp.o
+[61/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-memory-hybrid-idx.cpp.o
+[62/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o
+[63/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-memory-recurrent.cpp.o
+[64/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-mmap.cpp.o
+[65/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-model-saver.cpp.o
+[66/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-model-loader.cpp.o
+[67/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-quant.cpp.o
+[68/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/unicode-data.cpp.o
+[69/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-sampler.cpp.o
+[70/75] Building CXX object CMakeFiles/english_llama.dir/llama/bridge.cpp.o
+[71/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-model.cpp.o
+[72/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/llama-vocab.cpp.o
+[73/75] Building CXX object llama-vendor/src/CMakeFiles/llama.dir/unicode.cpp.o
+[74/75] Linking CXX static library llama-vendor/src/libllama.a
+[75/75] Linking CXX shared library libenglish_llama.so

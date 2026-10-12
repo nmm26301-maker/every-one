@@ -1,0 +1,90 @@
+"""Original bilingual micro-stories. No third-party books or film scripts copied."""
+import json
+from pathlib import Path
+
+# Title, paired paragraphs, contextual vocabulary and a speaking prompt.
+rows = [
+('The Window Seat','靠窗的座位',[
+('Mia always sat at the back of the bus. One morning, an older woman asked her to move to a window seat. "Look outside," she said. "You might find something new."','米娅总坐在公交车后排。一天早上，一位年长的女士请她坐到窗边。“看看外面，”她说，“也许会发现新东西。”'),
+('Mia saw a small garden between two buildings. A man was watering yellow flowers. She had taken this bus for months, but she had never noticed the garden.','米娅看见两栋楼之间有个小花园。一位男士正在给黄色的花浇水。她坐这班车好几个月了，却从没注意到这个花园。'),
+('On the way home, she put her phone away. The city was the same, but her journey felt different. Sometimes a new view begins with a small change.','回家路上，她收起了手机。城市没有变，旅程却感觉不同了。有时候，新的视角始于一个小小的改变。')], 'seat|座位;outside|在外面;garden|花园;notice|注意到;journey|旅程','What did you notice on your way home?','你回家途中注意到了什么？'),
+('A Cup for Two','两个人的一杯茶',[
+('Leo opened a tiny tea shop on a quiet street. On the first day, only one person came in. She asked for two cups of tea but sat alone.','利奥在安静的街上开了一家小茶店。第一天，只有一个人进店。她点了两杯茶，却独自坐着。'),
+('"Are you waiting for someone?" Leo asked. "No," she smiled. "The other cup is for you. Opening a shop must be hard work." He sat down for a few minutes.','“你在等人吗？”利奥问。“没有，”她笑着说，“另一杯给你。开店一定很辛苦。”他坐下来待了几分钟。'),
+('They talked about the neighborhood. The woman told her friends about the shop. Leo did not sell much that day, but he made his first friend on the street.','他们聊起了附近的街区。女士向朋友们介绍了这家店。利奥那天卖得不多，却交到了在这条街上的第一个朋友。')], 'tiny|很小的;quiet|安静的;alone|独自;neighborhood|街区;friend|朋友','How would you welcome a new neighbor?','你会怎样欢迎新邻居？'),
+('The Wrong Turn','拐错的路',[
+('Sara was walking to a job interview when her phone stopped working. She turned left instead of right and found herself beside a river. She was worried about being late.','萨拉步行去面试时，手机突然不能用了。她本该右拐，却左拐来到河边。她担心会迟到。'),
+('A cyclist stopped to help. He pointed to a bridge and explained the way. Sara repeated the directions aloud so she would not forget them.','一位骑车的人停下来帮忙。他指着一座桥，说明了路线。萨拉大声重复了一遍，以免忘记。'),
+('She arrived just in time. When the interviewer asked about a recent challenge, she told the story honestly. Asking for help, she realized, was also a useful skill.','她及时赶到了。面试官问起最近遇到的挑战，她如实讲了这件事。她意识到，寻求帮助也是一项有用的能力。')], 'interview|面试;instead|代替;bridge|桥;direction|方向;challenge|挑战','Give someone directions to a nearby shop.','为别人指路，去附近一家店。'),
+('The Blue Notebook','蓝色笔记本',[
+('Ben bought a blue notebook to learn English. He planned to write twenty new words every day. After three days, the pages were full, but he could not remember many of the words.','本买了一本蓝色笔记本学英语。他计划每天记二十个新词。三天后，笔记写满了几页，他却记不住其中很多词。'),
+('He changed his plan. Each day, he chose just three useful expressions and wrote a sentence about his own life. He read the sentences aloud while making breakfast.','他改变了计划。每天只选三个有用的表达，写一句与自己生活有关的话。做早餐时，他大声读这些句子。'),
+('A week later, he used one expression in a real conversation. The notebook was filling more slowly, but the words were becoming part of his day.','一周后，他在真实对话中用上了一个表达。笔记本写得慢了，里面的词却逐渐进入了他的日常生活。')], 'notebook|笔记本;remember|记住;expression|表达;sentence|句子;useful|有用的','Use one new word to describe your day.','用一个新词描述你今天的生活。'),
+('Rain at the Market','市场里的雨',[
+('It began to rain while Nina was buying tomatoes at an outdoor market. She had no umbrella. A seller moved her basket under the roof and offered her a dry place to wait.','妮娜在露天市场买番茄时下起了雨。她没带伞。摊主把她的篮子移到屋檐下，给她留了个避雨的地方。'),
+('Other shoppers joined them. Someone made a joke about the weather, and everyone laughed. Nina learned how to choose ripe tomatoes while the rain fell around them.','其他顾客也走了过来。有人拿天气开玩笑，大家都笑了。雨还在下，妮娜却学会了怎样挑选成熟的番茄。'),
+('When the sky cleared, she thanked the seller. Her shoes were wet, but she went home with good food and a story to tell.','天空放晴时，她向摊主道谢。鞋子湿了，她却带着好食物和一个值得分享的故事回家了。')], 'market|市场;umbrella|雨伞;basket|篮子;ripe|成熟的;weather|天气','What do you like doing on a rainy day?','雨天你喜欢做什么？'),
+('The Repair Table','修理桌',[
+('Every Saturday, a group of neighbors set up a repair table in the park. People brought broken lamps, toys, and small radios. Nobody charged for the work.','每到周六，一群邻居就在公园摆起修理桌。人们带来坏台灯、玩具和小收音机。修理不收钱。'),
+('Kai brought a lamp that belonged to his grandmother. He thought it was useless. A volunteer found a loose wire and showed him how to fix it safely.','凯带来了一盏奶奶的台灯。他以为它已经没用了。一位志愿者发现电线松了，向他展示怎样安全地修好它。'),
+('That evening, the lamp lit his desk again. He decided to return next Saturday, this time to help carry boxes. Keeping old things could also bring people together.','那天晚上，台灯又照亮了他的书桌。他决定下周六再来，帮大家搬箱子。留住旧物，也能让人们走到一起。')], 'repair|修理;broken|坏了的;volunteer|志愿者;wire|电线;safely|安全地','Describe an object you would like to keep.','描述一件你想一直保留的物品。'),
+('One Empty Chair','一把空椅子',[
+('At lunch, Omar saw a new colleague sitting alone. There was an empty chair beside her. He wanted to say hello, but he was not sure what to say.','午餐时，奥马尔看见一位新同事独自坐着。她旁边有把空椅子。他想打招呼，却不知道说什么。'),
+('Finally, he asked, "Is this seat taken?" She shook her head. They talked about the food first, then about their first week at work. Both had felt nervous.','最后，他问：“这个座位有人吗？”她摇摇头。他们先聊食物，再聊工作的第一周。两人都曾感到紧张。'),
+('The next day, she waved him over. A friendship had started with one simple question. Omar no longer waited for the perfect words before speaking.','第二天，她招手请他过去。一段友谊从一个简单的问题开始了。奥马尔不再等到想到完美的话才开口。')], 'colleague|同事;empty|空的;nervous|紧张的;simple|简单的;friendship|友谊','How can you start a conversation at lunch?','午餐时你会怎样开始一段对话？'),
+('The Library Card','借书卡',[
+('Ella had lived near the library for a year without going inside. One afternoon, she stepped through the door to escape the heat. The room was cool and quiet.','艾拉在图书馆附近住了一年，却没进去过。一天下午，她走进去避暑。房间凉爽而安静。'),
+('A librarian helped her find an easy English book. "You do not have to finish it today," he said. "Try a page and see how it feels." She stayed for an hour.','一位图书管理员帮她找到一本简单的英文书。“不用今天读完，”他说，“先试一页，看看感觉如何。”她待了一个小时。'),
+('Before leaving, she signed up for a library card. Now she had a place to explore without buying anything. Her next visit was already in her calendar.','离开前，她办了借书卡。现在，她有了一个不用购物也能探索的地方。下次到访已经记进了日历。')], 'library|图书馆;escape|避开;librarian|图书管理员;explore|探索;calendar|日历','What kind of book would you borrow?','你想借哪一类书？'),
+('Dinner Without a Recipe','没有食谱的晚餐',[
+('Tom invited his sister for dinner, then discovered that he had forgotten to buy several ingredients. He looked in the fridge and found eggs, rice, and a few vegetables.','汤姆请姐姐吃晚饭，随后发现自己忘买了几样食材。他打开冰箱，找到鸡蛋、米饭和一些蔬菜。'),
+('Instead of ordering food, they cooked together. His sister chopped the carrots while he heated the pan. They tasted the rice and added a little salt.','他们没有点外卖，而是一起做饭。姐姐切胡萝卜，他给锅加热。他们尝了尝米饭，加了一点盐。'),
+('The meal was simple, but they enjoyed it. Tom wrote down what they had done. Next time, he would have a recipe of his own.','饭菜简单，他们却吃得很开心。汤姆记下了做法。下次，他就有自己的食谱了。')], 'recipe|食谱;ingredient|食材;fridge|冰箱;chop|切碎;salt|盐','Explain how to make a simple meal.','说明一道简单饭菜的做法。'),
+('A Message Tomorrow','明天的信息',[
+('Lily received a difficult message late at night. She started typing a long reply, then stopped. She was tired, and every sentence sounded angry.','莉莉深夜收到一条棘手的信息。她开始写长篇回复，又停了下来。她很累，每句话听起来都带着怒气。'),
+('She saved a draft and went to bed. In the morning, she read the message again. The problem was still there, but she could see a calmer way to explain her thoughts.','她保存草稿，去睡觉。早上，她又读了一遍信息。问题还在，但她找到了更平静地表达想法的方式。'),
+('Her new reply was shorter and asked one clear question. The conversation became easier. Waiting had not solved everything, but it had helped her respond with care.','新回复更短，并提出了一个清楚的问题。沟通变得容易了。等待没有解决所有问题，却帮助她更用心地回应。')], 'reply|回复;draft|草稿;calm|平静的;explain|解释;respond|回应','What would you say in a polite reply?','礼貌地回复别人时，你会怎么说？'),
+('The First Kilometer','第一个一公里',[
+('Alex wanted to run five kilometers, but he could barely finish one. He felt disappointed when faster runners passed him. Then he noticed a woman walking between short runs.','亚历克斯想跑五公里，却连一公里都很难完成。别人从身边跑过时，他感到失落。随后，他看到一位女士在短距离跑步之间步行。'),
+('She told him that she had started the same way. "Go slowly enough to come back tomorrow," she said. Alex tried running for one minute and walking for two.','她告诉他，自己也是这样开始的。“慢到你明天还愿意来，”她说。亚历克斯试着跑一分钟、走两分钟。'),
+('He did not reach five kilometers that day. But he returned the next morning, and the morning after that. The routine mattered more than a single impressive day.','那天他没跑到五公里。但第二天和第三天早晨，他都回来了。持续的习惯，比某一天的亮眼表现更重要。')], 'barely|勉强;disappointed|失落的;slowly|慢慢地;routine|日常习惯;reach|达到','Describe one habit you want to build.','描述一个你想培养的习惯。'),
+('A Room of Her Own','自己的房间',[
+('After moving to a new city, June rented a small room. The furniture was plain, and the walls were empty. She missed the familiar sounds of home.','搬到新城市后，琼租了一个小房间。家具简单，墙上空空的。她想念家里熟悉的声音。'),
+('She put a plant beside the window and hung one photograph above her desk. On Sunday, she cooked a dish her father had taught her to make.','她在窗边放了一盆植物，在书桌上方挂了一张照片。周日，她做了一道父亲教过她的菜。'),
+('The room was still small, but it began to feel like hers. She understood that feeling at home could grow slowly, through ordinary things she chose for herself.','房间还是很小，却开始有了属于她的感觉。她明白，家的感觉可以从自己选择的日常小事中慢慢生长。')], 'rent|租住;furniture|家具;familiar|熟悉的;photograph|照片;ordinary|普通的','What makes a room feel comfortable to you?','什么会让你觉得房间舒适？'),
+('The Lost Wallet','丢失的钱包',[
+('Daniel found a wallet on a bench after lunch. There was money inside, along with a card from a nearby gym. He took it to the gym reception desk.','午饭后，丹尼尔在长椅上发现一个钱包。里面有钱，还有附近健身房的会员卡。他把它送到健身房前台。'),
+('The receptionist called the owner. A worried young man arrived ten minutes later. He checked the wallet and thanked Daniel several times.','前台联系了失主。十分钟后，一个焦急的年轻人赶到。他检查了钱包，一再向丹尼尔道谢。'),
+('The man offered him a reward, but Daniel declined. "Someone did this for me once," he said. On his walk back, he felt lighter than before.','年轻人想给他酬谢，丹尼尔婉拒了。“以前也有人这样帮助过我，”他说。走回去时，他感觉心情轻快了。')], 'wallet|钱包;bench|长椅;owner|失主;reward|酬谢;decline|婉拒','Explain where you found a lost item.','说明你在哪里捡到了一件失物。'),
+('The Small Exhibition','小小的展览',[
+('Rosa liked drawing, but she kept every picture in a drawer. She thought her work was not good enough to show anyone. Her friend asked to see just one sketch.','罗莎喜欢画画，却把所有画都放在抽屉里。她认为自己的作品不够好，不值得给别人看。朋友请她拿出一张素描。'),
+('They chose three pictures and put them on the wall of a local cafe, with the owner\'s permission. A customer noticed a drawing of the street outside and asked about it.','经店主同意，她们选了三幅画，挂在附近咖啡馆的墙上。一位顾客注意到一幅街景画，询问起它的故事。'),
+('Rosa was nervous, but she enjoyed explaining her idea. The exhibition was tiny. Still, it was the first time her drawings had started a conversation.','罗莎有些紧张，却很享受讲述自己的想法。展览很小，但这是她的画第一次开启了对话。')], 'drawer|抽屉;sketch|素描;permission|许可;customer|顾客;exhibition|展览','Describe a picture you would like to draw.','描述一幅你想画的画。'),
+('Learning to Listen','学会倾听',[
+('During a call, Max kept giving his friend advice. His friend became quiet. Max finally asked, "Would you like ideas, or would you rather tell me what happened?"','通话时，马克斯不停地给朋友建议。朋友逐渐沉默了。马克斯终于问：“你想听建议，还是更想讲讲发生了什么？”'),
+('"I just need someone to listen," his friend replied. Max put his other work aside and stopped interrupting. He asked a few questions instead of offering quick answers.','“我只是需要有人听我说，”朋友回答。马克斯放下其他工作，不再打断。他问了几个问题，没有急着给答案。'),
+('After the call, nothing had been magically fixed. But his friend felt understood. Max learned that being helpful sometimes meant making room for another person\'s words.','通话结束后，事情没有神奇地解决。但朋友感觉被理解了。马克斯学会了，帮助别人有时意味着给对方的话留出空间。')], 'advice|建议;interrupt|打断;reply|回答;understand|理解;helpful|有帮助的','How would you ask a friend what they need?','你会怎样询问朋友需要什么？'),
+('A Train to Somewhere New','驶向新地方的列车',[
+('On her first solo trip, Annie checked her ticket again and again. She worried about getting off at the wrong station. Across the aisle, a traveler was studying a paper map.','第一次独自旅行时，安妮反复检查车票。她担心下错站。过道对面，一位旅客正在看纸质地图。'),
+('They compared their routes and discovered they were visiting the same town. They agreed to find the tourist information desk together when they arrived.','她们比较路线，发现都要去同一座小镇。她们约好到站后一起找旅游咨询台。'),
+('Annie spent the afternoon exploring on her own. She still made a few mistakes, but she found her way back. The unfamiliar place no longer felt quite so frightening.','安妮下午独自游览。她仍犯了几个小错误，却找到了回去的路。陌生的地方不再那么令人害怕了。')], 'solo|独自的;ticket|车票;aisle|过道;route|路线;unfamiliar|陌生的','Ask someone for help at a train station.','在火车站向别人求助。'),
+('The Shared Garden','共享花园',[
+('A patch of land behind the apartments had been empty for years. The residents decided to plant vegetables there. Some knew a lot about gardening; others had never held a shovel.','公寓后面一块地空了多年。住户决定在那里种菜。有些人很懂园艺，另一些人连铲子都没拿过。'),
+('They divided the jobs and learned from each other. When the first seeds failed to grow, they tried again with better soil. Nobody expected a perfect harvest.','大家分工，相互学习。第一批种子没长出来时，他们换上更好的土，再试一次。没有人指望一次完美的收成。'),
+('By summer, there were beans, herbs, and new friendships. The garden gave them something to care for together, and a reason to say hello every evening.','夏天到了，花园有了豆子、香草和新的友谊。它给了大家共同照顾的事物，也给了每晚互相问候的理由。')], 'resident|住户;shovel|铲子;seed|种子;soil|土壤;harvest|收成','Suggest a project for your neighborhood.','为你住的街区提一个共同活动的建议。'),
+('Eighteen Small Steps','十八个小步',[
+('Mia looked back at the short stories she had read. She did not remember every word, but she remembered the people and the choices they made. Some expressions now felt familiar.','米娅回顾读过的短篇。她没有记住每个词，却记得故事里的人和他们的选择。有些表达已经变得熟悉。'),
+('She chose five saved words to review, then told a friend about her favorite story. When she could not find a word, she used a simpler one and kept talking.','她选出五个收藏的词复习，再向朋友讲最喜欢的故事。想不起一个词时，她换一个更简单的词，继续说下去。'),
+('Her next goal was not to finish a huge book immediately. It was to keep a small space for English in her day. Eighteen small steps had given her a place to begin again.','她的下一个目标不是立刻读完一本大书，而是在每天给英语留一小块空间。十八个小步，让她有了继续开始的地方。')], 'choice|选择;review|复习;favorite|最喜欢的;immediately|立刻;goal|目标','Retell your favorite story in three sentences.','用三句话复述你最喜欢的故事。'),
+]
+out=[]
+for i,(title,zh,paras,words,prompt,prompt_zh) in enumerate(rows,1):
+    out.append(dict(id=f'read_{i:02d}',title=title,title_zh=zh,level='A2' if i<=9 else 'A2–B1',paragraphs=[dict(en=en,zh=cn) for en,cn in paras],words=[dict(en=w.split('|')[0],zh=w.split('|')[1]) for w in words.split(';')],prompt=prompt,prompt_zh=prompt_zh))
+target=Path(__file__).resolve().parents[1]/'app/src/main/assets/reading/stories.json'
+target.parent.mkdir(parents=True,exist_ok=True)
+target.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+print('Original bilingual stories:',len(out))
+
+for story in out:
+    story['zhTitle']=story['title_zh']
+(target.parent.parent/'reading.json').write_text(json.dumps({'version':1,'notice':'18 篇原创双语短读；听读为本地合成语音。','stories':out},ensure_ascii=False,indent=2)+'\n')

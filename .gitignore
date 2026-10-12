@@ -1,0 +1,11 @@
+build/
+dist/
+*.keystore
+*.jks
+*.idsig
+__pycache__/
+app/src/main/jniLibs/
+app/src/main/assets/models/
+app/src/main/assets/languages/
+app/src/main/assets/kuromoji/
+vendor/

@@ -1,0 +1,36 @@
+Note: tests/host-stubs/android/content/Context.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+PASS punctuation and spaces do not become pronunciation errors
+PASS full width letters and digits normalize
+PASS single syllables excluded but full Japanese phrase allowed
+PASS substitution preserves expected and recognized spans
+PASS deletions retained in spoken order
+PASS extra text retained in spoken order
+PASS Japanese alternative orthography not claimed as wrong pronunciation
+PASS Cantonese mismatch has ASR warning
+PASS matching transcript not interpreted as phoneme accuracy
+PASS non lexical hallucination produces no matching text
+PASS alignment keeps supplementary Unicode intact
+PASS alignment memory is bounded for long model output
+PASS invalid scene metadata is rejected before navigation
+PASS colon inside scene survives parsing
+PASS language derives from actual topic metadata
+PASS empty and oversized scenes rejected
+PASS scene browser deduplicates in newest first order
+PASS search covers learner and teacher utterances
+PASS teacher-only words are searchable
+PASS scene title searchable
+PASS exact scene filter isolates other conversations
+PASS browser keeps languages isolated
+PASS empty query lists completed pairs and absent query yields empty state
+PASS result order is newest first
+PASS search reopens existing durable memory
+PASS deletion removes searchable scene memory but preserves preferences
+PASS case insensitive search retains bounded newest 300 pairs
+PASS production Cantonese check uses multilingual Whisper without installed teacher
+PASS Japanese check routes language explicitly
+PASS Mandarin check routes multilingual Chinese model
+PASS silent recording is not scored as matching content
+PASS cancelled check cannot decode retained audio
+PASS empty recognition becomes retryable failure
+COMPLETION_CHECKS: 33

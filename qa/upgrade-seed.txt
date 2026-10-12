@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: created old 2.0 word, note, progress and chat fixture
+INSTRUMENTATION_CODE: -1

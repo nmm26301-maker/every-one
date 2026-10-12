@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: signed 2.0 to 3.0 update preserves word, note, progress and accessible chat topic
+INSTRUMENTATION_CODE: -1

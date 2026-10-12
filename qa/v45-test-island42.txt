@@ -1,0 +1,39 @@
+Note: tests/host-stubs/android/content/Context.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+PASS scene history chronological across interleaved dialogues
+PASS other scene not injected into current history
+PASS new scene starts without unrelated turns
+PASS retrieved contextual memory stays in scene
+PASS preferences shared across scenes
+PASS resume survives reopening
+PASS restart removes scene context
+PASS restart preserves other scenes and preference
+PASS bounded transcript limit
+PASS missing system start times out
+PASS late system stop/done cannot end fallback
+PASS stalled synthesis or prepare times out
+PASS fallback playback has bounded timeout
+PASS interrupt clears all callbacks and deadlines
+PASS stale turn cannot modify current deadline
+PASS started system utterance also times out
+CONTINUATION_CHECKS: 16
+PASS secrets and unrelated preferences excluded
+PASS lesson recording linked
+PASS magic JSON and WAV actual checksummed archive round trip
+PASS failed commit never marks migration complete
+PASS retry recovers typed state and complete memory
+PASS favorites and scene mapping preserved
+PASS review spacing restored
+PASS restored recording path switched only after apply
+PASS startup retry does not reset newer learning
+PASS re-export includes relocated audio without device path
+PASS traversal path rejected before apply
+PASS numeric preference type mismatch rejected
+PASS invalid calibration rejected
+PASS fractional integer rejected
+PASS malformed completed pair rejected
+PASS malformed review card rejected
+PASS future magic format rejected
+PASS archive allowlist blocks incomplete and external paths
+PASS invalid inputs leave files outside recording directory untouched
+MAGIC_BACKUP_CHECKS: 19

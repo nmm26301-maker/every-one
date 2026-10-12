@@ -1,0 +1,9 @@
+native/CMakeLists.txt 7bb4adc72fec088a9b5406c6034a77dbf3cd816cc903db95a06f62bb339cc578 UNCHANGED from latest 3.6
+native/callback.hpp caeaaf13fbb3b54a7b15708fa92a507f45156816c46468b0bb2aa80a2c7e52b0 UNCHANGED from latest 3.6
+native/llama/bridge.cpp f71f572b69ae29a2902d7b93da74d30c65fe63e64ac0c7b48905b6faff4699b9 UNCHANGED from latest 3.6
+native/whisper/bridge.cpp ce265d57e0651105f22a2f37479a51dab3d550b21e4ea6ef97bed5fdf8ade103 UNCHANGED from latest 3.6
+app/src/main/jniLibs/arm64-v8a/libc++_shared.so f9992c4ba6b7c5a716e3a202fceb1ce029d6a2b0605838ac6b3219f489dd7970 UNCHANGED from latest 3.6
+app/src/main/jniLibs/arm64-v8a/libenglish_llama.so 1afcc1d6b4c830c4c8a64a19796bdd01497fb0239ea4b3e6d546885f16ec2e9a UNCHANGED from latest 3.6
+app/src/main/jniLibs/arm64-v8a/libenglish_whisper.so b0ecd9a672bb3839ec75205e5e434713e921999890b755ef64e72a97282815a5 UNCHANGED from latest 3.6
+Host test library: /tmp/english36/Everyone-AI-English-3.5/build/native-whisper-host/libenglish_whisper.so 6285687d0b37e9d8a74b9bcbd118a6e7e13552053686e2ca6bfdd29de6b92862
+Host test library: /tmp/english36/Everyone-AI-English-3.5/build/native-llama-host/libenglish_llama.so 9fc1f348f90a3e7b52b8e3cad36e781981b7e4f54c5d073177e0d01e0528550d

@@ -1,0 +1,16 @@
+PASS speaker input is available before a reply starts
+PASS AEC enabled flag does not let speaker echo cancel the reply
+PASS speaker stays protected without AEC
+PASS headphone duplex remains available during playback
+PASS explicit speaker duplex remains available with AEC
+PASS speaker opt-in without AEC still protects playback
+PASS protection survives a long gap between streamed chunks
+PASS stale completion cannot release the current reply
+PASS speaker reverberation tail is protected
+PASS automatic input resumes after full reply and tail
+PASS manual interruption clears reply but protects remaining speaker tail
+PASS input resumes after interruption tail
+PASS old callback cannot release new turn
+PASS diagnostics history is bounded
+PASS diagnostics retain recent control events
+PLAYBACK_GUARD_CHECKS: 15

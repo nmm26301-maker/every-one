@@ -1,0 +1,18 @@
+libc++_shared.so PASS AArch64 / 16 KB LOAD alignment / expected exports
+0x0000000000000001 (NEEDED)          Shared library: [libc.so]
+0x0000000000000001 (NEEDED)          Shared library: [libm.so]
+0x0000000000000001 (NEEDED)          Shared library: [libdl.so]
+libenglish_llama.so PASS AArch64 / 16 KB LOAD alignment / expected exports
+0x0000000000000001 (NEEDED)       Shared library: [liblog.so]
+0x0000000000000001 (NEEDED)       Shared library: [libandroid.so]
+0x0000000000000001 (NEEDED)       Shared library: [libm.so]
+0x0000000000000001 (NEEDED)       Shared library: [libdl.so]
+0x0000000000000001 (NEEDED)       Shared library: [libc++_shared.so]
+0x0000000000000001 (NEEDED)       Shared library: [libc.so]
+libenglish_whisper.so PASS AArch64 / 16 KB LOAD alignment / expected exports
+0x0000000000000001 (NEEDED)       Shared library: [liblog.so]
+0x0000000000000001 (NEEDED)       Shared library: [libandroid.so]
+0x0000000000000001 (NEEDED)       Shared library: [libm.so]
+0x0000000000000001 (NEEDED)       Shared library: [libdl.so]
+0x0000000000000001 (NEEDED)       Shared library: [libc++_shared.so]
+0x0000000000000001 (NEEDED)       Shared library: [libc.so]

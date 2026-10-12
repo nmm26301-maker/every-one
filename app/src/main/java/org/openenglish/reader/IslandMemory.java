@@ -1,0 +1,26 @@
+package org.openenglish.reader;
+import android.content.*;
+import org.json.*;
+import java.util.*;
+/** Durable, language-separated memory. Only completed pairs become conversational memory. */
+public final class IslandMemory {
+ private static final Object LOCK=new Object();private final SharedPreferences prefs;private final String lang;
+ public IslandMemory(Context c,String code){prefs=c.getSharedPreferences("island_memory",0);lang=code.equals("ja")?"ja":code.equals("zh")?"zh":"yue";}
+ private JSONArray pairs(){try{return new JSONArray(prefs.getString(lang+"_pairs","[]"));}catch(Exception e){return new JSONArray();}}
+ public String note(){synchronized(LOCK){return prefs.getString(lang+"_note","");}}
+ public void note(String note){synchronized(LOCK){if(!prefs.edit().putString(lang+"_note",IslandPrompt.clean(note,500)).commit())throw new IllegalStateException("学习偏好没有保存");}}
+ public void complete(String user,String assistant,String scene){synchronized(LOCK){try{JSONArray a=pairs(),out=new JSONArray();out.put(new JSONObject().put("user",IslandPrompt.clean(user,1000)).put("assistant",IslandPrompt.clean(assistant,1000)).put("scene",IslandPrompt.clean(scene,500)).put("time",System.currentTimeMillis()));for(int i=0;i<Math.min(299,a.length());i++)out.put(a.get(i));if(!prefs.edit().putString(lang+"_pairs",out.toString()).commit())throw new IllegalStateException("学习记忆没有保存，请检查存储空间");}catch(JSONException e){throw new IllegalStateException(e);}}}
+ public String context(String query){return context(query,null);}
+ public String context(String query,String scene){synchronized(LOCK){JSONArray a=scenePairs(scene,300);StringBuilder b=new StringBuilder("Preferences: ").append(note()).append('\n');Set<Integer> selected=new LinkedHashSet<>();for(int i=0;i<Math.min(2,a.length());i++)selected.add(i);int best=-1,score=0;for(int i=2;i<a.length();i++){JSONObject p=a.optJSONObject(i);if(p==null)continue;String old=p.optString("user")+p.optString("scene");int n=relevance(query,old);if(n>score){score=n;best=i;}}if(best>=0)selected.add(best);for(int i:selected){JSONObject p=a.optJSONObject(i);b.append("Prior learner: ").append(IslandPrompt.clean(p.optString("user"),100)).append("; teacher: ").append(IslandPrompt.clean(p.optString("assistant"),100)).append('\n');}return IslandPrompt.clean(b.toString(),1000);}}
+ static int relevance(String q,String old){int n=0;for(int i=0;i+1<q.length();i++){String part=q.substring(i,i+2);if(part.trim().length()==2&&old.contains(part))n++;}return n;}
+ public JSONArray history(String current){return history(current,null);}
+ public JSONArray history(String current,String scene){synchronized(LOCK){JSONArray a=scenePairs(scene,2),h=new JSONArray();try{for(int i=Math.min(2,a.length())-1;i>=0;i--){JSONObject p=a.optJSONObject(i);h.put(new JSONObject().put("role","user").put("content",p.optString("user")));h.put(new JSONObject().put("role","assistant").put("content",p.optString("assistant")));}h.put(new JSONObject().put("role","user").put("content",current));}catch(JSONException e){throw new IllegalStateException(e);}return h;}}
+ public JSONArray scenePairs(String scene,int limit){synchronized(LOCK){JSONArray source=pairs(),out=new JSONArray();for(int i=0;i<source.length()&&out.length()<Math.max(0,Math.min(300,limit));i++){JSONObject p=source.optJSONObject(i);if(p!=null&&(scene==null||scene.equals(p.optString("scene"))))out.put(p);}return out;}}
+ public void clearScene(String scene){synchronized(LOCK){JSONArray source=pairs(),out=new JSONArray();for(int i=0;i<source.length();i++){JSONObject p=source.optJSONObject(i);if(p!=null&&!scene.equals(p.optString("scene")))out.put(p);}if(!prefs.edit().putString(lang+"_pairs",out.toString()).commit())throw new IllegalStateException("场景记录没有清除，请检查存储空间");}}
+ public int count(){synchronized(LOCK){return pairs().length();}}
+ public List<String> scenes(){synchronized(LOCK){LinkedHashSet<String> out=new LinkedHashSet<>();JSONArray a=pairs();for(int i=0;i<a.length();i++){JSONObject p=a.optJSONObject(i);if(p!=null&&!p.optString("scene").isEmpty())out.add(p.optString("scene"));}return new ArrayList<>(out);}}
+ /** Newest first. Scene restriction is exact; text search also includes teacher replies. */
+ public JSONArray search(String query,String scene){synchronized(LOCK){String q=IslandPrompt.clean(query,100).trim().toLowerCase(Locale.ROOT);JSONArray source=scenePairs(scene,300),out=new JSONArray();for(int i=0;i<source.length();i++){JSONObject p=source.optJSONObject(i);String hay=(p.optString("user")+"\n"+p.optString("assistant")+"\n"+p.optString("scene")).toLowerCase(Locale.ROOT);if(q.isEmpty()||hay.contains(q))out.put(p);}return out;}}
+ public String display(){synchronized(LOCK){StringBuilder b=new StringBuilder("想让老师记住：\n").append(note().isEmpty()?"还没有填写":note()).append("\n\n已保存 ").append(count()).append(" 组完整对话（最多 300 组）。\n");JSONArray a=pairs();for(int i=0;i<Math.min(12,a.length());i++){JSONObject p=a.optJSONObject(i);b.append("\n你：").append(p.optString("user")).append("\n露娜：").append(p.optString("assistant")).append('\n');}return b.toString();}}
+ public void clear(){synchronized(LOCK){if(!prefs.edit().remove(lang+"_pairs").remove(lang+"_note").commit())throw new IllegalStateException("学习记忆没有清除");}}
+}

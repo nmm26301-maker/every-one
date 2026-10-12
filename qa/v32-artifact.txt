@@ -1,0 +1,25 @@
+Signer #1 certificate DN: CN=Everyone English, O=Local Build
+Signer #1 certificate SHA-256 digest: 716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887
+Signer #1 certificate SHA-1 digest: 5c703d585dea554aa0d1c0211f2364e8ba1024de
+Signer #1 certificate MD5 digest: e11d818f390483e2efeb49795c3ae29b
+package: name='org.openenglish.reader' versionCode='32' versionName='3.2.0' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+minSdkVersion:'23'
+targetSdkVersion:'33'
+uses-permission: name='android.permission.INTERNET'
+uses-permission: name='android.permission.RECORD_AUDIO'
+application-label:'Everyone 英语'
+application-icon-160:'res/drawable/icon.xml'
+application: label='Everyone 英语' icon='res/drawable/icon.xml'
+launchable-activity: name='org.openenglish.reader.StudioActivity'  label='' icon=''
+feature-group: label=''
+  uses-feature-not-required: name='android.hardware.microphone'
+  uses-feature: name='android.hardware.faketouch'
+  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'
+main
+other-activities
+supports-screens: 'small' 'normal' 'large' 'xlarge'
+supports-any-density: 'true'
+locales: '--_--'
+densities: '160'
+
+SHA-256: 586ee997641969a58202c2594599ab4f104e400f786d9a35b25f24feecfabfc4

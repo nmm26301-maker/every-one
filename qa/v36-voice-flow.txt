@@ -1,0 +1,26 @@
+PASS silence causes no turn
+PASS short transient does not interrupt
+PASS four neural speech frames trigger onset
+PASS utterance not ended before rounded silence interval
+PASS utterance ends at twelve 32ms quiet frames
+PASS pre-roll preserves audio before onset
+PASS utterance memory bounded
+PASS brief hesitation retains a single turn
+PASS insufficient voiced duration is not sent to ASR
+PASS long speech clips at eighteen seconds without buffer growth
+PASS pause resets partial utterance
+PASS loud audio rejected when neural detector says non-speech
+PASS real PCM meter calculation
+PASS incomplete word group waits
+PASS finished sentence speaks before generation ends
+PASS spoken prefix is not repeated
+PASS final sentence only once
+PASS duplicate final callback does not repeat speech
+PASS early complete-word chunk reduces first speech wait
+PASS chunking preserves every word once
+PASS incomplete UTF-8 token is not spoken
+PASS Unicode survives TTS chunking
+PASS barge-in clears previous stream cursor
+PASS late recognition and tokens invalidated immediately
+PASS concurrent turn epochs never collide
+VOICE_FLOW_CHECKS: 25

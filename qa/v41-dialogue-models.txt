@@ -1,0 +1,34 @@
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+QWEN_1_5 yue: 好呀，少甜定正常甜呀？ HOST_MS=3310
+PASS real selected model streams 0 yue
+PASS complete streamed response consistent 0 yue
+PASS private reasoning excluded 0 yue
+QWEN_1_5 ja: もちろんです。何をお手伝いできますか？ HOST_MS=2276
+PASS real selected model streams 0 ja
+PASS complete streamed response consistent 0 ja
+PASS private reasoning excluded 0 ja
+QWEN_1_5 zh: 好的，您想要热的还是冰的？ HOST_MS=1901
+PASS real selected model streams 0 zh
+PASS complete streamed response consistent 0 zh
+PASS private reasoning excluded 0 zh
+PASS selected model warm cache reused 0
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+DEEPSEEK yue: 唔該，我想飲凍奶茶。 HOST_MS=3652
+PASS real selected model streams 1 yue
+PASS complete streamed response consistent 1 yue
+PASS private reasoning excluded 1 yue
+DEEPSEEK ja: こんにちは。 coffee one please. HOST_MS=2137
+PASS real selected model streams 1 ja
+PASS complete streamed response consistent 1 ja
+PASS private reasoning excluded 1 ja
+DEEPSEEK zh: 你好，我想要一杯咖啡。 HOST_MS=1660
+PASS real selected model streams 1 zh
+PASS complete streamed response consistent 1 zh
+PASS private reasoning excluded 1 zh
+PASS selected model warm cache reused 1
+graph_compute: ggml_backend_sched_graph_compute_async failed with error 1
+process_ubatch: failed to compute graph, compute status: 1
+decode: removing memory module entries for seq_id = 0, pos = [99, +inf)
+llama_decode: failed to decode, ret = 2
+PASS barge-in stops active multilingual generation
+ISLAND_DIALOGUE_MODEL_CHECKS: 21

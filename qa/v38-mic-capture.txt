@@ -1,0 +1,14 @@
+PASS uninitialized recognition input falls back to ordinary microphone
+PASS playback guard keeps automatic detection inactive while reporting input
+PASS manual capture submits real PCM despite low VAD probability and playback guard
+PASS cancelled touch does not send a partial utterance
+PASS ordered reset does not discard a later manual press
+PASS press and release without enough frames gives an explicit short-recording notice
+PASS automatic speech resumes after manual control and accepts moderate neural confidence
+PASS system-silenced microphone state reaches UI diagnostics
+PASS stopping releases capture without reporting a false read error
+PASS native VAD and failed/active input resources are released once each
+PASS held microphone buffer is bounded to eighteen seconds
+PASS duplicate release cannot send a duplicate reply
+PASS lifecycle cancellation clears held audio
+MIC_CAPTURE_HOST_CHECKS: 13

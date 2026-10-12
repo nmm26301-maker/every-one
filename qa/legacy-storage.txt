@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: 16 Android storage, backup, key and endpoint checks
+INSTRUMENTATION_CODE: -1

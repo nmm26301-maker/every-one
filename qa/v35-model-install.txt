@@ -1,0 +1,13 @@
+PASS real bundled Whisper extraction and SHA-256 verification
+PASS 206 resume installs complete verified model
+PASS successful install consumes partial file
+PASS 200 response safely restarts ignored range
+PASS successful import preserves download partial
+PASS bad import hash retains installed model
+PASS bad import removes staging but keeps download
+PASS oversized import cannot replace installed model
+PASS bad download hash rejected and partial removed
+PASS HTTPS downgrade redirect rejected
+PASS download cancellation retains resumable bytes
+PASS fully downloaded cancelled part can verify and install
+LOCAL_MODEL_CHECKS: 12

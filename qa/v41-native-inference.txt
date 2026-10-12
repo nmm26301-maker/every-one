@@ -1,0 +1,31 @@
+ASR canto.wav: 早晨,吃了飯味啊? HOST_MS=2125
+PASS real multilingual ASR produces valid text canto.wav
+ASR japanese.wav: こんにちは、コーヒーをひとつください。 HOST_MS=1502
+PASS real multilingual ASR produces valid text japanese.wav
+PASS Japanese coffee phrase recognized
+ASR mandarin.wav: 你好,我想要一杯热咖啡。 HOST_MS=1525
+PASS real multilingual ASR produces valid text mandarin.wav
+PASS Mandarin coffee phrase recognized
+PASS multilingual ASR reuses warmed model
+PASS English-only model rejected for Japanese
+PASS original English ASR path preserved
+PASS multilingual recognition cancellation
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+QWEN yue: 唔該，我想飲凍奶茶。 HOST_MS=1674
+PASS real Qwen streams yue
+PASS streamed final Qwen response matches yue
+QWEN ja: はい。 HOST_MS=1268
+PASS real Qwen streams ja
+PASS streamed final Qwen response matches ja
+QWEN zh: 好的，您想喝热的还是冰的？ HOST_MS=1130
+PASS real Qwen streams zh
+PASS streamed final Qwen response matches zh
+PASS Qwen model reused between target languages
+PASS real offline speech produces signal yue
+SPEECH yue seconds=2.385 HOST_MS=15
+PASS real offline speech produces signal ja
+SPEECH ja seconds=3.1641875 HOST_MS=8
+PASS real offline speech produces signal cmn
+SPEECH cmn seconds=2.6925 HOST_MS=4
+PASS offline speech cancellation before synth
+ISLAND_NATIVE_CHECKS: 20

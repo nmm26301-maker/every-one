@@ -1,0 +1,9 @@
+PASS actual JNI produces audible PCM signal en-us
+PASS actual JNI produces audible PCM signal en
+PASS actual JNI produces audible PCM signal yue
+PASS actual JNI produces audible PCM signal ja
+PASS actual JNI produces audible PCM signal cmn
+PASS English fallback honours pre-synthesis cancellation
+PASS unsupported voices still rejected
+PASS engine remains usable after cancellation and rejected language
+SPEECH_NATIVE_CHECKS: 8

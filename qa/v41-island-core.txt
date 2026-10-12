@@ -1,0 +1,26 @@
+PASS new good one day
+PASS new easy four days
+PASS second good six days
+PASS third good ease growth
+PASS due based on rating time
+PASS again records lapse and resets
+PASS ease never falls below floor
+PASS scheduler immutable
+PASS invalid grades rejected
+PASS wait for complete CJK phrase
+PASS CJK phrase streams without whitespace
+PASS next CJK sentence only once
+PASS final flush has no duplicates
+PASS single English word held
+PASS final short reply never lost
+PASS revised spoken prefix not duplicated
+PASS Japanese sentences chunk separately
+PASS long Cantonese phrase streams at comma
+PASS incomplete UTF-8 waits
+PASS Qwen assistant prefix
+PASS user special tokens escaped
+PASS Unicode retained
+PASS Yue instruction explicit
+PASS Japanese fallback pronunciation uses kana
+PASS no text based phoneme scores
+ISLAND_CORE_CHECKS: 25

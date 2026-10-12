@@ -1,0 +1,1 @@
+package android.media.audiofx;public class AcousticEchoCanceler {public static boolean isAvailable(){return false;}public static AcousticEchoCanceler create(int id){return null;}public void setEnabled(boolean v){}public boolean getEnabled(){return false;}public void release(){}}

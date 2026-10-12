@@ -1,0 +1,25 @@
+import org.openenglish.reader.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+public class LocalDuplexNativeTest {
+ static int checks;static void check(boolean ok,String name){if(!ok)throw new AssertionError(name);checks++;System.out.println("PASS "+name);}
+ static class Call implements LocalNative.Callbacks {volatile boolean stop;public boolean abort(){return stop;}public void text(String s){}public void segment(long a,long b,String s){}}
+ public static void main(String[] args)throws Exception {
+  LocalNative.loadWhisper();LocalNative.loadLlama();Call base=new Call();long start=System.nanoTime();LocalNative.warmWhisper(args[0],base);LocalNative.warmLlama(args[1],base);System.out.println("HOST_COLD_MODEL_WARM_MS: "+(System.nanoTime()-start)/1000000);
+  LocalNative.warmWhisper(args[0],base);LocalNative.warmLlama(args[1],base);check(LocalNative.whisperLoadCount()==1&&LocalNative.llamaLoadCount()==1,"warmup reuses real model allocations");
+  float[] pcm=LocalWav.read(new File(args[2]));AtomicInteger aborts=new AtomicInteger();boolean asrCancelled=false;try{LocalNative.whisper(args[0],pcm,2,new Call(){public boolean abort(){return aborts.incrementAndGet()>8;}});}catch(CancellationException e){asrCancelled=true;}check(asrCancelled&&aborts.get()>8,"active cached Whisper can be interrupted");String resumed=LocalNative.whisper(args[0],pcm,2,new Call());check(resumed.toLowerCase(Locale.US).contains("ask not")&&LocalNative.whisperLoadCount()==1,"cached Whisper recovers correctly after interruption");long vad=LocalNative.vadOpen(args[3]);int voiced=0,frames=0;start=System.nanoTime();
+  try{float[] frame=new float[512];for(int at=0;at+512<=pcm.length;at+=512){System.arraycopy(pcm,at,frame,0,512);float probability=LocalNative.vadProbability(vad,frame);if(!(probability>=0&&probability<=1))throw new AssertionError("invalid Silero probability");if(probability>.55)voiced++;frames++;}System.out.println("HOST_VAD_TOTAL_MS: "+(System.nanoTime()-start)/1000000+" FRAMES: "+frames+" SPEECH: "+voiced);check(frames>0,"all real Silero frame probabilities are valid");check(voiced>frames/5,"real Silero detects JFK speech");LocalNative.vadReset(vad);float quiet=0;for(int i=0;i<20;i++)quiet=LocalNative.vadProbability(vad,new float[512]);check(quiet<.55,"real Silero rejects sustained digital silence");}finally{LocalNative.vadClose(vad);}
+  boolean rejected=false;try{LocalNative.vadProbability(vad,new float[512]);}catch(IOException e){rejected=true;}check(rejected,"closed VAD handle rejected safely");
+  // Hold one Java token callback to make simultaneous-engine lock testing deterministic.
+  // The wait is a test fixture, not an application latency benchmark.
+  CountDownLatch token=new CountDownLatch(1),release=new CountDownLatch(1);Call tutor=new Call(){boolean first=true;public void text(String text){if(first){first=false;token.countDown();try{if(!release.await(15,TimeUnit.SECONDS))throw new AssertionError("callback release timeout");}catch(InterruptedException e){Thread.currentThread().interrupt();}}}};
+  ExecutorService workers=Executors.newFixedThreadPool(2);String prompt=LocalPrompt.build("You are an English tutor. Reply in simple English.",Collections.singletonList(new String[]{"user","Tell me a short story about a school day."}));
+  try{Future<String> generated=workers.submit(()->LocalNative.chatFast(args[1],prompt,3,120,tutor));check(token.await(15,TimeUnit.SECONDS),"fast local tutor streams its first token");start=System.nanoTime();Future<String> recognition=workers.submit(()->LocalNative.whisper(args[0],pcm,2,new Call()));String heard=recognition.get(12,TimeUnit.SECONDS);System.out.println("HOST_ASR_DURING_LLM_CALLBACK_MS: "+(System.nanoTime()-start)/1000000);check(heard.toLowerCase(Locale.US).contains("ask not")&&!generated.isDone(),"real Whisper completes while tutor callback is still active");
+   LocalNative.releaseLlama();tutor.stop=true;release.countDown();boolean cancelled=false;try{generated.get(15,TimeUnit.SECONDS);}catch(ExecutionException e){cancelled=e.getCause() instanceof CancellationException;}check(cancelled,"barge-in cancels generation after cache release without use-after-free");
+   check(LocalNative.whisperLoadCount()==1,"recognition did not reload warmed Whisper");LocalNative.warmLlama(args[1],new Call());check(LocalNative.llamaLoadCount()==2,"released model can be reloaded safely");String corrected=LocalPrompt.visible(LocalNative.chatFast(args[1],LocalPrompt.build("Correct this English sentence.",Collections.singletonList(new String[]{"user","I goed to school yesterday."})),3,96,new Call()));System.out.println("FAST_CORRECTION: "+corrected);check(!corrected.isEmpty()&&corrected.toLowerCase(Locale.US).contains("went"),"fast model still performs a real grammatical correction");check(LocalNative.llamaLoadCount()==2,"successive fast reply reuses cached model");
+  }finally{tutor.stop=true;release.countDown();workers.shutdownNow();workers.awaitTermination(20,TimeUnit.SECONDS);LocalNative.releaseWhisper();LocalNative.releaseLlama();}
+  System.out.println("DUPLEX_NATIVE_CHECKS: "+checks);
+ }
+}

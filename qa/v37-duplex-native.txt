@@ -1,0 +1,30 @@
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+HOST_COLD_MODEL_WARM_MS: 1267
+PASS warmup reuses real model allocations
+whisper_full_with_state: failed to decode
+PASS active cached Whisper can be interrupted
+PASS cached Whisper recovers correctly after interruption
+HOST_VAD_TOTAL_MS: 52 FRAMES: 343 SPEECH: 307
+PASS all real Silero frame probabilities are valid
+PASS real Silero detects JFK speech
+PASS real Silero rejects sustained digital silence
+PASS closed VAD handle rejected safely
+PASS fast local tutor streams its first token
+HOST_ASR_DURING_LLM_CALLBACK_MS: 1013
+PASS real Whisper completes while tutor callback is still active
+graph_compute: ggml_backend_sched_graph_compute_async failed with error 1
+process_ubatch: failed to compute graph, compute status: 1
+decode: removing memory module entries for seq_id = 0, pos = [37, +inf)
+llama_decode: failed to decode, ret = 2
+PASS barge-in cancels generation after cache release without use-after-free
+PASS recognition did not reload warmed Whisper
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+PASS released model can be reloaded safely
+FAST_CORRECTION: Here’s a corrected version of your sentence:
+
+"Instruction applies to the following input. Input: I goed to school yesterday."
+
+Please note: "I goed" is likely a typo and should be "I went."
+PASS fast model still performs a real grammatical correction
+PASS successive fast reply reuses cached model
+DUPLEX_NATIVE_CHECKS: 14

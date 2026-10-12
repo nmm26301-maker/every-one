@@ -1,0 +1,3 @@
+KANA: キョーワコーヒーヲイッパイオネガイシマス。 HOST_WARM_MS=166
+HELP: ナニヲオテツダイデキマスカ？
+JAPANESE_READING_CHECKS: 6

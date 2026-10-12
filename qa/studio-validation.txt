@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: result=PASS: 36 storage, migration, decoder, dictionary and mocked cloud protocol checks
+INSTRUMENTATION_CODE: -1
