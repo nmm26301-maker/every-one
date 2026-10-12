@@ -22,6 +22,7 @@ public final class ConversationMic {
  public void cancelManual(){commands.offer(3);}
  public void start(){new Thread(this::capture,"english-duplex-mic").start();}
  public void reset(){commands.offer(3);}
+ public void finishAutomatic(){commands.offer(4);}
  public void close(){if(!stopping.compareAndSet(false,true))return;
   new Thread(()->{AudioRecord r=recorder;if(r!=null)try{r.stop();}catch(Exception ignored){}},"english-stop-mic").start();
  }
@@ -47,6 +48,7 @@ public final class ConversationMic {
     if(n<0){if(stopping.get())break;throw new IllegalStateException("录音中断（"+n+"），请重新开始");}
     if(n==0)continue;filled+=n;if(filled<frame.length)continue;filled=0;
     Integer command;while((command=commands.poll())!=null){
+     if(command==4){if(manual.active()){ManualCapture.Result result=manual.finish();if(result!=null)listener.end(result.pcm,result.clipped);}else if(gate.speaking())gate.finish();else listener.notice("还没有录到这句话，请先说话或按住录音");LocalNative.vadReset(vad);continue;}
      gate.reset();LocalNative.vadReset(vad);
      if(command==1){manual.begin();listener.start();}
      else if(command==2){ManualCapture.Result result=manual.finish();if(result!=null)listener.end(result.pcm,result.clipped);else listener.notice("录音太短，请按住按钮说完一句再松开");}

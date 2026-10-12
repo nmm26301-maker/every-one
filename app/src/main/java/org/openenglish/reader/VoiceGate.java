@@ -16,13 +16,17 @@ public final class VoiceGate {
   if(!active){if(!speech)noise=noise*.98+Math.min(energy,.02)*.02;pre.addLast(frame.clone());while(pre.size()>8)pre.removeFirst();onset=speech?onset+1:0;
    if(onset>=4){active=true;used=0;voiced=onset;quiet=0;clipped=false;for(short[] old:pre)append(old);pre.clear();listener.start();}return;}
   append(frame);if(speech){voiced++;quiet=0;}else quiet++;
+  if(used>=buffer.length){clipped=true;finish();return;}
   if(quiet>=quietFrames){
    // Four consecutive neural speech frames already established onset. Keep short Yes/No answers.
    // Leave 160 ms of trailing audio instead of passing all endpoint silence to Whisper.
-   int kept=clipped?used:Math.max(FRAME,used-Math.max(0,quiet-5)*FRAME);
-   float[] pcm=new float[kept];for(int i=0;i<kept;i++)pcm[i]=buffer[i]/32768f;
-   boolean limited=clipped;reset();listener.end(pcm,limited);
+   finish();
   }
+ }
+ public void finish(){if(!active)return;
+  int kept=clipped?used:Math.max(FRAME,used-Math.max(0,quiet-5)*FRAME);
+  float[] pcm=new float[kept];for(int i=0;i<kept;i++)pcm[i]=buffer[i]/32768f;
+  boolean limited=clipped;reset();listener.end(pcm,limited);
  }
  public void reset(){active=false;used=onset=voiced=quiet=0;clipped=false;pre.clear();}
 }

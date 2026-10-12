@@ -25,7 +25,7 @@ public final class DuplexActivity extends Activity {
  private final ThreadPoolExecutor asrWorker=worker(),chatWorker=worker();
  private static ThreadPoolExecutor worker(){return new ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(1),new ThreadPoolExecutor.DiscardOldestPolicy());}
  private volatile CloudClient.Job recognition,generation,warming;
- private volatile boolean running,closed;
+ private volatile boolean running,closed;private volatile boolean automaticBusy;
  private volatile ConversationMic microphone;
  private volatile boolean headphones,echoActive,outputBusy;
  private volatile long outputTail;
@@ -37,7 +37,7 @@ public final class DuplexActivity extends Activity {
 
  private StudioStore store;private long topicId;
  private String scene="日常聊天",utterance="";private int utteranceSequence;private long utteranceTurn=-1;
- private TextView status,heard,answer,metrics,route,inputInfo;private EditText typed;private Button manual,inputMode;private boolean manualHeld;private long inputStarted;private int actualSource=MediaRecorder.AudioSource.VOICE_RECOGNITION;
+ private TextView status,heard,answer,metrics,route,inputInfo;private EditText typed;private Button manual,inputMode;private volatile boolean manualHeld;private long inputStarted;private int actualSource=MediaRecorder.AudioSource.VOICE_RECOGNITION;
  private ProgressBar level;private Button start,stop;private Switch quick,speakerDuplex;
  private long asrMs=-1,firstTokenMs=-1,ttsStartMs=-1,modelAt,firstTokenAt;private boolean tokenMeasured,ttsMeasured;
  private final AudioManager.OnAudioFocusChangeListener focus=change->{if(change<0)ui.post(()->stopSession("音频被其他应用占用，会话已暂停"));};
@@ -50,9 +50,9 @@ public final class DuplexActivity extends Activity {
   button(root,"‹ 返回话题",this::finish);text(root,"全双工 · AI 外教",27);text(root,topic.optString("title")+" · 耳机可边听边说；外放可按按钮打断",16);
   status=text(root,"点开始，模型准备好后会持续收听英语",18);level=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);level.setMax(1000);root.addView(level);
   start=button(root,"开始连续对话",this::startSession);stop=button(root,"暂停收听与回复",()->stopSession("已暂停，麦克风已关闭"));stop.setEnabled(false);
-  button(root,"立即打断外教",()->{if(running){turns.next();cancelTasks();resetSpeech();ConversationMic mic=microphone;if(mic!=null)mic.reset();status.setText("已打断，可以直接说英语");}});
+  button(root,"立即打断外教",()->{if(running){turns.next();cancelTasks();resetSpeech();ConversationMic mic=microphone;if(mic!=null)mic.reset();automaticBusy=false;status.setText("已打断，可以直接说英语");}});
   manual=button(root,"按住说话 · 松开发送",()->{});manual.setEnabled(false);
-  manual.setOnTouchListener((v,event)->{int action=event.getActionMasked();if(action==MotionEvent.ACTION_DOWN){ConversationMic mic=microphone;if(!running||mic==null)return true;manualHeld=true;v.getParent().requestDisallowInterceptTouchEvent(true);turns.next();cancelTasks();resetSpeech();mic.beginManual();manual.setText("正在录音 · 松开立即发送");status.setText("正在录音，松开后直接交给 Whisper");return true;}
+  manual.setOnTouchListener((v,event)->{int action=event.getActionMasked();if(action==MotionEvent.ACTION_DOWN){ConversationMic mic=microphone;if(!running||mic==null)return true;manualHeld=true;v.getParent().requestDisallowInterceptTouchEvent(true);turns.next();cancelTasks();resetSpeech();automaticBusy=false;mic.beginManual();manual.setText("正在录音 · 松开立即发送");status.setText("正在录音，松开后直接交给 Whisper");return true;}
    if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL){if(manualHeld){manualHeld=false;ConversationMic mic=microphone;if(mic!=null){if(action==MotionEvent.ACTION_UP)mic.finishManual();else mic.cancelManual();}manual.setText("按住说话 · 松开发送");v.getParent().requestDisallowInterceptTouchEvent(false);if(action==MotionEvent.ACTION_UP)v.performClick();}return true;}return manualHeld;});
   inputInfo=text(root,"麦克风信号和人声检测会显示在这里",13);
   inputMode=button(root,"录音输入："+sourceName(savedSource()),this::selectInputMode);
@@ -91,12 +91,12 @@ public final class DuplexActivity extends Activity {
   running=true;turns.next();status.setText("正在打开麦克风…");start.setEnabled(false);stop.setEnabled(true);
   events.add(SystemClock.elapsedRealtime(),"SESSION_BEGIN");long[] capturedTurn={-1};ConversationMic[] holder=new ConversationMic[1];
   ConversationMic mic=new ConversationMic(LocalModels.file(this,LocalModels.VAD).getPath(),quick.isChecked()?360:600,savedSource(),.40f,
-   aec->running&&!closed&&SystemClock.elapsedRealtime()>=replayUntil&&playback.allows(headphones,aec,speakerBargeIn,SystemClock.elapsedRealtime()),
+   aec->running&&!closed&&(!automaticBusy||speakerBargeIn&&(headphones||aec))&&SystemClock.elapsedRealtime()>=replayUntil&&playback.allows(headphones,aec,speakerBargeIn,SystemClock.elapsedRealtime()),
    new ConversationMic.Listener(){
     private boolean mine(){return running&&!closed&&microphone==holder[0];}
     public void ready(boolean aec,int source){ui.post(()->{if(mine()){actualSource=source;inputStarted=SystemClock.elapsedRealtime();manual.setEnabled(true);echoActive=aec;updateRoute();status.setText("正在收听；未自动接话时，按住说话再松开发送");}});}
-    public void start(){if(!mine())return;events.add(SystemClock.elapsedRealtime(),"VOICE_ONSET cancels prior reply");long turn=turns.next();capturedTurn[0]=turn;cancelTasks();ui.post(()->{if(valid(turn)&&mine()){resetSpeech();asrMs=firstTokenMs=ttsStartMs=-1;tokenMeasured=ttsMeasured=false;updateMetrics();answer.setText("");status.setText(manualHeld?"正在录音，松开后立即发送":"听到你开口了，外教已停止，请继续说");}});}
-    public void end(float[] pcm,boolean clipped){long turn=capturedTurn[0];if(mine()&&valid(turn))recognize(turn,pcm,clipped);}
+    public void start(){if(!mine()||automaticBusy&&!manualHeld&&!speakerBargeIn)return;events.add(SystemClock.elapsedRealtime(),"VOICE_ONSET learner recording");long turn=turns.next();capturedTurn[0]=turn;cancelTasks();ui.post(()->{if(valid(turn)&&mine()){if(manualHeld||speakerBargeIn){resetSpeech();if(!manualHeld)playback.captureStarted();}asrMs=firstTokenMs=ttsStartMs=-1;tokenMeasured=ttsMeasured=false;updateMetrics();status.setText(manualHeld?"正在录音，松开后立即发送":"正在听你说，停顿后自动识别");}});}
+    public void end(float[] pcm,boolean clipped){long turn=capturedTurn[0];if(mine()&&valid(turn)){automaticBusy=true;recognize(turn,pcm,clipped);}}
     public void meter(int value,double rms,float probability,boolean guarded,boolean silenced){ui.post(()->{if(mine()){level.setProgress(value);String state=silenced?"系统已静音录音输入":guarded?"外放回声保护":manualHeld?"手动录音":Float.isNaN(probability)?"等待检测":"人声 "+Math.round(probability*100)+"%";
      inputInfo.setText(sourceName(actualSource)+" · 信号 "+String.format(Locale.US,"%.0f dB",20*Math.log10(Math.max(rms,.000001)))+" · "+state);
      if(silenced&&!manualHeld)status.setText("系统正在屏蔽录音，请检查麦克风开关或占用麦克风的应用");
@@ -109,20 +109,20 @@ public final class DuplexActivity extends Activity {
  }catch(Exception e){stopSession(message(e));}}
  private void recognize(long turn,float[] pcm,boolean clipped){
   final long ended=SystemClock.elapsedRealtime();CloudClient.Job job=turnJob(turn);recognition=job;
-  ui.post(()->{if(valid(turn))status.setText(clipped?"正在识别前 18 秒；请尽量用短句":"Whisper 正在识别，同时继续收听…");});
+  ui.post(()->{if(valid(turn))status.setText(clipped?"正在识别前 18 秒；请尽量用短句":"Whisper 正在识别；环境声不会打断这一句…");});
   try{asrWorker.execute(()->{try{job.check();String sentence=LocalAI.transcribePCM(getApplicationContext(),pcm,job).getString("text").trim();job.check();
     if(sentence.isEmpty())throw new IllegalStateException("没有识别出英语，请重新说一句");
     long elapsed=SystemClock.elapsedRealtime()-ended;
     if(!turns.commit(turn,()->{if(running&&!closed)store.message(topicId,"user",sentence);}))return;
     ui.post(()->{if(valid(turn)&&!job.cancelled()){asrMs=elapsed;heard.setText(sentence);reply(turn,sentence);}});
-   }catch(Exception e){ui.post(()->{if(valid(turn)&&!job.cancelled()){asrMs=SystemClock.elapsedRealtime()-ended;updateMetrics();status.setText(message(e)+"；仍在收听，可直接重说");}});}
+   }catch(Exception e){ui.post(()->{if(valid(turn)&&!job.cancelled()){asrMs=SystemClock.elapsedRealtime()-ended;updateMetrics();automaticBusy=false;status.setText(message(e)+"；仍在收听，可直接重说");}});}
    catch(OutOfMemoryError|UnsatisfiedLinkError e){ui.post(()->{if(valid(turn))stopSession("本地识别失败，请检查模型或可用内存");});}
    finally{if(recognition==job)recognition=null;}});}catch(RejectedExecutionException ignored){}
  }
  private int savedSource(){return getSharedPreferences("local_ai",0).getInt("conversation_source",MediaRecorder.AudioSource.VOICE_RECOGNITION);}
  private static String sourceName(int source){return source==MediaRecorder.AudioSource.MIC?"普通麦克风":source==MediaRecorder.AudioSource.VOICE_COMMUNICATION?"通话回声模式":"清晰识别模式";}
  private void selectInputMode(){new AlertDialog.Builder(this).setTitle("录音输入（暂停后可切换）").setItems(new String[]{"清晰识别模式（默认）","普通麦克风（收不到声音时试试）","通话回声模式"},(d,n)->{int source=n==0?MediaRecorder.AudioSource.VOICE_RECOGNITION:n==1?MediaRecorder.AudioSource.MIC:MediaRecorder.AudioSource.VOICE_COMMUNICATION;getSharedPreferences("local_ai",0).edit().putInt("conversation_source",source).apply();inputMode.setText("录音输入："+sourceName(source));}).show();}
- private void sendTyped(){String sentence=typed.getText().toString().trim();if(sentence.isEmpty()){typed.setError("请输入一句英语");return;}if(!running){status.setText("请先点开始连续对话，等模型准备完成后发送");return;}long turn=turns.next();cancelTasks();resetSpeech();ConversationMic mic=microphone;if(mic!=null)mic.reset();manualHeld=false;manual.setText("按住说话 · 松开发送");asrMs=-1;heard.setText(sentence);typed.setText("");
+ private void sendTyped(){String sentence=typed.getText().toString().trim();if(sentence.isEmpty()){typed.setError("请输入一句英语");return;}if(!running){status.setText("请先点开始连续对话，等模型准备完成后发送");return;}long turn=turns.next();cancelTasks();resetSpeech();ConversationMic mic=microphone;if(mic!=null)mic.reset();manualHeld=false;manual.setText("按住说话 · 松开发送");asrMs=-1;heard.setText(sentence);typed.setText("");automaticBusy=true;
   // Keep database I/O off the UI thread and serialize it with turn invalidation.
   asrWorker.execute(()->{if(turns.commit(turn,()->{if(running&&!closed)store.message(topicId,"user",sentence);}))ui.post(()->{if(valid(turn))reply(turn,sentence);});});
  }
@@ -144,12 +144,12 @@ public final class DuplexActivity extends Activity {
  private static String deviceName(int type){switch(type){case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER:return "扬声器";case AudioDeviceInfo.TYPE_BUILTIN_EARPIECE:return "听筒";case AudioDeviceInfo.TYPE_BLUETOOTH_SCO:case AudioDeviceInfo.TYPE_BLE_HEADSET:return "蓝牙通话";case AudioDeviceInfo.TYPE_WIRED_HEADSET:case AudioDeviceInfo.TYPE_WIRED_HEADPHONES:return "有线耳机";case AudioDeviceInfo.TYPE_USB_HEADSET:return "USB 耳机";default:return "通话设备";}}
  private CloudClient.Job turnJob(long turn){return new CloudClient.Job(){@Override public void check(){super.check();if(!valid(turn))throw new CancellationException("已被新一轮对话替代");}};}
  private boolean valid(long turn){return running&&!closed&&turns.current(turn);}
- private void reply(long turn,String sentence){if(!valid(turn))return;resetSpeech();firstTokenMs=ttsStartMs=-1;tokenMeasured=ttsMeasured=false;modelAt=SystemClock.elapsedRealtime();updateMetrics();replyComplete=false;completedReply="";ttsBlockedTurn=-1;spokenChunks=0;events.add(SystemClock.elapsedRealtime(),"GENERATION_BEGIN turn="+turn);status.setText("DeepSeek 正在接话，仍在收听…");CloudClient.Job job=turnJob(turn);generation=job;final long started=modelAt;generationProgress(turn,job,started);
+ private void reply(long turn,String sentence){if(!valid(turn))return;automaticBusy=true;resetSpeech();firstTokenMs=ttsStartMs=-1;tokenMeasured=ttsMeasured=false;modelAt=SystemClock.elapsedRealtime();updateMetrics();replyComplete=false;completedReply="";ttsBlockedTurn=-1;spokenChunks=0;events.add(SystemClock.elapsedRealtime(),"GENERATION_BEGIN turn="+turn);status.setText("DeepSeek 正在回复，完成后继续收听…");CloudClient.Job job=turnJob(turn);generation=job;final long started=modelAt;generationProgress(turn,job,started);
   chatWorker.execute(()->{String[] partial={""};long[] lastPost={0};try{
    job.check();if(!valid(turn))return;JSONArray history=store.context(topicId);
    partial[0]=LocalAI.chatVoice(getApplicationContext(),"You are an English conversation tutor. Scenario: "+scene+". Reply only in simple English, under 45 words. Gently correct one error and ask one short question. Never assess pronunciation from text.",history,job,complete->{partial[0]=complete;long at=SystemClock.elapsedRealtime();if(at-lastPost[0]<40)return;lastPost[0]=at;ui.post(()->{if(valid(turn)&&!job.cancelled()){if(!tokenMeasured){tokenMeasured=true;events.add(at,"FIRST_VISIBLE_TEXT turn="+turn);firstTokenAt=at;firstTokenMs=at-started;updateMetrics();}answer.setText(complete);enqueue(turn,splitter.accept(complete,false));}});});
    String finalText=partial[0];job.check();if(!turns.commit(turn,()->{if(running&&!closed&&!job.cancelled())store.message(topicId,"assistant",finalText);}))return;ui.post(()->{if(valid(turn)&&!job.cancelled()){if(!tokenMeasured){tokenMeasured=true;firstTokenAt=SystemClock.elapsedRealtime();firstTokenMs=firstTokenAt-started;updateMetrics();}replyComplete=true;completedReply=finalText;events.add(SystemClock.elapsedRealtime(),"GENERATION_DONE turn="+turn);answer.setText(finalText);enqueue(turn,splitter.accept(finalText,true));finishPlayback(turn);if(utterance.isEmpty()&&speechQueue.isEmpty())status.setText("回复完成，继续听你说");}});
-  }catch(Exception e){ui.post(()->{if(valid(turn)&&!job.cancelled()){resetSpeech();status.setText(message(e)+"；仍在收听，可直接重说");}});}
+  }catch(Exception e){ui.post(()->{if(valid(turn)&&!job.cancelled()){resetSpeech();automaticBusy=false;status.setText(message(e)+"；仍在收听，可直接重说");}});}
   catch(OutOfMemoryError|UnsatisfiedLinkError e){ui.post(()->{if(valid(turn))stopSession("本地回复失败，请检查模型或可用内存");});}
   finally{if(generation==job)generation=null;}
   });
@@ -159,14 +159,14 @@ public final class DuplexActivity extends Activity {
  private void generationProgress(long turn,CloudClient.Job job,long started){ui.postDelayed(()->{if(!valid(turn)||job.cancelled()||replyComplete)return;if(utterance.isEmpty())status.setText("DeepSeek 正在生成 · 已等待 "+((SystemClock.elapsedRealtime()-started)/1000)+" 秒"+(spokenChunks>0?" · 已朗读 "+spokenChunks+" 段":""));generationProgress(turn,job,started);},1000);}
  private void speakNext(long turn){if(!valid(turn)||!utterance.isEmpty()||speechQueue.isEmpty() )return;String chunk=speechQueue.removeFirst().replace("**","").replace("`","");String id="duplex:"+turn+":"+(++utteranceSequence);utterance=id;utteranceTurn=turn;activeChunk=chunk;utteranceStarted=false;speechDeadline.system(id,SystemClock.elapsedRealtime());watchSpeech(turn,id);outputBusy=true;playback.begin(turn);events.add(SystemClock.elapsedRealtime(),"TTS_QUEUED "+id+" chars="+chunk.length());if(!ttsReady){speakFallback(turn,id,chunk);return;}int result=tts.speak(chunk,TextToSpeech.QUEUE_ADD,null,id);if(result==TextToSpeech.ERROR){ttsReady=false;speakFallback(turn,id,chunk);return;}}
 
- private void finishPlayback(long turn){if(replyComplete&&utterance.isEmpty()&&speechQueue.isEmpty()){playback.finish(turn,SystemClock.elapsedRealtime());replayUntil=0;}}
+ private void finishPlayback(long turn){if(replyComplete&&utterance.isEmpty()&&speechQueue.isEmpty()){playback.finish(turn,SystemClock.elapsedRealtime());replayUntil=0;automaticBusy=false;ConversationMic mic=microphone;if(mic!=null)mic.reset();}}
  private void speechDone(String id,boolean failed){ui.post(()->{if(!speechDeadline.accepts(id,false))return;finishSpeech(id,failed);});}
- private void finishSpeech(String id,boolean failed){if(!valid(utteranceTurn)||!id.equals(utterance))return;events.add(SystemClock.elapsedRealtime(),(failed?"TTS_ERROR ":"TTS_DONE ")+id);long turn=utteranceTurn;if(failed&&ttsReady&&!activeChunk.isEmpty()){ttsReady=false;speakFallback(turn,id,activeChunk);return;}speechDeadline.clear();utterance="";activeChunk="";outputBusy=false;if(failed){ttsBlockedTurn=turn;replayUntil=0;speechQueue.clear();playback.finish(turn,SystemClock.elapsedRealtime());status.setText("朗读失败，点击重新朗读完整回复可重试");return;}spokenChunks++;speakNext(turn);finishPlayback(turn);if(utterance.isEmpty()&&replyComplete)status.setText("外教说完了，仍在听你说");}
- private void speechStopped(String id,boolean interrupted){ui.post(()->{if(!speechDeadline.accepts(id,false))return;if(!valid(utteranceTurn)||!id.equals(utterance))return;events.add(SystemClock.elapsedRealtime(),"TTS_STOP interrupted="+interrupted+" "+id);long turn=utteranceTurn;if(ttsReady&&!activeChunk.isEmpty()){ttsReady=false;speakFallback(turn,id,activeChunk);return;}ttsBlockedTurn=turn;replayUntil=0;utterance="";activeChunk="";outputBusy=false;speechQueue.clear();playback.finish(turn,SystemClock.elapsedRealtime());status.setText("系统停止了朗读；文字仍在生成，完成后可重新朗读完整回复");});}
+ private void finishSpeech(String id,boolean failed){if(!valid(utteranceTurn)||!id.equals(utterance))return;events.add(SystemClock.elapsedRealtime(),(failed?"TTS_ERROR ":"TTS_DONE ")+id);long turn=utteranceTurn;if(failed&&ttsReady&&!activeChunk.isEmpty()){ttsReady=false;speakFallback(turn,id,activeChunk);return;}speechDeadline.clear();utterance="";activeChunk="";outputBusy=false;if(failed){ttsBlockedTurn=turn;replayUntil=0;speechQueue.clear();playback.finish(turn,SystemClock.elapsedRealtime());finishPlayback(turn);status.setText("朗读失败，点击重新朗读完整回复可重试");return;}spokenChunks++;speakNext(turn);finishPlayback(turn);if(utterance.isEmpty()&&replyComplete)status.setText("外教说完了，仍在听你说");}
+ private void speechStopped(String id,boolean interrupted){ui.post(()->{if(!speechDeadline.accepts(id,false))return;if(!valid(utteranceTurn)||!id.equals(utterance))return;events.add(SystemClock.elapsedRealtime(),"TTS_STOP interrupted="+interrupted+" "+id);long turn=utteranceTurn;if(ttsReady&&!activeChunk.isEmpty()){ttsReady=false;speakFallback(turn,id,activeChunk);return;}ttsBlockedTurn=turn;replayUntil=0;utterance="";activeChunk="";outputBusy=false;speechQueue.clear();playback.finish(turn,SystemClock.elapsedRealtime());finishPlayback(turn);status.setText("系统停止了朗读；文字仍在生成，完成后可重新朗读完整回复");});}
  private void replayAnswer(){String text=completedReply;if(!running){status.setText("请先开始会话，再重新朗读");return;}if(!replyComplete){status.setText("回复还在生成，请等生成完成后重新朗读");return;}if(text.isEmpty()){status.setText("暂时没有可朗读的回复");return;}if(tts!=null)ttsReady=OfflineVoice.select(tts);long turn=turns.next();cancelTasks();resetSpeech();ConversationMic mic=microphone;if(mic!=null)mic.reset();replayUntil=SystemClock.elapsedRealtime()+120000;replyComplete=true;speechQueue.add(text);events.add(SystemClock.elapsedRealtime(),"REPLAY_COMPLETE_REPLY turn="+turn);speakNext(turn);}
  private void resetSpeech(){replyComplete=true;replayUntil=0;utteranceTurn=-1;speechDeadline.clear();outputBusy=false;outputTail=SystemClock.elapsedRealtime()+650;utterance="";activeChunk="";speechQueue.clear();splitter.clear();playback.clear(SystemClock.elapsedRealtime());if(tts!=null)tts.stop();fallbackId="";if(speechJob!=null)speechJob.cancel();if(fallbackFile!=null){fallbackFile.delete();fallbackFile=null;}if(fallbackPlayer!=null){try{fallbackPlayer.release();}catch(Exception ignored){}fallbackPlayer=null;}}
  private void cancelTasks(){CloudClient.Job job=recognition;if(job!=null)job.cancel();job=generation;if(job!=null)job.cancel();asrWorker.getQueue().clear();chatWorker.getQueue().clear();}
- private void stopSession(String reason){events.add(SystemClock.elapsedRealtime(),"SESSION_STOP "+reason);running=false;turns.next();CloudClient.Job job=warming;warming=null;if(job!=null)job.cancel();cancelTasks();resetSpeech();
+ private void stopSession(String reason){automaticBusy=false;events.add(SystemClock.elapsedRealtime(),"SESSION_STOP "+reason);running=false;turns.next();CloudClient.Job job=warming;warming=null;if(job!=null)job.cancel();cancelTasks();resetSpeech();
   ConversationMic mic=microphone;if(mic!=null)mic.close();manualHeld=false;if(manual!=null){manual.setEnabled(false);manual.setText("按住说话 · 松开发送");}
   if(ownsAudio){try{if(Build.VERSION.SDK_INT>=31){if(previousDevice==null)audio.clearCommunicationDevice();else audio.setCommunicationDevice(previousDevice);}audio.setSpeakerphoneOn(previousSpeaker);audio.setMode(previousMode);}catch(Exception ignored){}ownsAudio=false;}
   if(audio!=null)try{audio.abandonAudioFocus(focus);}catch(Exception ignored){}

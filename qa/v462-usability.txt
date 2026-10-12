@@ -1,0 +1,31 @@
+PASS generation with no visible output reaches idle deadline
+PASS increasing output extends idle wait
+PASS total generation deadline remains bounded despite output
+PASS duplicate output cannot hold request open
+PASS shorter replacement output does not renew wait
+PASS ASR has total deadline without idle requirement
+PASS model warmup cannot extend total deadline
+PASS elapsed display uses monotonic duration
+PASS durably completed operation cannot become a timeout
+PASS late progress cannot reopen completed deadline
+PASS completion boundary wins over later timeout cancellation
+PASS small adventure removes repeated IDs and caps at three
+PASS rating unrelated lesson cannot advance path
+PASS explicit rating advances exactly one lesson
+PASS duplicate callback cannot advance next lesson
+PASS rotation restores exact next lesson
+PASS completion remains idempotent
+PASS invalid restored IDs discarded and cursor bounded
+PASS empty review path has no phantom lesson
+PASS text warmup never extracts or loads Whisper/VAD
+PASS text warmup has ordered ready progress
+PASS warmup does not run a discarded inference
+PASS voice preparation still warms bundled recognition
+PASS voice warms recognition before teacher
+PASS voice stage reports are explicit
+PASS cancelled preparation does not load a model
+PASS cancellation between speech and teacher prevents extra warmup
+PASS missing teacher does not waste voice model loading for text
+PASS chosen teacher preserved in text warmup
+PASS unsupported ABI fails before engines are loaded
+USABILITY_CHECKS: 30

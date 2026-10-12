@@ -26,6 +26,6 @@ SIGNING_ALIAS="${SIGNING_ALIAS:?Set the signing alias}"
 : "${SIGNING_STORE_PASSWORD:?Set signing store password}"
 : "${SIGNING_KEY_PASSWORD:?Set signing key password}"
 export SIGNING_STORE_PASSWORD SIGNING_KEY_PASSWORD
-"$TOOLS/apksigner" sign --ks "$SIGNING_KEYSTORE" --ks-key-alias "$SIGNING_ALIAS" --ks-pass env:SIGNING_STORE_PASSWORD --key-pass env:SIGNING_KEY_PASSWORD --out dist/Everyone-AI-English-4.6.1.apk build/aligned.apk
-"$TOOLS/apksigner" verify --verbose dist/Everyone-AI-English-4.6.1.apk
-echo "Built dist/Everyone-AI-English-4.6.1.apk"
+"$TOOLS/apksigner" sign --ks "$SIGNING_KEYSTORE" --ks-key-alias "$SIGNING_ALIAS" --ks-pass env:SIGNING_STORE_PASSWORD --key-pass env:SIGNING_KEY_PASSWORD --out dist/Everyone-AI-English-4.6.2.apk build/aligned.apk
+"$TOOLS/apksigner" verify --verbose dist/Everyone-AI-English-4.6.2.apk
+echo "Built dist/Everyone-AI-English-4.6.2.apk"

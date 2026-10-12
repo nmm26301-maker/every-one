@@ -1,6 +1,6 @@
 import json,pathlib,zipfile,sqlite3,tempfile,hashlib
 root=pathlib.Path(__file__).resolve().parents[1]
-with zipfile.ZipFile(root/'dist/Everyone-AI-English-4.6.1.apk') as apk:
+with zipfile.ZipFile(root/'dist/Everyone-AI-English-4.6.2.apk') as apk:
     assert 'classes.dex' in apk.namelist()
     for name in ['libenglish_whisper.so','libenglish_llama.so','libenglish_speech.so','libc++_shared.so','libonnxruntime.so','libonnxruntime4j_jni.so']:assert 'lib/arm64-v8a/'+name in apk.namelist()
     assert hashlib.sha256(apk.read('assets/models/ggml-tiny.en.bin')).hexdigest()=='921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f'

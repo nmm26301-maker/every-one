@@ -11,12 +11,12 @@ public final class LocalAI {
  private static final Object WHISPER_LOCK=new Object(),LLAMA_LOCK=new Object();
  private LocalAI() {}
  public static String islandTranscribe(Context c,float[] pcm,String language,CloudClient.Job job)throws Exception {
-  synchronized(WHISPER_LOCK){device();job.check();if(!LocalWav.hasSignal(pcm))throw new IOException("没有有效声音，请重新说一句");LocalNative.loadWhisper();String result=LocalNative.whisperLanguage(LocalModels.multilingual(c,job).getPath(),pcm,2,"ja".equals(language)?"ja":"zh",callback(job,s->{}));job.check();if(result==null||result.trim().isEmpty())throw new IOException("没有识别出文字，请按住说话或改用文字输入");return result.trim();}
+  synchronized(WHISPER_LOCK){device();job.check();if(!LocalWav.hasSignal(pcm))throw new IOException("没有有效声音，请重新说一句");LocalNative.loadWhisper();String result=LocalNative.whisperLanguage(LocalModels.multilingual(c,job).getPath(),pcm,3,"ja".equals(language)?"ja":"zh",callback(job,s->{}));job.check();if(result==null||result.trim().isEmpty())throw new IOException("没有识别出文字，请按住说话或改用文字输入");return result.trim();}
  }
  private static LocalNative.Callbacks callback(CloudClient.Job job,CloudClient.Delta delta){return new LocalNative.Callbacks(){public boolean abort(){try{job.check();return false;}catch(CancellationException e){return true;}}public void segment(long a,long b,String s){}public void text(String s){String visible=LocalPrompt.visible(s);if(!visible.isEmpty())delta.text(visible);}};}
  public static String islandChat(Context c,String instruction,JSONArray history,CloudClient.Job job,CloudClient.Delta delta)throws Exception {
   synchronized(LLAMA_LOCK){device();job.check();LocalModels.Spec spec=LocalModels.islandModel(c);if(!LocalModels.ready(c,spec))throw new IOException("先安装选中的 "+spec.name);List<String[]> messages=new ArrayList<>();for(int i=0;i<history.length();i++){JSONObject m=history.getJSONObject(i);messages.add(new String[]{m.optString("role"),m.optString("content")});}
-   String prompt=spec!=LocalModels.DEEPSEEK?IslandPrompt.qwen(instruction,messages):IslandPrompt.deepseek(instruction,messages);LocalNative.loadLlama();String reply=LocalNative.chat(LocalModels.file(c,spec).getPath(),prompt,3,160,callback(job,delta));job.check();reply=LocalPrompt.visible(reply);if(reply.isEmpty())throw new IOException("模型没有生成可用回复，请再试一句");delta.text(reply);return reply;}
+   String prompt=spec!=LocalModels.DEEPSEEK?IslandPrompt.qwen(instruction,messages):IslandPrompt.deepseek(instruction,messages);LocalNative.loadLlama();String reply=LocalNative.chatFast(LocalModels.file(c,spec).getPath(),prompt,3,96,callback(job,delta));job.check();reply=LocalPrompt.visible(reply);if(reply.isEmpty())throw new IOException("模型没有生成可用回复，请再试一句");delta.text(reply);return reply;}
  }
  public interface WarmProgress {void stage(String value);}
  public static void warmIsland(Context c,CloudClient.Job job)throws Exception {warmIsland(c,job,true,s->{});}
