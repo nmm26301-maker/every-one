@@ -48,4 +48,12 @@ TIFA 1.0 ST 是音素时间对齐模型：输入课程的预期发音，输出�
 
 ## GitHub 备份
 
-此仓库正在导入 4.5 源码与经过 SHA-256 校验的安装包。公开备份排除原签名私钥。备份完成状态以 BACKUP.md 为准。
+4.5 完整项目备份已完成并校验，包含原始源码 ZIP、原签名 APK、模型、原生库、课程、测试、构建脚本、原签名密钥及原密码。
+
+因源码 ZIP 内也含签名私钥，完整备份保存在本人私有仓库，访问需要仓库权限：
+
+[打开完整私有备份](https://github.com/nmm26301-maker/Zizai/tree/backup/magic-island-4.5-20261012/backups/Magic-Island-4.5)
+
+`SIGNING.md` 保存原签名和原密码说明；`restore.py` 按 `manifest.json` 还原并校验文件；`VALIDATION.json` 记录验证结果。完整备份共 10 个原始交付文件，约 906 MB，全部 69 个备份文件已核对 GitHub blob SHA；原密钥和密码已从 GitHub 取回并完成签名验证。
+
+此备份覆盖 4.5 项目文件；手机内聊天记录、学习进度、录音及个人 API 设置需在应用内另行导出，早期 APK/源码版本未收录。
