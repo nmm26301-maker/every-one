@@ -6,13 +6,15 @@
 
 阅读计时只统计前台阅读与词卡复习，满 10 分钟可记录当日路线完成；不会重复记录同一天。词卡翻面后才能评价记忆情况，按结果安排到期复习。阅读位置、词卡与路线状态随“完整学习迁移包”导出和恢复；收藏的词也加入原有词库。长词典释义在词卡中限长，原有词库保留完整释义。
 
+[下载原签名 APK](https://github.com/nmm26301-maker/Zizai/releases/download/everyone-v4.6.1/Everyone-AI-English-4.6.1.apk)（需登录有权访问私有备份的 GitHub 账号）。
+
 APK 包名仍为 org.openenglish.reader，版本号 4.6.1 / versionCode 47，沿用原签名。直接覆盖安装，不要先卸载。
 
 验证：全部 Android Java、DEX、资源构建；原签名、APK/原生库对齐、现有课程/模型资源校验；原有宿主回归与阅读状态/内容验证通过；TIFA 1784 项真实宿主 ONNX 检查通过。宿主测试不等同于手机实测，目前未执行小米 10 Pro 的安装、系统 TTS、麦克风和端到端播放测试。
 
 ## 构建及完整备份
 
-完整模型、原生库与原签名材料来自你指定的私有 4.5 备份。本次完整源码 ZIP、APK、原密钥、密码说明、校验清单和恢复脚本会备份到私有分支 backup/everyone-4.6.1-20261012 的 backups/Everyone-4.6.1。公开仓库中的 build.sh 使用环境变量指定签名材料，不包含私钥。
+完整模型、原生库与原签名材料来自你指定的私有 4.5 备份。本次完整源码 ZIP、APK、原密钥、密码说明与 SHA256SUMS 已保存在 [完整私有发布备份](https://github.com/nmm26301-maker/Zizai/releases/tag/everyone-v4.6.1)。恢复/构建脚本位于私有分支 backup/everyone-4.6.1-20261012 的 backups/Everyone-4.6.1。GitHub Actions 已实际完成恢复、构建、阅读验证、资源检查、原签名核对及发布。公开仓库中的 build.sh 使用环境变量指定签名材料，不包含私钥。
 
 既有基线备份：https://github.com/nmm26301-maker/Zizai/tree/backup/magic-island-4.5-20261012/backups/Magic-Island-4.5
 
