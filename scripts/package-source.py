@@ -8,7 +8,7 @@ for directory in ['app','scripts','tests','native','vendor']:
         if not path.is_file() or '__pycache__' in path.parts:continue
         if path.name in ['ui-smoke.py','final-probes.py']:continue
         files.append(path)
-for name in ['README.md','README-4.1.md','README-4.2.md','README-4.3.md','README-4.4.md','README-4.5.md','README-4.6.1.md','README-4.6.2.md','VALIDATION.md','LICENSE','build.sh','.gitignore','build/debug.keystore']:
+for name in ['README.md','README-4.1.md','README-4.2.md','README-4.3.md','README-4.4.md','README-4.5.md','README-4.6.1.md','README-4.6.2.md','VALIDATION.md','LICENSE','build.sh','.gitignore']:
     files.append(root/name)
 for path in (root/'qa').glob('*'):
     if path.is_file() and ((path.name.startswith(('v3-', 'v31-', 'v32-', 'v33-', 'v34-', 'v35-', 'v36-', 'v37-', 'v38-', 'v39-', 'v40-', 'v41-', 'v42-', 'v43-', 'v44-', 'v45-', 'v46-', 'v461-', 'v462-')) and not any(term in path.name for term in ['failure','diagnosis','first'])) or path.name in ['legacy-storage.txt','studio-validation.txt','upgrade-seed.txt','upgrade-validation.txt','ui-persistence.txt','runtime.txt','dictionary-ui.txt']):files.append(path)
