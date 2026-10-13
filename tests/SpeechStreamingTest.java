@@ -47,6 +47,18 @@ public final class SpeechStreamingTest {
   s.clear();check(s.accept("1.\n",false).isEmpty(),"line break alone does not speak a numbered marker");
   check(s.accept("1.\nSay hello.",false).equals(Arrays.asList("1.\nSay hello.")),"split-line instruction retains its number once");
   s.clear();check(s.accept("It is 2. Next item.",false).equals(Arrays.asList("It is 2.","Next item.")),"integer sentence still ends normally");
+  String mixedWord="abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+  s.clear();check(s.accept("中文 "+mixedWord,false).isEmpty(),"Chinese prefix cannot force an unfinished English word into TTS");
+  check(s.accept("中文 "+mixedWord,true).equals(Arrays.asList("中文 "+mixedWord)),"final mixed-language long word flushes intact");
+  for(String mixed:Arrays.asList("中文 "+mixedWord+" next word.","An introduction 中文 "+mixedWord+" then continue.","日本語 "+mixedWord+" 続けましょう。","한국어 😀 "+mixedWord+" finish!")){
+   magic.clear();List<String> pieces=new ArrayList<>();
+   for(int i=1;i<=mixed.length();i++)pieces.addAll(magic.accept(mixed.substring(0,i),false));
+   pieces.addAll(magic.accept(mixed,true));
+   check(pieces.stream().anyMatch(p->p.contains(mixedWord)),"mixed cumulative tokens keep the whole Latin word: "+mixed.substring(0,4));
+   check(String.join("",pieces).replaceAll("\\s+","").equals(mixed.replaceAll("\\s+","")),"mixed cumulative tokens preserve all text exactly once: "+mixed.substring(0,4));
+  }
+  check(magic.accept("한국어 😀 "+mixedWord+" finish!",true).isEmpty(),"mixed completion remains idempotent");
+  magic.clear();check(magic.accept(cjk,false).get(0).length()==28,"mixed-word protection preserves prompt CJK chunking");
   System.out.println("SPEECH_STREAM_CHECKS: "+checks);
  }
 }

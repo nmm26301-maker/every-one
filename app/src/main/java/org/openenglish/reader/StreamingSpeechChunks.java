@@ -23,7 +23,8 @@ public final class StreamingSpeechChunks {
    if(boundary){
     while(to<limit&&closing(text.charAt(to)))to++;
     emit(out,text,from,to);from=to;consumed=to;i=to-1;cjk=false;
-   }else if(cjk&&((c=='，'||c=='、'||c=='；')&&i-from+1>=10||i-from+1>=28&&!Character.isHighSurrogate(c))){
+   // A CJK prefix does not make later Latin words safe to cut at an arbitrary length.
+   }else if(cjk&&((c=='，'||c=='、'||c=='；')&&i-from+1>=10||i-from+1>=28&&(isCjk(c)||Character.isWhitespace(c)))){
     emit(out,text,from,to);from=to;consumed=to;cjk=false;
    }else if(!cjk&&Character.isWhitespace(c)&&(i-from>=72||consumed==0&&i-from>=38)){
     emit(out,text,from,i);from=to;consumed=to;
