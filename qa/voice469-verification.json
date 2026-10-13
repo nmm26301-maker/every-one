@@ -1,0 +1,21 @@
+{
+  "versionName": "4.6.9",
+  "versionCode": 55,
+  "apk_sha256": "163806322603e6156c4b5ae50bc77fa941aac3f167faa0cc31c91f63fac57a36",
+  "apk_bytes": 427866592,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "new_job_checks": 15,
+  "existing_commit_checks": 8,
+  "existing_voice_checks": 179,
+  "backup_integrity_tests": 6,
+  "total_host_checks": 208,
+  "identical_classes": 1000,
+  "changed_classes": [
+    "org/openenglish/reader/CloudClient$Job.smali"
+  ],
+  "added_classes": [
+    "org/openenglish/reader/CloudClient$Job$1.smali"
+  ],
+  "identical_assets_native_resources": 347,
+  "phone_tested": false
+}

@@ -21,23 +21,46 @@ public final class CloudClient {
     private volatile boolean committing;
     private HttpURLConnection connection;
 
-    public synchronized void cancel() {
-      if (committing) return;
-      cancelled = true;
-      if (connection != null) connection.disconnect();
+    public void cancel() {
+      HttpURLConnection closing;
+      synchronized (this) {
+        if (committing || cancelled) return;
+        cancelled = true;
+        closing = connection;
+        connection = null;
+      }
+      disconnectLater(closing);
     }
 
     public void check() {
+      checkState();
+    }
+
+    private void checkState() {
       if (!committing && (cancelled || Thread.currentThread().isInterrupted()))
         throw new CancellationException("已取消");
     }
 
     /** Used for the final local database transaction, after cancellable preparation has completed. */
-    public synchronized void beginCommit() { check(); committing = true; }
+    public void beginCommit() { check(); synchronized (this) { checkState(); committing = true; } }
 
-    synchronized void attach(HttpURLConnection c) {
-      check();
-      connection = c;
+    void attach(HttpURLConnection c) {
+      try {
+        check();
+        synchronized (this) { checkState(); connection = c; }
+      } catch (CancellationException stopped) {
+        disconnectLater(c);
+        throw stopped;
+      }
+    }
+
+    private static void disconnectLater(final HttpURLConnection c) {
+      if (c == null) return;
+      Thread cleanup = new Thread(new Runnable() {
+        public void run() { try { c.disconnect(); } catch (RuntimeException ignored) {} }
+      }, "english-request-cleanup");
+      cleanup.setDaemon(true);
+      cleanup.start();
     }
 
     public boolean cancelled() {

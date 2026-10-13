@@ -21,3 +21,4 @@ jobs:
           bash tests/test-deadline-recovery.sh
           bash tests/test-speech-streaming.sh
           python3 tests/test-exact-apk.py
+          python3 tests/test-cloud-job-recovery.py
