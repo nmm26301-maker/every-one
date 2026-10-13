@@ -38,6 +38,15 @@ public final class SpeechStreamingTest {
   magic.clear();check(magic.accept("好的。下一句？",false).equals(Arrays.asList("好的。","下一句？")),"short Chinese sentences speak promptly");
   s.clear();List<String> tokens=new ArrayList<>();for(int i=1;i<=english.length();i++)tokens.addAll(s.accept(english.substring(0,i),false));tokens.addAll(s.accept(english,true));check(joined(tokens).equals(english),"character-at-a-time cumulative stream preserves all words");
   s.clear();String word="abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";check(s.accept(word,false).isEmpty(),"long English word is never cut in half");check(s.accept(word,true).equals(Arrays.asList(word)),"long final word flushes intact");
+  s.clear();check(s.accept("你好!我们一起练习。",false).equals(Arrays.asList("你好!","我们一起练习。")),"ASCII punctuation ends a Chinese phrase without spaces");
+  s.clear();check(s.accept("Hello!你好。",false).equals(Arrays.asList("Hello!","你好。")),"English can hand off immediately to Chinese text");
+  s.clear();check(s.accept("**Hello!** How are you?",false).equals(Arrays.asList("**Hello!**","How are you?")),"bold formatting does not delay a finished greeting");
+  s.clear();check(s.accept("`Hello!` Next sentence.",false).equals(Arrays.asList("`Hello!`","Next sentence.")),"inline formatting stays with completed phrase");
+  s.clear();check(s.accept("1. ",false).isEmpty(),"streamed numbered marker waits for spoken content");
+  check(s.accept("1. Say hello.",false).equals(Arrays.asList("1. Say hello.")),"number stays with its instruction");
+  s.clear();check(s.accept("1.\n",false).isEmpty(),"line break alone does not speak a numbered marker");
+  check(s.accept("1.\nSay hello.",false).equals(Arrays.asList("1.\nSay hello.")),"split-line instruction retains its number once");
+  s.clear();check(s.accept("It is 2. Next item.",false).equals(Arrays.asList("It is 2.","Next item.")),"integer sentence still ends normally");
   System.out.println("SPEECH_STREAM_CHECKS: "+checks);
  }
 }

@@ -1,0 +1,25 @@
+{
+  "versionName": "4.6.8",
+  "versionCode": 54,
+  "apk_sha256": "3f3da240f6d5716ac751d42bb49ff032863d9d7fd08ec4c07ee68481c48099f0",
+  "apk_bytes": 427866592,
+  "overlay_sha256": "f024c2f39427b0835c4208ca1c57ea3158ad3598554388bf4fe442e46c1d882f",
+  "host_checks_passed": 179,
+  "checks": {
+    "buffer": 7,
+    "boundary": 24,
+    "voice_flow": 39,
+    "playback_guard": 15,
+    "deadline": 15,
+    "streaming": 43,
+    "microphone": 36
+  },
+  "identical_class_disassemblies": 1000,
+  "changed": [
+    "org/openenglish/reader/StreamingSpeechChunks.smali"
+  ],
+  "identical_assets_native_resources": 347,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "phone_tested": false,
+  "source_note": "Complete 4.6.2 source baseline plus recovered microphone/speech deltas; intervening Java source remains unavailable, preserved as compiled code."
+}

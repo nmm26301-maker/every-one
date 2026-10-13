@@ -8,7 +8,7 @@
 
 仓库保留 4.6.2 的完整源码基线，以及恢复出的录音和流式朗读源码。4.6.3 的界面、重试和模型上下文等完整 Java 修改未从临时工作区恢复；4.6.7 保留这些功能的方式是使用已验证安装包的编译代码快照。不要把常规 `build.sh` 的基线构建结果当作本次安装包。
 
-当前签名发行由私有备份仓库 `nmm26301-maker/Zizai` 的 `backup/everyone-4.6.7-20261013` 分支构建，保存代码覆盖包、原签名 APK、签名恢复资料、SHA256SUMS 和本仓库的确切提交。公开仓库不包含签名密钥或密码。
+4.6.7 源码增量已同步到公开主分支，编译覆盖包已保存到私有备份分支 `backup/everyone-4.6.7-20261013`。APK 自动构建发布工作流被自动审核拦截，尚未执行。公开仓库不包含签名密钥或密码。
 
 `python3 scripts/build-release-overlay.py BASE_APK CODE_OVERLAY_ZIP OUTPUT_APK` 会核对每个模型、音频和本地库的 SHA-256，然后恢复当前代码和 Android 资源。覆盖包保存在私有备份中。基线资产可取自已保存的 4.6.2–4.6.6 APK，必须通过逐文件校验。随后使用 Android 35 build-tools 的 zipalign 和 `scripts/sign-release.py` 生成覆盖安装包。
 
