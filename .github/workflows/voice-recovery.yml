@@ -20,3 +20,4 @@ jobs:
           bash tests/test-mic-capture.sh
           bash tests/test-deadline-recovery.sh
           bash tests/test-speech-streaming.sh
+          python3 tests/test-exact-apk.py
