@@ -12,7 +12,7 @@ public final class ConversationMic {
  public interface Listener extends VoiceGate.Listener {
   void ready(boolean echoCancellation,int source);void meter(int value,double rms,float probability,boolean guarded,boolean silenced);void notice(String message);void error(String message);void released();
  }
- private final AtomicBoolean stopping=new AtomicBoolean();
+ private final AtomicBoolean stopping=new AtomicBoolean(),started=new AtomicBoolean();
  private final ConcurrentLinkedQueue<Integer> commands=new ConcurrentLinkedQueue<>();
  private final Listener listener;private final Permit permit;private final String model;private final int silence;private final int source;private final float threshold;
  private volatile AudioRecord recorder;
@@ -20,12 +20,10 @@ public final class ConversationMic {
  public void beginManual(){commands.offer(1);}
  public void finishManual(){commands.offer(2);}
  public void cancelManual(){commands.offer(3);}
- public void start(){new Thread(this::capture,"english-duplex-mic").start();}
+ public void start(){if(started.compareAndSet(false,true)&&!stopping.get())new Thread(this::capture,"english-duplex-mic").start();}
  public void reset(){commands.offer(3);}
  public void finishAutomatic(){commands.offer(4);}
- public void close(){if(!stopping.compareAndSet(false,true))return;
-  new Thread(()->{AudioRecord r=recorder;if(r!=null)try{r.stop();}catch(Exception ignored){}},"english-stop-mic").start();
- }
+ public void close(){stopping.set(true);}
  private void capture(){
   AudioRecord record=null;AcousticEchoCanceler echo=null;NoiseSuppressor noise=null;long vad=0;
   try{
@@ -42,20 +40,30 @@ public final class ConversationMic {
    vad=LocalNative.vadOpen(model);if(stopping.get())return;
    record.startRecording();if(record.getRecordingState()!=AudioRecord.RECORDSTATE_RECORDING)throw new IllegalStateException("无法启动麦克风，请检查其他应用是否占用");
    listener.ready(aec,record.getAudioSource());VoiceGate gate=new VoiceGate(silence,listener);ManualCapture manual=new ManualCapture();
-   short[] frame=new short[VoiceGate.FRAME];float[] samples=new float[VoiceGate.FRAME];int filled=0;long meterAt=0;boolean guarded=false;
+   short[] frame=new short[VoiceGate.FRAME];float[] samples=new float[VoiceGate.FRAME];int filled=0;long meterAt=0,lastAudioAt=SystemClock.elapsedRealtime();boolean guarded=false;
    while(!stopping.get()){
-    int n=record.read(frame,filled,frame.length-filled,AudioRecord.READ_BLOCKING);
-    if(n<0){if(stopping.get())break;throw new IllegalStateException("录音中断（"+n+"），请重新开始");}
-    if(n==0)continue;filled+=n;if(filled<frame.length)continue;filled=0;
-    Integer command;while((command=commands.poll())!=null){
+    Integer command;while(!stopping.get()&&(command=commands.poll())!=null){
+     if(command==1&&manual.active())continue;
+     if((command==2||command==4)&&manual.active()&&filled>0)manual.append(java.util.Arrays.copyOf(frame,filled));
+     filled=0;
      if(command==4){if(manual.active()){ManualCapture.Result result=manual.finish();if(result!=null)listener.end(result.pcm,result.clipped);}else if(gate.speaking())gate.finish();else listener.notice("还没有录到这句话，请先说话或按住录音");LocalNative.vadReset(vad);continue;}
      gate.reset();LocalNative.vadReset(vad);
      if(command==1){manual.begin();listener.start();}
      else if(command==2){ManualCapture.Result result=manual.finish();if(result!=null)listener.end(result.pcm,result.clipped);else listener.notice("录音太短，请按住按钮说完一句再松开");}
      else manual.cancel();
     }
+    if(stopping.get())break;
+    int n=record.read(frame,filled,frame.length-filled,AudioRecord.READ_NON_BLOCKING);
+    if(stopping.get())break;
+    if(n<0)throw new IllegalStateException("录音中断（"+n+"），请重新开始");
+    long readAt=SystemClock.elapsedRealtime();
+    if(n==0){
+     if(readAt-lastAudioAt>=3000)throw new IllegalStateException("麦克风连续 3 秒没有返回音频，请检查是否被其他应用占用后重新开始");
+     java.util.concurrent.locks.LockSupport.parkNanos(8_000_000L);continue;
+    }
+    lastAudioAt=readAt;filled+=n;if(filled<frame.length)continue;filled=0;
     double volume=VoiceGate.rms(frame);boolean allowed=permit.allowed(aec);float probability=Float.NaN;
-    if(manual.active()){manual.append(frame);}
+    if(manual.active()){boolean limited=manual.limitReached();manual.append(frame);if(!limited&&manual.limitReached())listener.notice("录音已达 18 秒上限，请松开发送；后续声音不会保留");}
     else if(!allowed){if(!guarded){gate.reset();LocalNative.vadReset(vad);}guarded=true;}
     else {
      if(guarded){guarded=false;gate.reset();LocalNative.vadReset(vad);}

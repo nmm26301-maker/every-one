@@ -1,0 +1,14 @@
+{
+  "versionName": "4.6.7",
+  "versionCode": 53,
+  "host_checks_passed": 170,
+  "host_quiet_frames": 10000,
+  "old_allocated_bytes": 10400000,
+  "new_allocated_bytes": 0,
+  "identical_class_disassemblies": 1000,
+  "changed": [
+    "org/openenglish/reader/VoiceGate.smali"
+  ],
+  "phone_tested": false,
+  "source_note": "4.6.2 source baseline plus recovered microphone/speech deltas; intervening UI/model source is preserved as verified compiled code in the private overlay."
+}

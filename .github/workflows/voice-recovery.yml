@@ -1,0 +1,22 @@
+name: Voice capture and speech recovery
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: |
+          bash tests/test-voice-buffer.sh
+          bash tests/test-conversation-boundary.sh
+          bash tests/test-mic-capture.sh
+          bash tests/test-deadline-recovery.sh
+          bash tests/test-speech-streaming.sh
