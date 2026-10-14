@@ -10,22 +10,22 @@ public final class SpeechStreamingTest {
   check(s.accept("Hello! How are you?",false).equals(Arrays.asList("How are you?")),"next sentence follows without repeating greeting");
   check(s.accept("Hello! How are you?",true).isEmpty(),"final callback does not repeat spoken sentences");
   s.clear();check(s.accept("It costs 3.",false).isEmpty(),"pending decimal waits for next token");
-  check(s.accept("It costs 3.50 dollars.",false).equals(Arrays.asList("It costs 3.50 dollars.")),"decimal is spoken as a single number");
+  check(s.accept("It costs 3.50 dollars. ",false).equals(Arrays.asList("It costs 3.50 dollars.")),"decimal is spoken as a single number");
   s.clear();check(s.accept("There are 2.",true).equals(Arrays.asList("There are 2.")),"final integer sentence flushes");
   for(String title:Arrays.asList("Dr.","Mr.","Ms.","Prof.")){
    s.clear();check(s.accept("Ask "+title,false).isEmpty(),"streamed title stays with name: "+title);
-   check(s.accept("Ask "+title+" Smith.",false).equals(Arrays.asList("Ask "+title+" Smith.")),"complete name sentence stays together: "+title);
+   check(s.accept("Ask "+title+" Smith. ",false).equals(Arrays.asList("Ask "+title+" Smith.")),"complete name sentence stays together: "+title);
   }
-  s.clear();check(s.accept("Use e.g. a short reply.",false).equals(Arrays.asList("Use e.g. a short reply.")),"example abbreviation does not split a phrase");
-  s.clear();check(s.accept("Meet J. Smith in the U.S. today.",false).equals(Arrays.asList("Meet J. Smith in the U.S. today.")),"initials and country abbreviation stay in sentence");
-  s.clear();check(s.accept("Visit example.com today.",false).equals(Arrays.asList("Visit example.com today.")),"domain period does not split a sentence");
+  s.clear();check(s.accept("Use e.g. a short reply. ",false).equals(Arrays.asList("Use e.g. a short reply.")),"example abbreviation does not split a phrase");
+  s.clear();check(s.accept("Meet J. Smith in the U.S. today. ",false).equals(Arrays.asList("Meet J. Smith in the U.S. today.")),"initials and country abbreviation stay in sentence");
+  s.clear();check(s.accept("Visit example.com today. ",false).equals(Arrays.asList("Visit example.com today.")),"domain period does not split a sentence");
   s.clear();check(s.accept("She said \"Hello!\" Then left.",true).equals(Arrays.asList("She said \"Hello!\"","Then left.")),"closing quote remains with sentence");
   s.clear();check(s.accept("Wait... Please continue.",true).equals(Arrays.asList("Wait...","Please continue.")),"ellipsis does not create empty speech fragments");
   s.clear();check(s.accept("### ... !!!",true).isEmpty(),"punctuation-only content is not sent to speech engine");
   s.clear();check(s.accept("Hello \ud83d",false).isEmpty(),"incomplete surrogate is not handed to TTS");
   check(s.accept("Hello 😀!",true).equals(Arrays.asList("Hello 😀!")),"completed emoji is preserved");
   s.clear();check(s.accept("bad\ufffd",false).isEmpty(),"incomplete native text is ignored");
-  s.clear();s.accept("Hello there.",false);check(s.accept("Revised first sentence. Other words",true).isEmpty(),"model revision cannot replay an unrelated suffix");
+  s.clear();s.accept("Hello there. ",false);check(s.accept("Revised first sentence. Other words",true).isEmpty(),"model revision cannot replay an unrelated suffix");
   check(s.accept("Hello there. Stable ending",true).equals(Arrays.asList("Stable ending")),"stable prefix resumes after revision");
   String english="This is a long English reply with enough complete words to begin speaking before the rest of this reply is generated";
   MagicSpeechChunks magic=new MagicSpeechChunks();List<String> early=magic.accept(english,false);
@@ -41,12 +41,12 @@ public final class SpeechStreamingTest {
   s.clear();check(s.accept("你好!我们一起练习。",false).equals(Arrays.asList("你好!","我们一起练习。")),"ASCII punctuation ends a Chinese phrase without spaces");
   s.clear();check(s.accept("Hello!你好。",false).equals(Arrays.asList("Hello!","你好。")),"English can hand off immediately to Chinese text");
   s.clear();check(s.accept("**Hello!** How are you?",false).equals(Arrays.asList("**Hello!**","How are you?")),"bold formatting does not delay a finished greeting");
-  s.clear();check(s.accept("`Hello!` Next sentence.",false).equals(Arrays.asList("`Hello!`","Next sentence.")),"inline formatting stays with completed phrase");
+  s.clear();check(s.accept("`Hello!` Next sentence. ",false).equals(Arrays.asList("`Hello!`","Next sentence.")),"inline formatting stays with completed phrase");
   s.clear();check(s.accept("1. ",false).isEmpty(),"streamed numbered marker waits for spoken content");
-  check(s.accept("1. Say hello.",false).equals(Arrays.asList("1. Say hello.")),"number stays with its instruction");
+  check(s.accept("1. Say hello. ",false).equals(Arrays.asList("1. Say hello.")),"number stays with its instruction");
   s.clear();check(s.accept("1.\n",false).isEmpty(),"line break alone does not speak a numbered marker");
-  check(s.accept("1.\nSay hello.",false).equals(Arrays.asList("1.\nSay hello.")),"split-line instruction retains its number once");
-  s.clear();check(s.accept("It is 2. Next item.",false).equals(Arrays.asList("It is 2.","Next item.")),"integer sentence still ends normally");
+  check(s.accept("1.\nSay hello. ",false).equals(Arrays.asList("1.\nSay hello.")),"split-line instruction retains its number once");
+  s.clear();check(s.accept("It is 2. Next item. ",false).equals(Arrays.asList("It is 2.","Next item.")),"integer sentence still ends normally");
   String mixedWord="abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
   s.clear();check(s.accept("中文 "+mixedWord,false).isEmpty(),"Chinese prefix cannot force an unfinished English word into TTS");
   check(s.accept("中文 "+mixedWord,true).equals(Arrays.asList("中文 "+mixedWord)),"final mixed-language long word flushes intact");
@@ -59,6 +59,20 @@ public final class SpeechStreamingTest {
   }
   check(magic.accept("한국어 😀 "+mixedWord+" finish!",true).isEmpty(),"mixed completion remains idempotent");
   magic.clear();check(magic.accept(cjk,false).get(0).length()==28,"mixed-word protection preserves prompt CJK chunking");
+  s.clear();check(s.accept("Visit example.",false).isEmpty(),"ambiguous trailing period waits for its next token");
+  check(s.accept("Visit example.com",false).isEmpty(),"domain continuation stays with the unspoken prefix");
+  check(s.accept("Visit example.com now.",true).equals(Arrays.asList("Visit example.com now.")),"final domain phrase flushes intact");
+  s.clear();check(s.accept("Hello.",false).isEmpty(),"sentence period at a stream edge waits for confirmation");
+  check(s.accept("Hello. ",false).equals(Arrays.asList("Hello.")),"confirmed sentence period speaks before completion");
+  check(s.accept("Hello. ",true).isEmpty(),"final confirmation does not repeat spoken sentence");
+  for(String phrase:Arrays.asList("Visit example.com.","Use example.org/path.","Wait... Continue.","Ask Dr. Smith.","打开 example.com 再继续。")){
+   s.clear();List<String> parts=new ArrayList<>();
+   for(int i=1;i<=phrase.length();i++)parts.addAll(s.accept(phrase.substring(0,i),false));
+   parts.addAll(s.accept(phrase,true));
+   check(joined(parts).equals(phrase),"period token stream preserves punctuation and words: "+phrase);
+   String atom=phrase.contains("example.com")?"example.com":phrase.contains("example.org")?"example.org/path":phrase.startsWith("Wait")?"Wait...":"Dr. Smith";
+   check(parts.stream().anyMatch(p->p.contains(atom)),"period token stream keeps its spoken unit whole: "+atom);
+  }
   System.out.println("SPEECH_STREAM_CHECKS: "+checks);
  }
 }

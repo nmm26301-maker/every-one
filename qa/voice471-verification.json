@@ -1,0 +1,19 @@
+{
+  "versionName": "4.7.1",
+  "versionCode": 57,
+  "apk_sha256": "d962457ae7440fd977eeebfd19debcc036e9a57ce1251bb792f1ddfdd38f3d82",
+  "apk_bytes": 427866592,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "new_period_stream_checks": 16,
+  "speech_stream_checks": 71,
+  "total_host_checks": 236,
+  "identical_classes": 1001,
+  "changed_classes": [
+    "org/openenglish/reader/StreamingSpeechChunks.smali"
+  ],
+  "added_classes": [],
+  "identical_assets_native_resources": 347,
+  "phone_tested": false,
+  "restore_kit_sha256": "5ccfc49b16fbbe58228dd511266a109d6ab395fafa3f8a74761b430ecbbf5276",
+  "restore_kit_bytes": 462803
+}

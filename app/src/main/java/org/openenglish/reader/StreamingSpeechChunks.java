@@ -34,10 +34,14 @@ public final class StreamingSpeechChunks {
   prefix=text.substring(0,consumed);return out;
  }
  private static boolean periodEnds(String s,int at,int limit,boolean done){
-  if(at+1<limit&&s.charAt(at+1)=='.')return false;
+  // A token ending in '.' may still grow into a domain, abbreviation or ellipsis.
+  if(at+1==limit&&!done)return false;
+  if(at+1<limit){
+   char next=s.charAt(at+1);
+   if(next=='.'||Character.isLetterOrDigit(next)&&!isCjk(next)||next=='/'||next=='\\')return false;
+  }
   if(at>0&&Character.isDigit(s.charAt(at-1))){
    if(at+1<limit&&Character.isDigit(s.charAt(at+1)))return false;
-   if(at+1==limit&&!done)return false;
   }
   int line=s.lastIndexOf('\n',Math.max(0,at-1))+1;
   if((at+1==limit||Character.isWhitespace(s.charAt(at+1)))&&numberMarker(s.substring(line,at+1).trim()))return false;
