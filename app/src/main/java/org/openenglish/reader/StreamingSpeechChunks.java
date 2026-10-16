@@ -31,7 +31,10 @@ public final class StreamingSpeechChunks {
    }
   }
   if(done){emit(out,text,from,limit);consumed=limit;}
-  prefix=text.substring(0,consumed);return out;
+  // Native callbacks are cumulative: keep the spoken prefix until a new chunk is emitted.
+  // Copying it on every token creates garbage proportional to the whole spoken reply.
+  if(consumed!=prefix.length())prefix=text.substring(0,consumed);
+  return out;
  }
  private static boolean periodEnds(String s,int at,int limit,boolean done){
   // A token ending in '.' may still grow into a domain, abbreviation or ellipsis.

@@ -73,6 +73,20 @@ public final class SpeechStreamingTest {
    String atom=phrase.contains("example.com")?"example.com":phrase.contains("example.org")?"example.org/path":phrase.startsWith("Wait")?"Wait...":"Dr. Smith";
    check(parts.stream().anyMatch(p->p.contains(atom)),"period token stream keeps its spoken unit whole: "+atom);
   }
+  StringBuilder longReply=new StringBuilder();
+  for(int n=0;n<160;n++)longReply.append("Sentence ").append(n).append(" keeps every spoken word. ");
+  String cumulative=longReply.toString();s.clear();List<String> many=new ArrayList<>();boolean duplicatesSilent=true;
+  for(int i=1;i<=cumulative.length();i++){
+   String update=cumulative.substring(0,i);many.addAll(s.accept(update,false));
+   duplicatesSilent&=s.accept(update,false).isEmpty();
+  }
+  many.addAll(s.accept(cumulative,true));
+  check(duplicatesSilent,"duplicate callbacks across a long token stream stay silent");
+  check(joined(many).equals(cumulative.trim()),"long token stream preserves every numbered sentence exactly once");
+  check(s.accept(cumulative,true).isEmpty(),"long reply final callback stays idempotent");
+  check(s.accept("Rewritten previous reply. New ending.",true).isEmpty(),"long spoken prefix rejects unrelated model revision");
+  check(s.accept(cumulative+"One final sentence.",true).equals(Arrays.asList("One final sentence.")),"long spoken prefix accepts stable continuation after rejected revision");
+  s.clear();check(s.accept("Fresh session!",true).equals(Arrays.asList("Fresh session!")),"clearing long reply permits a fresh session");
   System.out.println("SPEECH_STREAM_CHECKS: "+checks);
  }
 }

@@ -1,0 +1,16 @@
+{
+  "versionName": "4.7.2",
+  "versionCode": 58,
+  "baseline_commit": "01404cb2fc10fb3b08b5128b847ae4bdfca2c44e",
+  "baseline_apk_sha256": "d962457ae7440fd977eeebfd19debcc036e9a57ce1251bb792f1ddfdd38f3d82",
+  "speech_stream_checks": 77,
+  "total_host_checks": 242,
+  "allocation_benchmark": {
+    "callbacks": 5970,
+    "sentences": 160,
+    "previous_allocated_bytes": 19091808,
+    "current_allocated_bytes": 1607240,
+    "scope": "host Java splitting only; prebuilt input strings; excludes model, UI and speech engine"
+  },
+  "phone_tested": false
+}
