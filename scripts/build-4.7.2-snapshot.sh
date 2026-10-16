@@ -6,6 +6,8 @@ output_apk=$(realpath -m "$2")
 cd "$(dirname "$0")/.."
 sdk_tools="$ANDROID_HOME/build-tools/35.0.0"
 build_dir=build/snapshot472
+# Resolve explicit paths for both javac.Main and the Java launcher.
+smali_cp=$(dpkg -L libsmali-java libguava-java libjcommander-java libantlr3-runtime-java | sed -n '/\.jar$/p' | paste -sd:)
 mkdir -p "$build_dir/classes" "$build_dir/dex"
 java --add-modules jdk.compiler com.sun.tools.javac.Main -source 8 -target 8 -d "$build_dir/classes" app/src/main/java/org/openenglish/reader/StreamingSpeechChunks.java
 "$sdk_tools/d8" --min-api 26 --output "$build_dir/dex" "$build_dir/classes/org/openenglish/reader/StreamingSpeechChunks.class"
@@ -15,12 +17,12 @@ p=pathlib.Path(sys.argv[1])
 assert hashlib.sha256(p.read_bytes()).hexdigest()=='d962457ae7440fd977eeebfd19debcc036e9a57ce1251bb792f1ddfdd38f3d82'
 with zipfile.ZipFile(p) as z:pathlib.Path(sys.argv[2]).write_bytes(z.read('classes.dex'))
 PY
-java --add-modules jdk.compiler com.sun.tools.javac.Main -cp '/usr/share/java/*' -d "$build_dir/classes" scripts/DexClassPatch.java
-java -cp "$build_dir/classes:/usr/share/java/*" DexClassPatch "$build_dir/base.dex" "$build_dir/dex/classes.dex" "$build_dir/merged.dex" 'Lorg/openenglish/reader/StreamingSpeechChunks;'
+java --add-modules jdk.compiler com.sun.tools.javac.Main -cp "$smali_cp" -d "$build_dir/classes" scripts/DexClassPatch.java
+java -cp "$build_dir/classes:$smali_cp" DexClassPatch "$build_dir/base.dex" "$build_dir/dex/classes.dex" "$build_dir/merged.dex" 'Lorg/openenglish/reader/StreamingSpeechChunks;'
 python3 scripts/patch-apk-version.py "$base_apk" "$build_dir/merged.dex" "$build_dir/unsigned.apk" d962457ae7440fd977eeebfd19debcc036e9a57ce1251bb792f1ddfdd38f3d82 4.7.1 4.7.2 57 58
 "$sdk_tools/zipalign" -f -P 16 4 "$build_dir/unsigned.apk" "$output_apk"
-java -cp '/usr/share/java/*' org.jf.baksmali.Main disassemble "$build_dir/base.dex" -o "$build_dir/old-smali"
-java -cp '/usr/share/java/*' org.jf.baksmali.Main disassemble "$build_dir/merged.dex" -o "$build_dir/new-smali"
+java -cp "$smali_cp" org.jf.baksmali.Main disassemble "$build_dir/base.dex" -o "$build_dir/old-smali"
+java -cp "$smali_cp" org.jf.baksmali.Main disassemble "$build_dir/merged.dex" -o "$build_dir/new-smali"
 python3 - "$base_apk" "$output_apk" "$build_dir" <<'PY'
 import sys,zipfile,pathlib,hashlib,json
 base,output,build=sys.argv[1:];build=pathlib.Path(build)
