@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Preserve the verified 4.7.1 compiled snapshot; replace only the reviewed streaming class.
 set -euo pipefail
-cd "$(dirname "$0")/.."
 base_apk=$(realpath "$1")
 output_apk=$(realpath -m "$2")
+cd "$(dirname "$0")/.."
 sdk_tools="$ANDROID_HOME/build-tools/35.0.0"
 build_dir=build/snapshot472
 mkdir -p "$build_dir/classes" "$build_dir/dex"
