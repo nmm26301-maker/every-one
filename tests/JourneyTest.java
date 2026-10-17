@@ -14,6 +14,8 @@ public final class JourneyTest {
   for(int i=0;i<40;i++)s.message("u01",i%2==0?"user":"assistant","Message "+i);check(s.chat("u01").length()==30,"chat bounded");check(s.chat("u01").getJSONObject(0).getString("content").equals("Message 10"),"most recent messages retained");
   String exported=s.export();JourneyState restored=new JourneyState(new Memory());restored.restore(exported);check(restored.export().equals(exported),"backup round trip");boolean rejected=false;try{restored.restore("{\"schema\":99}");}catch(Exception e){rejected=true;}check(rejected&&restored.export().equals(exported),"invalid restore preserves state");
   JSONObject invalid=new JSONObject(exported);invalid.getJSONObject("cards").put("u99_4",new JSONObject());rejected=false;try{restored.restore(invalid.toString());}catch(Exception e){rejected=true;}check(rejected,"unknown course rejected");
+  String compact=JourneyCore.tutorInstruction(5,String.join("",Collections.nCopies(80,"话")),String.join("",Collections.nCopies(200,"a")));
+  check(compact.length()<=600,"local tutor instructions survive 600-character engine cap");check(compact.contains("Never judge pronunciation")&&compact.contains("40-90"),"local prompt retains feedback limits and advanced style");
   System.out.println("Journey checks: "+checks);
  }
 }

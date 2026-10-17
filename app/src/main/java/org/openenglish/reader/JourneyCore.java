@@ -63,5 +63,10 @@ public final class JourneyCore {
    default:return "先听单词示范，再慢速分音节模仿，最后放回整句自然说。评测受口音、噪声与设备影响。";
   }
  }
+ public static String tutorInstruction(int level,String topic,String example){
+  String band=new String[]{"Pre-A1","A1","A2","B1","B2","advanced"}[Math.max(0,Math.min(5,level))];
+  String style=level<2?"Use 15-30 words and simple sentences.":level<4?"Use 30-60 everyday words.":"Use 40-90 words with natural varied expressions.";
+  return "English role-play for a Chinese learner, "+band+". "+style+" Respond to meaning; gently correct one important grammar error; ask one question. Never judge pronunciation or assign CEFR from text. Give brief Chinese help or recap when asked. Topic: "+topic.substring(0,Math.min(40,topic.length()))+". Practise: "+example.substring(0,Math.min(120,example.length()))+" Change details, not just repetition.";
+ }
  private JourneyCore(){}
 }
