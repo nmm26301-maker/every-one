@@ -16,6 +16,10 @@ public final class JourneyTest {
   JSONObject invalid=new JSONObject(exported);invalid.getJSONObject("cards").put("u99_4",new JSONObject());rejected=false;try{restored.restore(invalid.toString());}catch(Exception e){rejected=true;}check(rejected,"unknown course rejected");
   String compact=JourneyCore.tutorInstruction(5,String.join("",Collections.nCopies(80,"话")),String.join("",Collections.nCopies(200,"a")));
   check(compact.length()<=600,"local tutor instructions survive 600-character engine cap");check(compact.contains("Never judge pronunciation")&&compact.contains("40-90"),"local prompt retains feedback limits and advanced style");
+  s.message("u01","assistant",String.join("",Collections.nCopies(12000,"字")));check(s.chat("u01").getJSONObject(29).getString("content").length()<=1500,"stored replies bounded with explicit truncation");
+  JSONObject largest=new JSONObject(s.export());JSONObject allChats=new JSONObject();String chinese=String.join("",Collections.nCopies(1500,"字"));
+  for(int u=1;u<=48;u++){JSONArray a=new JSONArray();for(int m=0;m<30;m++)a.put(new JSONObject().put("role","user").put("content",chinese));allChats.put(String.format(Locale.US,"u%02d",u),a);}largest.put("chats",allChats);
+  JourneyState.validate(largest);check(largest.toString().getBytes("UTF-8").length<10000000,"all 48 full Chinese conversations fit the import byte ceiling");
   System.out.println("Journey checks: "+checks);
  }
 }
