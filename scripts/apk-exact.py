@@ -29,7 +29,7 @@ def pack(apk_path,kit_path):
                 next_at=entries[index+1].header_offset if index+1<len(entries) else signature_start
                 if data_end>next_at:raise ValueError('Overlapping archive entries')
                 compressed=raw[data_at:data_end];plain=apk.read(entry.filename)
-                reusable=entry.filename.startswith(('assets/','lib/')) and not entry.is_dir()
+                reusable=entry.filename.startswith(('assets/','lib/')) and not entry.filename.startswith('assets/journey/') and not entry.is_dir()
                 row={'name':entry.filename,'offset':at,'header':b64(raw[at:data_at]),'tail':b64(raw[data_end:next_at]),'method':entry.compress_type,'plain_sha256':digest(plain),'raw_sha256':digest(compressed),'raw_bytes':len(compressed),'baseline':reusable}
                 if reusable:
                     rebuilt=plain if entry.compress_type==0 else deflate(plain) if entry.compress_type==8 else None

@@ -40,6 +40,11 @@ class ExactAPKTest(unittest.TestCase):
             data=json.loads(rows['layout.json']);data['entries'][0]['header']=exact.b64(b'bad header');rows['layout.json']=json.dumps(data).encode()
         self.alter_kit(change)
         with self.assertRaises(ValueError):exact.restore(self.base,self.kit,self.output)
+    def test_new_journey_assets_are_embedded_without_baseline_copy(self):
+        with zipfile.ZipFile(self.original,'a') as z:z.writestr('assets/journey/course.json',b'{"new":"curriculum"}')
+        exact.pack(self.original,self.kit)
+        exact.restore(self.base,self.kit,self.output)
+        self.assertEqual(self.original.read_bytes(),self.output.read_bytes())
     def test_inputs_cannot_be_overwritten(self):
         before=self.base.read_bytes()
         with self.assertRaises(ValueError):exact.restore(self.base,self.kit,self.base)

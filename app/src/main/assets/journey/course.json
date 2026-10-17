@@ -1,0 +1,1141 @@
+{
+  "schema": 1,
+  "levels": [
+    {
+      "name": "零基础 · Pre-A1",
+      "goal": "建立声音与意义的联系；能借助提示完成简短回应。",
+      "canDo": "能不看文字问候、介绍自己、表达一个需要；没听懂时会请求重复。"
+    },
+    {
+      "name": "起步 · A1",
+      "goal": "用常用句型处理个人信息、点餐、时间与方向。",
+      "canDo": "能完成自我介绍和简单交易；能听懂慢速、清楚的提问。"
+    },
+    {
+      "name": "生活 · A2",
+      "goal": "连接多句表达，在常见生活场景中追问、说明情况。",
+      "canDo": "能在旅行、购物、预约中交换信息，描述经历和计划。"
+    },
+    {
+      "name": "独立 · B1",
+      "goal": "讲述经历、表达理由，遇到意外能澄清并继续交流。",
+      "canDo": "能无脚本进行熟悉话题对话，叙述经历并说明观点。"
+    },
+    {
+      "name": "深入 · B2",
+      "goal": "表达细微差异、协商、讨论抽象问题并回应不同观点。",
+      "canDo": "能持续交换意见，给出论据、确认隐含意思和修复误解。"
+    },
+    {
+      "name": "进阶交流",
+      "goal": "扩展话题、语域、语速与口音适应；练习真实互动。",
+      "canDo": "能根据对象调整表达、处理打断和含蓄意见，准确复述对方立场。"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "u01",
+      "level": 0,
+      "title": "初次见面",
+      "note": "I am + 名字，介绍自己；you 用来指对方。",
+      "focus": "句中重读名字；Hi 的 /aɪ/ 从开口滑向高位。",
+      "sentences": [
+        {
+          "en": "Hi, I'm Mei.",
+          "zh": "你好，我是梅。"
+        },
+        {
+          "en": "What's your name?",
+          "zh": "你叫什么名字？"
+        },
+        {
+          "en": "Nice to meet you.",
+          "zh": "很高兴认识你。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“初次见面”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 初次见面. Practise these communicative functions: Hi, I'm Mei.; What's your name?; Nice to meet you.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u02",
+      "level": 0,
+      "title": "我来自哪里",
+      "note": "I am from + 地点，from 表示来自。",
+      "focus": "from 轻读，重读城市名称；词尾 m 闭唇收尾。",
+      "sentences": [
+        {
+          "en": "I'm from China.",
+          "zh": "我来自中国。"
+        },
+        {
+          "en": "Where are you from?",
+          "zh": "你来自哪里？"
+        },
+        {
+          "en": "I live in Beijing.",
+          "zh": "我住在北京。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“我来自哪里”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 我来自哪里. Practise these communicative functions: I'm from China.; Where are you from?; I live in Beijing.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u03",
+      "level": 0,
+      "title": "表达需要",
+      "note": "I need + 名词；please 让请求更礼貌。",
+      "focus": "need 词尾 d 收住，不额外加元音。",
+      "sentences": [
+        {
+          "en": "I need some water.",
+          "zh": "我需要一些水。"
+        },
+        {
+          "en": "Water, please.",
+          "zh": "请给我水。"
+        },
+        {
+          "en": "Thank you very much.",
+          "zh": "非常感谢你。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“表达需要”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 表达需要. Practise these communicative functions: I need some water.; Water, please.; Thank you very much.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u04",
+      "level": 0,
+      "title": "是与不是",
+      "note": "Yes / No 后加一个完整短句确认信息。",
+      "focus": "this 的 /ð/ 轻咬舌尖并振动声带。",
+      "sentences": [
+        {
+          "en": "Yes, that's right.",
+          "zh": "是的，没错。"
+        },
+        {
+          "en": "No, thank you.",
+          "zh": "不用了，谢谢。"
+        },
+        {
+          "en": "Is this yours?",
+          "zh": "这是你的吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“是与不是”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 是与不是. Practise these communicative functions: Yes, that's right.; No, thank you.; Is this yours?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u05",
+      "level": 0,
+      "title": "听不懂也能沟通",
+      "note": "Could you + 动词，礼貌请对方帮忙；不要假装听懂。",
+      "focus": "please 里的 /pl/ 连续发音，不插入元音。",
+      "sentences": [
+        {
+          "en": "Sorry, I don't understand.",
+          "zh": "抱歉，我没听懂。"
+        },
+        {
+          "en": "Could you say that again?",
+          "zh": "你能再说一遍吗？"
+        },
+        {
+          "en": "Please speak more slowly.",
+          "zh": "请说慢一些。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“听不懂也能沟通”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 听不懂也能沟通. Practise these communicative functions: Sorry, I don't understand.; Could you say that again?; Please speak more slowly.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u06",
+      "level": 0,
+      "title": "数字与价格",
+      "note": "How much is + 物品，询问价格；数字要确认。",
+      "focus": "three 的 /θ/ 不振动声带，与 tree 区分。",
+      "sentences": [
+        {
+          "en": "One, two, three.",
+          "zh": "一、二、三。"
+        },
+        {
+          "en": "How much is this?",
+          "zh": "这个多少钱？"
+        },
+        {
+          "en": "It's ten dollars.",
+          "zh": "十美元。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“数字与价格”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 数字与价格. Practise these communicative functions: One, two, three.; How much is this?; It's ten dollars.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u07",
+      "level": 0,
+      "title": "找东西",
+      "note": "Where is + 单个东西；here / there 表示位置。",
+      "focus": "where 的 /w/ 收圆双唇；here 的 h 轻送气。",
+      "sentences": [
+        {
+          "en": "Where is my phone?",
+          "zh": "我的手机在哪里？"
+        },
+        {
+          "en": "It's right here.",
+          "zh": "就在这里。"
+        },
+        {
+          "en": "Is it over there?",
+          "zh": "是在那边吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“找东西”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 找东西. Practise these communicative functions: Where is my phone?; It's right here.; Is it over there?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u08",
+      "level": 0,
+      "title": "第一段小对话",
+      "note": "用 and 把两个想法连起来；用简单句完成一个来回。",
+      "focus": "一句一个意群；不要每个单词都一样重。",
+      "sentences": [
+        {
+          "en": "Hi, I'm Mei, and I'm a student.",
+          "zh": "你好，我是梅，是一名学生。"
+        },
+        {
+          "en": "I speak a little English.",
+          "zh": "我会说一点英语。"
+        },
+        {
+          "en": "Can you help me, please?",
+          "zh": "你能帮帮我吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“第一段小对话”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 第一段小对话. Practise these communicative functions: Hi, I'm Mei, and I'm a student.; I speak a little English.; Can you help me, please?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u09",
+      "level": 1,
+      "title": "介绍自己",
+      "note": "I work / I study 描述日常；问句用 What do you do?。",
+      "focus": "work 的 /w/ 与 v 不同；student 重读第一音节。",
+      "sentences": [
+        {
+          "en": "I work in a shop.",
+          "zh": "我在商店工作。"
+        },
+        {
+          "en": "What do you do?",
+          "zh": "你是做什么工作的？"
+        },
+        {
+          "en": "I study English every day.",
+          "zh": "我每天学习英语。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“介绍自己”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 介绍自己. Practise these communicative functions: I work in a shop.; What do you do?; I study English every day.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u10",
+      "level": 1,
+      "title": "家人和朋友",
+      "note": "This is + 人，介绍别人；my / your 表示所属。",
+      "focus": "brother 的 th 是浊音 /ð/；词尾 r 不卷得过重。",
+      "sentences": [
+        {
+          "en": "This is my sister.",
+          "zh": "这是我的姐姐或妹妹。"
+        },
+        {
+          "en": "She lives near me.",
+          "zh": "她住在我附近。"
+        },
+        {
+          "en": "Do you have any brothers?",
+          "zh": "你有兄弟吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“家人和朋友”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 家人和朋友. Practise these communicative functions: This is my sister.; She lives near me.; Do you have any brothers?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u11",
+      "level": 1,
+      "title": "一天的安排",
+      "note": "一般现在时描述习惯；at + 时间。",
+      "focus": "get up 连读，保留节奏；eight 词尾 t 不加元音。",
+      "sentences": [
+        {
+          "en": "I get up at seven.",
+          "zh": "我七点起床。"
+        },
+        {
+          "en": "I go to work at eight.",
+          "zh": "我八点去上班。"
+        },
+        {
+          "en": "What time do you finish?",
+          "zh": "你几点结束？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“一天的安排”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 一天的安排. Practise these communicative functions: I get up at seven.; I go to work at eight.; What time do you finish?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u12",
+      "level": 1,
+      "title": "在咖啡店",
+      "note": "I'd like + 物品，比 I want 更适合点单。",
+      "focus": "coffee 重读第一音节；please 词尾 /z/ 带振动。",
+      "sentences": [
+        {
+          "en": "I'd like a coffee, please.",
+          "zh": "请给我一杯咖啡。"
+        },
+        {
+          "en": "Can I have it without sugar?",
+          "zh": "可以不加糖吗？"
+        },
+        {
+          "en": "That's all, thank you.",
+          "zh": "就这些，谢谢。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“在咖啡店”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 在咖啡店. Practise these communicative functions: I'd like a coffee, please.; Can I have it without sugar?; That's all, thank you.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u13",
+      "level": 1,
+      "title": "问路与确认",
+      "note": "How do I get to + 地点；确认左右和地标。",
+      "focus": "right / light 区分 r 和 l；left 词尾 ft 连续收尾。",
+      "sentences": [
+        {
+          "en": "How do I get to the station?",
+          "zh": "去车站怎么走？"
+        },
+        {
+          "en": "Turn left at the next street.",
+          "zh": "在下一条街左转。"
+        },
+        {
+          "en": "Is it far from here?",
+          "zh": "离这里远吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“问路与确认”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 问路与确认. Practise these communicative functions: How do I get to the station?; Turn left at the next street.; Is it far from here?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u14",
+      "level": 1,
+      "title": "购买物品",
+      "note": "Do you have + 物品；this one 代替刚指过的东西。",
+      "focus": "size 词尾 /z/；this 和 these 元音不同。",
+      "sentences": [
+        {
+          "en": "Do you have this in blue?",
+          "zh": "这个有蓝色的吗？"
+        },
+        {
+          "en": "Can I try it on?",
+          "zh": "我能试穿吗？"
+        },
+        {
+          "en": "I'll take this one.",
+          "zh": "我要这一个。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“购买物品”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 购买物品. Practise these communicative functions: Do you have this in blue?; Can I try it on?; I'll take this one.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u15",
+      "level": 1,
+      "title": "约时间",
+      "note": "Are you free + 时间；用具体时间避免含糊。",
+      "focus": "Tuesday 重读第一音节；fifteen / fifty 重音不同。",
+      "sentences": [
+        {
+          "en": "Are you free on Friday?",
+          "zh": "你星期五有空吗？"
+        },
+        {
+          "en": "Let's meet at three.",
+          "zh": "我们三点见吧。"
+        },
+        {
+          "en": "See you then.",
+          "zh": "到时候见。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“约时间”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 约时间. Practise these communicative functions: Are you free on Friday?; Let's meet at three.; See you then.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u16",
+      "level": 1,
+      "title": "爱好与追问",
+      "note": "like + 动词 ing；追问 How about you? 保持互动。",
+      "focus": "swimming 的 /ŋ/ 不添加 g；like 词尾 k 收住。",
+      "sentences": [
+        {
+          "en": "I like reading and swimming.",
+          "zh": "我喜欢阅读和游泳。"
+        },
+        {
+          "en": "What do you do for fun?",
+          "zh": "你平时喜欢做什么？"
+        },
+        {
+          "en": "How about you?",
+          "zh": "你呢？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“爱好与追问”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 爱好与追问. Practise these communicative functions: I like reading and swimming.; What do you do for fun?; How about you?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u17",
+      "level": 2,
+      "title": "昨天发生了什么",
+      "note": "过去式描述已结束的事情；注意时间词 yesterday。",
+      "focus": "worked 的 ed 是 /t/，visited 结尾是 /ɪd/。",
+      "sentences": [
+        {
+          "en": "I visited a friend yesterday.",
+          "zh": "我昨天拜访了一位朋友。"
+        },
+        {
+          "en": "We had lunch together.",
+          "zh": "我们一起吃了午饭。"
+        },
+        {
+          "en": "What did you do yesterday?",
+          "zh": "你昨天做了什么？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“昨天发生了什么”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 昨天发生了什么. Practise these communicative functions: I visited a friend yesterday.; We had lunch together.; What did you do yesterday?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u18",
+      "level": 2,
+      "title": "周末计划",
+      "note": "going to + 动词，说明已有计划。",
+      "focus": "going to 可自然轻读，但先练清楚完整形式。",
+      "sentences": [
+        {
+          "en": "I'm going to visit my parents.",
+          "zh": "我打算去看父母。"
+        },
+        {
+          "en": "What are your plans for the weekend?",
+          "zh": "你周末有什么计划？"
+        },
+        {
+          "en": "We might go for a walk.",
+          "zh": "我们可能去散步。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“周末计划”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 周末计划. Practise these communicative functions: I'm going to visit my parents.; What are your plans for the weekend?; We might go for a walk.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u19",
+      "level": 2,
+      "title": "酒店入住",
+      "note": "I have a reservation；用 under + 姓名说明预订人。",
+      "focus": "reservation 主重音在 va；连读 check in。",
+      "sentences": [
+        {
+          "en": "I have a reservation under Chen.",
+          "zh": "我有预订，姓陈。"
+        },
+        {
+          "en": "What time is breakfast?",
+          "zh": "早餐几点开始？"
+        },
+        {
+          "en": "Could I have a quiet room?",
+          "zh": "能给我一间安静的房间吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“酒店入住”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 酒店入住. Practise these communicative functions: I have a reservation under Chen.; What time is breakfast?; Could I have a quiet room?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u20",
+      "level": 2,
+      "title": "餐厅里说明需求",
+      "note": "Could I have + 需求；先说清楚不能吃什么。",
+      "focus": "allergic 重读第二音节；nuts 词尾 ts 收清。",
+      "sentences": [
+        {
+          "en": "I'm allergic to peanuts.",
+          "zh": "我对花生过敏。"
+        },
+        {
+          "en": "Does this dish contain nuts?",
+          "zh": "这道菜含坚果吗？"
+        },
+        {
+          "en": "Could we have the bill, please?",
+          "zh": "请给我们结账。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“餐厅里说明需求”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 餐厅里说明需求. Practise these communicative functions: I'm allergic to peanuts.; Does this dish contain nuts?; Could we have the bill, please?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u21",
+      "level": 2,
+      "title": "交通与意外",
+      "note": "missed / next / delayed 描述交通变化；确认目的地。",
+      "focus": "train 的 /tr/ 连续发音；missed 词尾 /st/。",
+      "sentences": [
+        {
+          "en": "I think I missed my stop.",
+          "zh": "我想我坐过站了。"
+        },
+        {
+          "en": "When is the next train?",
+          "zh": "下一班火车是什么时候？"
+        },
+        {
+          "en": "Does this bus go to the airport?",
+          "zh": "这辆公交车去机场吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“交通与意外”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 交通与意外. Practise these communicative functions: I think I missed my stop.; When is the next train?; Does this bus go to the airport?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u22",
+      "level": 2,
+      "title": "预约和改期",
+      "note": "I'd like to book；Could we move it to + 新时间。",
+      "focus": "appointment 重读 point；日期与时间放慢确认。",
+      "sentences": [
+        {
+          "en": "I'd like to book an appointment.",
+          "zh": "我想预约。"
+        },
+        {
+          "en": "Could we move it to Monday?",
+          "zh": "我们能改到星期一吗？"
+        },
+        {
+          "en": "Is there anything available in the afternoon?",
+          "zh": "下午还有空位吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“预约和改期”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 预约和改期. Practise these communicative functions: I'd like to book an appointment.; Could we move it to Monday?; Is there anything available in the afternoon?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u23",
+      "level": 2,
+      "title": "描述身体不适",
+      "note": "I've had + 症状 + for + 持续时间；表达症状而非自诊。",
+      "focus": "throat 的 /θ/ 不变成 s；pain 双元音 /eɪ/。",
+      "sentences": [
+        {
+          "en": "I've had a headache since yesterday.",
+          "zh": "我从昨天开始头痛。"
+        },
+        {
+          "en": "My throat hurts when I swallow.",
+          "zh": "我吞咽时喉咙痛。"
+        },
+        {
+          "en": "Where is the nearest pharmacy?",
+          "zh": "最近的药店在哪里？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“描述身体不适”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 描述身体不适. Practise these communicative functions: I've had a headache since yesterday.; My throat hurts when I swallow.; Where is the nearest pharmacy?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u24",
+      "level": 2,
+      "title": "说明问题和退换",
+      "note": "It doesn't work；请求解决办法并保留礼貌。",
+      "focus": "refund 作名词重读首音节；broken 重读 bro。",
+      "sentences": [
+        {
+          "en": "This doesn't seem to work.",
+          "zh": "这个好像不能正常使用。"
+        },
+        {
+          "en": "Could I exchange it for another one?",
+          "zh": "我能换一个吗？"
+        },
+        {
+          "en": "I bought it here yesterday.",
+          "zh": "我昨天在这里买的。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“说明问题和退换”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 说明问题和退换. Practise these communicative functions: This doesn't seem to work.; Could I exchange it for another one?; I bought it here yesterday.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u25",
+      "level": 3,
+      "title": "讲一段经历",
+      "note": "先背景，再事件，最后感受；用 while / when 连接。",
+      "focus": "意群之间稍停顿，不在每个词后停。",
+      "sentences": [
+        {
+          "en": "I was walking home when it started raining.",
+          "zh": "我走回家时开始下雨。"
+        },
+        {
+          "en": "Luckily, a friend offered me a ride.",
+          "zh": "幸运的是，一位朋友捎了我一程。"
+        },
+        {
+          "en": "It turned out to be a memorable day.",
+          "zh": "那天结果很难忘。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“讲一段经历”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 讲一段经历. Practise these communicative functions: I was walking home when it started raining.; Luckily, a friend offered me a ride.; It turned out to be a memorable day.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u26",
+      "level": 3,
+      "title": "表达观点和理由",
+      "note": "I think + 观点，because + 理由，并给一个例子。",
+      "focus": "重读观点关键词；because 通常轻读。",
+      "sentences": [
+        {
+          "en": "I think working from home can save time.",
+          "zh": "我认为在家工作能节省时间。"
+        },
+        {
+          "en": "It depends on the kind of work you do.",
+          "zh": "这取决于你做什么工作。"
+        },
+        {
+          "en": "For example, I spend less time commuting.",
+          "zh": "例如，我花在通勤上的时间更少了。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“表达观点和理由”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 表达观点和理由. Practise these communicative functions: I think working from home can save time.; It depends on the kind of work you do.; For example, I spend less time commuting.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u27",
+      "level": 3,
+      "title": "提出建议",
+      "note": "You could / Why don't we 提供选择，不替对方做决定。",
+      "focus": "could 的 l 不发音；建议语气保持友好。",
+      "sentences": [
+        {
+          "en": "You could try taking a short break.",
+          "zh": "你可以试着休息一会儿。"
+        },
+        {
+          "en": "Why don't we ask someone for advice?",
+          "zh": "我们为什么不问问别人的建议呢？"
+        },
+        {
+          "en": "What would you suggest?",
+          "zh": "你有什么建议？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“提出建议”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 提出建议. Practise these communicative functions: You could try taking a short break.; Why don't we ask someone for advice?; What would you suggest?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u28",
+      "level": 3,
+      "title": "澄清误会",
+      "note": "What I meant was + 原意；用复述确认理解。",
+      "focus": "meant 的元音 /ɛ/；mean 是 /iː/。",
+      "sentences": [
+        {
+          "en": "That's not quite what I meant.",
+          "zh": "我不完全是那个意思。"
+        },
+        {
+          "en": "Let me explain it another way.",
+          "zh": "我换一种方式解释。"
+        },
+        {
+          "en": "Do you mean we should wait until tomorrow?",
+          "zh": "你的意思是我们应该等到明天吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“澄清误会”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 澄清误会. Practise these communicative functions: That's not quite what I meant.; Let me explain it another way.; Do you mean we should wait until tomorrow?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u29",
+      "level": 3,
+      "title": "工作进度",
+      "note": "已完成、正在做、下一步三部分；用 by + 截止时间。",
+      "focus": "finished 的词尾 /t/；project 名词重读首音节。",
+      "sentences": [
+        {
+          "en": "I've finished the first part of the project.",
+          "zh": "我已经完成项目的第一部分。"
+        },
+        {
+          "en": "I'm still waiting for some information.",
+          "zh": "我还在等一些信息。"
+        },
+        {
+          "en": "I'll send you an update by Friday.",
+          "zh": "我会在星期五之前给你发进展。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“工作进度”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 工作进度. Practise these communicative functions: I've finished the first part of the project.; I'm still waiting for some information.; I'll send you an update by Friday.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u30",
+      "level": 3,
+      "title": "自然地闲聊",
+      "note": "从共同情境开始，追问一个细节，并分享相关经历。",
+      "focus": "how's 的 /z/ 接 your，先清楚再练自然连读。",
+      "sentences": [
+        {
+          "en": "How's your week been so far?",
+          "zh": "你这周过得怎么样？"
+        },
+        {
+          "en": "That sounds interesting. How did you get into it?",
+          "zh": "听起来很有趣。你怎么开始接触它的？"
+        },
+        {
+          "en": "I've always wanted to try that.",
+          "zh": "我一直想试试那个。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“自然地闲聊”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 自然地闲聊. Practise these communicative functions: How's your week been so far?; That sounds interesting. How did you get into it?; I've always wanted to try that.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u31",
+      "level": 3,
+      "title": "陌生词也能表达",
+      "note": "用用途、外观或例子解释不会的词，避免直接停止。",
+      "focus": "thing 的 /θ/ 与 /ŋ/；停顿用于组织思路。",
+      "sentences": [
+        {
+          "en": "I don't know the word, but it's used for cooking.",
+          "zh": "我不知道这个词，但它是做饭用的。"
+        },
+        {
+          "en": "It's similar to a small oven.",
+          "zh": "它有点像小烤箱。"
+        },
+        {
+          "en": "What do you call that in English?",
+          "zh": "那个用英语怎么说？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“陌生词也能表达”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 陌生词也能表达. Practise these communicative functions: I don't know the word, but it's used for cooking.; It's similar to a small oven.; What do you call that in English?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u32",
+      "level": 3,
+      "title": "面对突发变化",
+      "note": "说明变化、影响、可行替代；明确请求确认。",
+      "focus": "changed 结尾 /dʒd/ 不增加音节。",
+      "sentences": [
+        {
+          "en": "Our plans have changed at the last minute.",
+          "zh": "我们的计划在最后一刻变了。"
+        },
+        {
+          "en": "Would it be possible to meet online instead?",
+          "zh": "我们改成线上见面可以吗？"
+        },
+        {
+          "en": "Let me know what works best for you.",
+          "zh": "告诉我怎样安排最适合你。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“面对突发变化”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 面对突发变化. Practise these communicative functions: Our plans have changed at the last minute.; Would it be possible to meet online instead?; Let me know what works best for you.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u33",
+      "level": 4,
+      "title": "比较与权衡",
+      "note": "On the one hand / on the other hand；比较成本和收益。",
+      "focus": "重读对比词，连接词轻读；costs 词尾不要漏掉。",
+      "sentences": [
+        {
+          "en": "The cheaper option may cost more in the long run.",
+          "zh": "便宜的方案长期来看可能更贵。"
+        },
+        {
+          "en": "We need to weigh the benefits against the risks.",
+          "zh": "我们需要权衡收益和风险。"
+        },
+        {
+          "en": "What matters most is whether it meets our needs.",
+          "zh": "最重要的是它是否符合我们的需求。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“比较与权衡”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 比较与权衡. Practise these communicative functions: The cheaper option may cost more in the long run.; We need to weigh the benefits against the risks.; What matters most is whether it meets our needs.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u34",
+      "level": 4,
+      "title": "有分寸地不同意",
+      "note": "先承认合理部分，再提出疑问和理由。",
+      "focus": "语调平稳，避免每句都像命令。",
+      "sentences": [
+        {
+          "en": "I see your point, but I'm not entirely convinced.",
+          "zh": "我理解你的观点，但还没有完全被说服。"
+        },
+        {
+          "en": "My main concern is how this would work in practice.",
+          "zh": "我主要担心实际操作会怎样。"
+        },
+        {
+          "en": "Could we look at it from another perspective?",
+          "zh": "我们能换个角度看吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“有分寸地不同意”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 有分寸地不同意. Practise these communicative functions: I see your point, but I'm not entirely convinced.; My main concern is how this would work in practice.; Could we look at it from another perspective?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u35",
+      "level": 4,
+      "title": "协商与达成一致",
+      "note": "If + 条件，we could + 方案；复述双方承诺。",
+      "focus": "条件和结论分意群；重读条件中的数量或日期。",
+      "sentences": [
+        {
+          "en": "If we extend the deadline, we could improve the quality.",
+          "zh": "如果延长截止时间，我们就能提高质量。"
+        },
+        {
+          "en": "Would you be willing to consider a compromise?",
+          "zh": "你愿意考虑折中方案吗？"
+        },
+        {
+          "en": "Let's agree on the next steps before we finish.",
+          "zh": "结束前我们来确认下一步。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“协商与达成一致”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 协商与达成一致. Practise these communicative functions: If we extend the deadline, we could improve the quality.; Would you be willing to consider a compromise?; Let's agree on the next steps before we finish.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u36",
+      "level": 4,
+      "title": "说明复杂流程",
+      "note": "先概述目标，再按步骤解释，检查对方是否跟上。",
+      "focus": "process 美式常读 /prɑːses/；重点是清楚的意群。",
+      "sentences": [
+        {
+          "en": "The process consists of three main stages.",
+          "zh": "这个流程包括三个主要阶段。"
+        },
+        {
+          "en": "Once you've completed this step, you can move on.",
+          "zh": "完成这一步后，就可以继续了。"
+        },
+        {
+          "en": "Would it help if I walked you through an example?",
+          "zh": "我带你过一个例子会有帮助吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“说明复杂流程”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 说明复杂流程. Practise these communicative functions: The process consists of three main stages.; Once you've completed this step, you can move on.; Would it help if I walked you through an example?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u37",
+      "level": 4,
+      "title": "媒体与信息判断",
+      "note": "区分事实、观点与不确定性；询问信息来源。",
+      "focus": "evidence 重读首音节；claim 结尾 m 闭唇。",
+      "sentences": [
+        {
+          "en": "I'm not sure how reliable that source is.",
+          "zh": "我不确定那个来源有多可靠。"
+        },
+        {
+          "en": "The evidence seems to support a different conclusion.",
+          "zh": "证据似乎支持另一个结论。"
+        },
+        {
+          "en": "We should distinguish between facts and opinions.",
+          "zh": "我们应该区分事实和观点。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“媒体与信息判断”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 媒体与信息判断. Practise these communicative functions: I'm not sure how reliable that source is.; The evidence seems to support a different conclusion.; We should distinguish between facts and opinions.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u38",
+      "level": 4,
+      "title": "谈文化差异",
+      "note": "描述个人经验，避免把一群人都说成同一种情况。",
+      "focus": "culture 重读首音节；不同口音都可以清晰可懂。",
+      "sentences": [
+        {
+          "en": "In my experience, expectations vary from place to place.",
+          "zh": "依我看，不同地方的期望有所不同。"
+        },
+        {
+          "en": "I wouldn't want to make a generalization.",
+          "zh": "我不想一概而论。"
+        },
+        {
+          "en": "How is that usually handled where you live?",
+          "zh": "你住的地方通常怎么处理那种情况？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“谈文化差异”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 谈文化差异. Practise these communicative functions: In my experience, expectations vary from place to place.; I wouldn't want to make a generalization.; How is that usually handled where you live?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u39",
+      "level": 4,
+      "title": "反馈与建设性表达",
+      "note": "描述具体行为和影响，再提出可执行的改变。",
+      "focus": "反馈重读行为而非指责对方的人格。",
+      "sentences": [
+        {
+          "en": "I appreciated how clearly you explained the problem.",
+          "zh": "我很欣赏你把问题解释得那么清楚。"
+        },
+        {
+          "en": "One thing we could improve is the handover process.",
+          "zh": "我们可以改进的一点是交接流程。"
+        },
+        {
+          "en": "Could we set aside some time to discuss this?",
+          "zh": "我们能留点时间讨论一下吗？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“反馈与建设性表达”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 反馈与建设性表达. Practise these communicative functions: I appreciated how clearly you explained the problem.; One thing we could improve is the handover process.; Could we set aside some time to discuss this?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u40",
+      "level": 4,
+      "title": "深入追问",
+      "note": "用具体细节、原因和反例把对话推进一层。",
+      "focus": "问句不一定都升调，开放式提问可自然降调。",
+      "sentences": [
+        {
+          "en": "What led you to that conclusion?",
+          "zh": "是什么让你得出了那个结论？"
+        },
+        {
+          "en": "Could you give me a concrete example?",
+          "zh": "你能给我一个具体的例子吗？"
+        },
+        {
+          "en": "How would your view change if the situation were different?",
+          "zh": "如果情况不同，你的看法会怎样改变？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“深入追问”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 深入追问. Practise these communicative functions: What led you to that conclusion?; Could you give me a concrete example?; How would your view change if the situation were different?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u41",
+      "level": 5,
+      "title": "听懂隐含意思",
+      "note": "先提出你理解的意思，让对方确认，避免猜测当事实。",
+      "focus": "重音会改变暗示；同一句换重音再听。",
+      "sentences": [
+        {
+          "en": "Are you suggesting that we should reconsider?",
+          "zh": "你是在建议我们重新考虑吗？"
+        },
+        {
+          "en": "I get the impression that you have some reservations.",
+          "zh": "我感觉你有些顾虑。"
+        },
+        {
+          "en": "Please correct me if I've misunderstood.",
+          "zh": "如果我理解错了，请纠正我。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“听懂隐含意思”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 听懂隐含意思. Practise these communicative functions: Are you suggesting that we should reconsider?; I get the impression that you have some reservations.; Please correct me if I've misunderstood.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u42",
+      "level": 5,
+      "title": "插话和重新接续",
+      "note": "礼貌进入话轮；被打断后用 returning to 回到重点。",
+      "focus": "插话用短句，自然停顿给对方回应空间。",
+      "sentences": [
+        {
+          "en": "Sorry to jump in, but could I clarify one point?",
+          "zh": "抱歉插一句，我能澄清一点吗？"
+        },
+        {
+          "en": "Please go ahead. I'll come back to that later.",
+          "zh": "请继续。我稍后再回到那一点。"
+        },
+        {
+          "en": "Returning to what we were discussing earlier...",
+          "zh": "回到我们刚才讨论的内容……"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“插话和重新接续”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 插话和重新接续. Practise these communicative functions: Sorry to jump in, but could I clarify one point?; Please go ahead. I'll come back to that later.; Returning to what we were discussing earlier.... Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u43",
+      "level": 5,
+      "title": "精确表达不确定性",
+      "note": "区分可能、较可能与已知；不要用绝对词掩盖不确定。",
+      "focus": "potentially 主重音在 ten；probably 可自然弱化。",
+      "sentences": [
+        {
+          "en": "As far as I can tell, the situation hasn't changed.",
+          "zh": "据我判断，情况还没有变化。"
+        },
+        {
+          "en": "That's plausible, though we don't have enough evidence yet.",
+          "zh": "那是有可能的，不过我们还没有足够证据。"
+        },
+        {
+          "en": "I'd be hesitant to draw a firm conclusion at this stage.",
+          "zh": "我不愿在这个阶段就下定论。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“精确表达不确定性”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 精确表达不确定性. Practise these communicative functions: As far as I can tell, the situation hasn't changed.; That's plausible, though we don't have enough evidence yet.; I'd be hesitant to draw a firm conclusion at this stage.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u44",
+      "level": 5,
+      "title": "讲故事的节奏",
+      "note": "铺垫、转折、结果；省掉不必要细节并观察对方反应。",
+      "focus": "转折前稍停顿，用重音突出意外信息。",
+      "sentences": [
+        {
+          "en": "What I hadn't realized was that we'd met before.",
+          "zh": "我没想到的是我们以前见过。"
+        },
+        {
+          "en": "Just when I thought it was over, something unexpected happened.",
+          "zh": "就在我以为结束时，意想不到的事发生了。"
+        },
+        {
+          "en": "Looking back, that's what made the experience worthwhile.",
+          "zh": "回头看，那正是这段经历值得的原因。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“讲故事的节奏”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 讲故事的节奏. Practise these communicative functions: What I hadn't realized was that we'd met before.; Just when I thought it was over, something unexpected happened.; Looking back, that's what made the experience worthwhile.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u45",
+      "level": 5,
+      "title": "调整正式程度",
+      "note": "朋友、同事、客户用不同措辞；意思相同但语气有别。",
+      "focus": "礼貌来自措辞与语调，不必把每个词读得很慢。",
+      "sentences": [
+        {
+          "en": "Could you send me the details when you have a moment?",
+          "zh": "你方便时能把详情发给我吗？"
+        },
+        {
+          "en": "I'd appreciate it if you could confirm receipt.",
+          "zh": "如果你能确认收到，我将不胜感激。"
+        },
+        {
+          "en": "Just checking whether you got my message.",
+          "zh": "只是想确认你是否收到我的消息。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“调整正式程度”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 调整正式程度. Practise these communicative functions: Could you send me the details when you have a moment?; I'd appreciate it if you could confirm receipt.; Just checking whether you got my message.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u46",
+      "level": 5,
+      "title": "适应不同表达和口音",
+      "note": "先抓关键词和意群；请求重复具体部分，而非整段重来。",
+      "focus": "清晰可懂优先于模仿单一口音；自然弱读需要反复听。",
+      "sentences": [
+        {
+          "en": "I caught the first part, but missed the last detail.",
+          "zh": "前半部分我听懂了，但漏掉了最后一个细节。"
+        },
+        {
+          "en": "Could you rephrase the bit about the schedule?",
+          "zh": "关于日程的那一部分，你能换个说法吗？"
+        },
+        {
+          "en": "So, if I've understood correctly, we're meeting at noon.",
+          "zh": "所以，如果我理解对了，我们中午见面。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“适应不同表达和口音”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 适应不同表达和口音. Practise these communicative functions: I caught the first part, but missed the last detail.; Could you rephrase the bit about the schedule?; So, if I've understood correctly, we're meeting at noon.. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u47",
+      "level": 5,
+      "title": "敏感分歧中的沟通",
+      "note": "说明自己的理解，承认差异，询问对方在意的事。",
+      "focus": "语速略放慢，留回应空间；不要靠提高音量加强观点。",
+      "sentences": [
+        {
+          "en": "I can see why this matters to you.",
+          "zh": "我理解为什么这对你很重要。"
+        },
+        {
+          "en": "We may disagree on the approach, but we share the same goal.",
+          "zh": "我们的方法可能不同，但目标相同。"
+        },
+        {
+          "en": "What would a fair outcome look like to you?",
+          "zh": "在你看来，什么结果才算公平？"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“敏感分歧中的沟通”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 敏感分歧中的沟通. Practise these communicative functions: I can see why this matters to you.; We may disagree on the approach, but we share the same goal.; What would a fair outcome look like to you?. Change names, numbers and details; do not make the learner merely repeat a script."
+    },
+    {
+      "id": "u48",
+      "level": 5,
+      "title": "真实交流综合任务",
+      "note": "不看脚本：提出话题、追问、澄清、总结、约定下一步。",
+      "focus": "回听一段完整对话，只选择最影响理解的一处改进。",
+      "sentences": [
+        {
+          "en": "Let me make sure we're on the same page.",
+          "zh": "让我确认一下我们理解一致。"
+        },
+        {
+          "en": "Is there anything important that we haven't covered?",
+          "zh": "还有什么重要的内容我们没有谈到吗？"
+        },
+        {
+          "en": "It's been great talking with you. Let's stay in touch.",
+          "zh": "和你聊天很愉快。我们保持联系吧。"
+        }
+      ],
+      "task": "不看英文，用自己的信息完成“真实交流综合任务”场景；至少回应三轮，追问一次。如果没听懂，主动澄清。",
+      "scene": "Role-play 真实交流综合任务. Practise these communicative functions: Let me make sure we're on the same page.; Is there anything important that we haven't covered?; It's been great talking with you. Let's stay in touch.. Change names, numbers and details; do not make the learner merely repeat a script."
+    }
+  ]
+}
