@@ -123,3 +123,7 @@ bash tests/test-speech-streaming.sh
 [原签名 APK 与完整私有源码备份](https://github.com/nmm26301-maker/Zizai/releases/tag/everyone-v4.6.2)。原签名恢复信息继续保存在该账号私有备份中。
 
 4.6.1 阅读内容说明见 [README-4.6.1.md](README-4.6.1.md)。第三方许可保留，TIFA 模型及派生资产为 CC BY-NC-SA 4.0（非商业）。
+
+### 开源离线纠音接入
+
+Everyone 5.0 默认新增 OpenPronounce 音素录音分析：复用固定版本的 Wav2Vec2 音素模型和 MIT 比对规则，提供疑似音素差异、中文发音动作、示范与逐词回听。模型约 357 MB，安装后离线，无付费 API 依赖。详见 [接入与验证说明](docs/OPENPRONOUNCE.md)。

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "filename": "openpronounce-en-int8.onnx",
+  "url": "https://github.com/nmm26301-maker/every-one/releases/download/openpronounce-en-v1/openpronounce-en-int8.onnx",
+  "sha256": "fd3aa2a754a03d0693425a54fee1797ed77e64cc8c1493891949c48d6170dcac",
+  "bytes": 356716900,
+  "upstream_model": "facebook/wav2vec2-lv-60-espeak-cv-ft",
+  "revision": "ae45363bf3413b374fecd9dc8bc1df0e24c3b7f4",
+  "license": "Apache-2.0",
+  "sample_rate": 16000,
+  "normalization_epsilon": 1e-07,
+  "onnx_opset": 17,
+  "quantization": "MatMul/Gemm dynamic int8; Conv float32"
+}

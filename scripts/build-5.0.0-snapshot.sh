@@ -8,9 +8,14 @@ android_jar="$ANDROID_HOME/platforms/android-35/android.jar"
 build_dir=build/journey500
 smali_cp=$(dpkg -L libsmali-java libguava-java libjcommander-java libantlr3-runtime-java | sed -n '/\.jar$/p' | paste -sd:)
 mkdir -p "$build_dir/classes" "$build_dir/dex" "$build_dir/res"
-java --add-modules jdk.compiler com.sun.tools.javac.Main -encoding UTF-8 -source 8 -target 8 -cp "$android_jar" -d "$build_dir/classes" scripts/journey-stubs/org/openenglish/reader/*.java app/src/main/java/org/openenglish/reader/Journey*.java
+mkdir -p vendor/onnxruntime
+if [[ ! -f vendor/onnxruntime/classes.jar ]]; then
+  curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.22.0/onnxruntime-1.22.0.jar -o vendor/onnxruntime/classes.jar
+fi
+# Compile-only: ONNX Runtime 1.22.0 already exists in the preserved baseline DEX/native libraries.
+java --add-modules jdk.compiler com.sun.tools.javac.Main -encoding UTF-8 -source 8 -target 8 -cp "$android_jar:vendor/onnxruntime/classes.jar" -d "$build_dir/classes" scripts/journey-stubs/org/openenglish/reader/*.java app/src/main/java/org/openenglish/reader/Journey*.java
 mapfile -t new_classes < <(find "$build_dir/classes/org/openenglish/reader" -name 'Journey*.class' -print)
-"$sdk_tools/d8" --min-api 23 --lib "$android_jar" --classpath "$build_dir/classes" --output "$build_dir/dex" "${new_classes[@]}"
+"$sdk_tools/d8" --min-api 23 --lib "$android_jar" --classpath "$build_dir/classes" --classpath vendor/onnxruntime/classes.jar --output "$build_dir/dex" "${new_classes[@]}"
 python3 - "$base_apk" "$build_dir/base.dex" <<'PY'
 import pathlib,sys,zipfile,hashlib
 assert hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest()=='ea2cfa871c48d73ead8c1c58940858ec01f9f9c9ef0b15a1ed8ebe1978ceb2e6'

@@ -14,6 +14,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - run: sudo apt-get update -qq && sudo apt-get install -y libandroid-json-java
       - run: |
           bash tests/test-voice-buffer.sh
           bash tests/test-conversation-boundary.sh
@@ -22,3 +23,5 @@ jobs:
           bash tests/test-speech-streaming.sh
           python3 tests/test-exact-apk.py
           python3 tests/test-cloud-job-recovery.py
+          bash tests/test-journey.sh
+          bash tests/test-phones.sh
