@@ -1,4 +1,5 @@
 name: Export verified OpenPronounce Android model
+# Compare evaluation-mode outputs with dropout disabled.
 on:
   push:
     branches: [main]

@@ -20,7 +20,8 @@ class Wrapper(torch.nn.Module):
     def forward(self,input_values):return self.model(input_values).logits
 full=out/'phone-float.onnx';quant=out/'openpronounce-en-int8.onnx'
 with torch.no_grad():
-    torch.onnx.export(Wrapper(),(torch.zeros(1,32000),),str(full),input_names=['input_values'],output_names=['logits'],dynamic_axes={'input_values':{1:'samples'},'logits':{1:'frames'}},opset_version=17,dynamo=False)
+    torch.onnx.export(Wrapper().eval(),(torch.zeros(1,32000),),str(full),input_names=['input_values'],output_names=['logits'],dynamic_axes={'input_values':{1:'samples'},'logits':{1:'frames'}},opset_version=17,dynamo=False)
+model.eval()  # Export restores the wrapper's training flag; comparisons must disable dropout.
 quantize_dynamic(str(full),str(quant),weight_type=QuantType.QInt8,op_types_to_quantize=['MatMul','Gemm'],per_channel=True)
 opts=ort.SessionOptions();opts.intra_op_num_threads=2;opts.inter_op_num_threads=1
 session=ort.InferenceSession(str(quant),opts,providers=['CPUExecutionProvider'])
