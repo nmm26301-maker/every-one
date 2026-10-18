@@ -1,0 +1,30 @@
+name: Export verified OpenPronounce Android model
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/openpronounce-model.yml']
+permissions:
+  contents: write
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install fixed export dependencies
+        run: |
+          pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r scripts/requirements-phone-export.txt
+      - name: Export and compare with original on human speech
+        run: python scripts/export-openpronounce.py
+      - name: Publish open model and verification
+        run: |
+          if ! gh release view openpronounce-en-v1 >/dev/null 2>&1; then
+            gh release create openpronounce-en-v1 --target "$GITHUB_SHA" --title 'OpenPronounce English phone model · Android int8' --notes 'Apache-2.0 facebook/wav2vec2-lv-60-espeak-cv-ft, pinned revision. MatMul/Gemm int8 export for offline phone recognition. Numerical conversion validation is not learner pronunciation accuracy validation. Upstream model card and licenses included.'
+          fi
+          gh release upload openpronounce-en-v1 --clobber build/phone-export/openpronounce-en-int8.onnx build/phone-export/phone-model.json build/phone-export/MODEL-VERIFICATION.json third_party/openpronounce/LICENSE third_party/openpronounce/MODEL-CARD.md third_party/openpronounce/MODEL-LICENSE
