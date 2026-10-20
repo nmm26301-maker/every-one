@@ -1,0 +1,62 @@
+name: Everyone Android immersion checks
+on:
+  push:
+    branches:
+      - feature/android-video-immersion-20261021
+    paths:
+      - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
+      - 'app/src/main/AndroidManifest.xml'
+      - 'tests/JourneySubtitlesTest.java'
+      - 'tests/test-journey-subtitles.sh'
+      - '.github/workflows/immersion.yml'
+  pull_request:
+    paths:
+      - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
+      - 'app/src/main/AndroidManifest.xml'
+      - 'tests/JourneySubtitlesTest.java'
+      - 'tests/test-journey-subtitles.sh'
+      - '.github/workflows/immersion.yml'
+permissions:
+  contents: read
+jobs:
+  immersion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Parse real subtitles without Android dependencies
+        run: bash tests/test-journey-subtitles.sh
+      - name: Check existing manifest and home entry
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = ET.parse('app/src/main/AndroidManifest.xml').getroot()
+          android = '{http://schemas.android.com/apk/res/android}'
+          activities = root.findall('.//activity')
+          assert any(x.get(android+'name') == '.JourneyImmersionActivity' and x.get(android+'exported') == 'false' for x in activities)
+          home = Path('app/src/main/java/org/openenglish/reader/JourneyActivity.java').read_text()
+          assert 'JourneyImmersionActivity.class' in home
+          print('Native immersion Activity wired to home')
+          PY
+      - name: Compile native Android module with Android 35 API
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          jar="$sdk/platforms/android-35/android.jar"
+          if [[ ! -f "$jar" ]]; then
+            echo "Android platform android-35 is not installed at $sdk"
+            exit 1
+          fi
+          mkdir -p build/immersion-classes
+          javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
+            app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
+            app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
