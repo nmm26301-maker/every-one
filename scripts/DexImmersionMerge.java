@@ -16,13 +16,14 @@ public final class DexImmersionMerge {
   private static final String ENTRY = OWNER + "JourneyActivity";
   private static final String VIEW = OWNER + "JourneyImmersionActivity";
   private static final String SUBTITLES = OWNER + "JourneySubtitles";
+  private static final String CANTONESE = OWNER + "JourneyCantonese";
 
   private static boolean within(String type, String base) {
     return type.equals(base + ";") || type.startsWith(base + "$");
   }
 
   private static boolean selected(String type) {
-    return within(type, ENTRY) || within(type, VIEW) || within(type, SUBTITLES);
+    return within(type, ENTRY) || within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE);
   }
 
   public static void main(String[] args) throws Exception {
@@ -34,12 +35,12 @@ public final class DexImmersionMerge {
     Set<String> originalTypes = new HashSet<>();
     Set<String> newTypes = new HashSet<>();
     List<ClassDef> output = new ArrayList<>();
-    int removed = 0, added = 0, activityRoot = 0, viewRoot = 0, subtitleRoot = 0;
+    int removed = 0, added = 0, activityRoot = 0, viewRoot = 0, subtitleRoot = 0, cantoneseRoot = 0;
 
     for (ClassDef c : original.getClasses()) {
       String type = c.getType();
       if (!originalTypes.add(type)) throw new IllegalStateException("Duplicate source " + type);
-      if (within(type, VIEW) || within(type, SUBTITLES)) {
+      if (within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE)) {
         throw new IllegalStateException("New immersion type already installed " + type);
       }
       if (within(type, ENTRY)) {
@@ -59,16 +60,17 @@ public final class DexImmersionMerge {
       if (type.equals(ENTRY + ";")) activityRoot++;
       if (type.equals(VIEW + ";")) viewRoot++;
       if (type.equals(SUBTITLES + ";")) subtitleRoot++;
+      if (type.equals(CANTONESE + ";")) cantoneseRoot++;
       if (originalTypes.contains(type) && !within(type, ENTRY)) {
         throw new IllegalStateException("Collision " + type);
       }
       output.add(c);
       added++;
     }
-    if (activityRoot != 1 || viewRoot != 1 || subtitleRoot != 1) {
+    if (activityRoot != 1 || viewRoot != 1 || subtitleRoot != 1 || cantoneseRoot != 1) {
       throw new IllegalStateException("Patch is missing an Activity or parser root class");
     }
-    if (added < removed + 2) {
+    if (added < removed + 3) {
       throw new IllegalStateException("Unexpected missing JourneyActivity synthetic definitions");
     }
     DexPool.writeTo(args[2], new ImmutableDexFile(original.getOpcodes(), output));
