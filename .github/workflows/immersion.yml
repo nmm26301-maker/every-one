@@ -61,6 +61,24 @@ jobs:
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
 
+      - name: Validate all compiled Journey sources and overlay scripts
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          jar="$sdk/platforms/android-35/android.jar"
+          mkdir -p vendor/onnxruntime build/integrated-classes
+          curl --fail --silent --show-error --location --retry 3 \
+            https://repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.22.0/onnxruntime-1.22.0.jar \
+            -o vendor/onnxruntime/classes.jar
+          javac -encoding UTF-8 -source 8 -target 8 \
+            -cp "$jar:vendor/onnxruntime/classes.jar" \
+            -d build/integrated-classes \
+            scripts/journey-stubs/org/openenglish/reader/*.java \
+            app/src/main/java/org/openenglish/reader/Journey*.java
+          test -f build/integrated-classes/org/openenglish/reader/JourneyActivity.class
+          test -f build/integrated-classes/org/openenglish/reader/JourneyImmersionActivity.class
+          bash -n scripts/build-5.0.1-immersion-snapshot.sh
+          python3 -m py_compile scripts/verify-immersion.py
   preview-apk:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -97,7 +115,7 @@ jobs:
           keytool -genkeypair -noprompt -alias preview \
             -keystore build/immersion-preview/ephemeral.keystore \
             -storepass android -keypass android -keyalg RSA -keysize 2048 \
-            -validity 2 -dname "CN=Everyone Immersion Preview, O=Ephemeral Test Build"
+            -validity 3650 -dname "CN=Everyone Immersion Preview, O=Ephemeral Test Build"
           "$buildtools/apksigner" sign \
             --ks build/immersion-preview/ephemeral.keystore \
             --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
