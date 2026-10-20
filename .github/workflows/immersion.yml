@@ -60,3 +60,58 @@ jobs:
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
+
+  preview-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build independently installable Android preview
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          jar="$sdk/platforms/android-35/android.jar"
+          buildtools="$sdk/build-tools/35.0.0"
+          for tool in aapt2 d8 zipalign apksigner; do
+            test -x "$buildtools/$tool"
+          done
+          mkdir -p build/immersion-preview/classes build/immersion-preview/dex
+          javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" \
+            -d build/immersion-preview/classes \
+            app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
+            app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
+          mapfile -t classes < <(find build/immersion-preview/classes -name '*.class' -print)
+          "$buildtools/d8" --min-api 23 --lib "$jar" --output build/immersion-preview/dex "${classes[@]}"
+          "$buildtools/aapt2" link \
+            -o build/immersion-preview/app-shell.apk \
+            -I "$jar" --manifest preview/AndroidManifest.xml \
+            --min-sdk-version 23 --target-sdk-version 33
+          cp build/immersion-preview/app-shell.apk build/immersion-preview/unsigned.apk
+          (cd build/immersion-preview/dex && zip -q ../unsigned.apk classes.dex)
+          "$buildtools/zipalign" -f -P 16 4 \
+            build/immersion-preview/unsigned.apk build/immersion-preview/aligned.apk
+          keytool -genkeypair -noprompt -alias preview \
+            -keystore build/immersion-preview/ephemeral.keystore \
+            -storepass android -keypass android -keyalg RSA -keysize 2048 \
+            -validity 2 -dname "CN=Everyone Immersion Preview, O=Ephemeral Test Build"
+          "$buildtools/apksigner" sign \
+            --ks build/immersion-preview/ephemeral.keystore \
+            --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk \
+            build/immersion-preview/aligned.apk
+          "$buildtools/apksigner" verify --verbose \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk
+          "$buildtools/aapt2" dump badging \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk \
+            | head -n 8
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Everyone-Immersion-Preview-5.0.1
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk
+          if-no-files-found: error
+          retention-days: 14
