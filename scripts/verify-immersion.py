@@ -13,7 +13,7 @@ new = {str(p.relative_to(new_dir)): p.read_bytes() for p in new_dir.rglob("*.sma
 
 def in_scope(name):
     prefix = "org/openenglish/reader/"
-    return name.startswith(prefix + ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles"))
+    return name.startswith(prefix + ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles", "JourneyCantonese"))
 
 unchanged = [name for name in old if not in_scope(name)]
 for name in unchanged:
@@ -23,6 +23,7 @@ added = [name for name in new if name not in old]
 assert added and all(in_scope(name) for name in added), f"Unexpected classes: {added}"
 assert any(name.endswith("/JourneyImmersionActivity.smali") for name in added)
 assert any(name.endswith("/JourneySubtitles.smali") for name in added)
+assert any(name.endswith("/JourneyCantonese.smali") for name in added)
 assert any(name.endswith("/JourneyActivity.smali") for name in old)
 assert any(name.endswith("/JourneyActivity.smali") for name in new)
 
