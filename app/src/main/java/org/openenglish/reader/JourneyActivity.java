@@ -70,6 +70,7 @@ public final class JourneyActivity extends Activity {
   button("场景交流 · AI 对话",()->{if(lesson==null)lesson=nextLesson();conversation();});
   button("纠音训练室",this::lab);button("间隔复习 · "+due+" 句",this::reviewList);
   button("进步与阶段挑战",this::progress);button("设置、模型与备份",this::settings);
+  button("影视精听 · 双语字幕 / 逐句复读",()->startActivity(new Intent(this,JourneyImmersionActivity.class)));
   button("原有工作室 · 阅读 / 听写 / 素材 / 多语言",()->startActivity(new Intent(this,StudioActivity.class)));
  }
  private JSONObject nextLesson(){for(int i=state.level()*8;i<(state.level()+1)*8;i++){JSONObject u=lessons.optJSONObject(i);if(!state.complete(u.optString("id")))return u;}return lessons.optJSONObject(state.level()*8);}
