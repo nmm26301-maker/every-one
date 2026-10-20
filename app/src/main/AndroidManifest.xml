@@ -8,6 +8,7 @@
  <uses-feature android:name="android.hardware.microphone" android:required="false" />
  <queries><intent><action android:name="android.speech.RecognitionService" /></intent><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent><intent><action android:name="android.speech.action.RECOGNIZE_SPEECH" /></intent></queries>
  <application android:label="Everyone 英语" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="false" android:icon="@drawable/icon" android:supportsRtl="true">
+  <activity android:name=".JourneyImmersionActivity" android:exported="false" />
   <activity android:name=".JourneyActivity" android:exported="true" android:configChanges="orientation|screenSize" android:windowSoftInputMode="adjustResize">
    <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
   </activity>
