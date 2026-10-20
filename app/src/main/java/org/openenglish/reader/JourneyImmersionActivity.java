@@ -2,6 +2,7 @@ package org.openenglish.reader;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +41,7 @@ public final class JourneyImmersionActivity extends Activity {
   private static final int PICK_SOURCE = 62;
   private static final int PICK_TRANSLATION = 63;
   private static final int EXPORT_ANKI = 64;
+  private static final int SPEECH_COMPARE = 65;
   private static final int INK = 0xff19263b;
   private static final int MUTED = 0xff5f6e83;
   private static final int ACCENT = 0xff5948cf;
@@ -51,6 +54,11 @@ public final class JourneyImmersionActivity extends Activity {
   private SharedPreferences prefs;
   private VideoView player;
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
+  private TextView languageLabel, cantoneseLesson, speechFeedback;
+  private LinearLayout cantonesePanel;
+  private String language = "yue";
+  private String speechReference = "";
+  private int cantoneseLessonIndex = 0;
   private LinearLayout playlist;
   private Button pauseButton, loopButton;
   private Uri videoUri;
@@ -84,6 +92,7 @@ public final class JourneyImmersionActivity extends Activity {
   @Override public void onCreate(Bundle state) {
     super.onCreate(state);
     prefs = getSharedPreferences("everyone-immersion", MODE_PRIVATE);
+    language = prefs.getString("language", "yue");
     saved.addAll(prefs.getStringSet("saved-phrases", Collections.emptySet()));
     pauseEach = prefs.getBoolean("pause", true);
     loopOne = prefs.getBoolean("loop", false);
@@ -155,6 +164,13 @@ public final class JourneyImmersionActivity extends Activity {
 
     page.addView(label("双语字幕 · 逐句复读 · 口语提示 · 收藏导出", 14, MUTED));
     page.addView(label("选择你有权播放的本地视频及 SRT/VTT 字幕。无需上传个人视频。", 13, MUTED));
+    languageLabel = label("", 13, MUTED);
+    page.addView(languageLabel);
+    LinearLayout languages = row(page);
+    button("粤语", languages, () -> selectLanguage("yue"));
+    button("日语", languages, () -> selectLanguage("ja"));
+    button("英语", languages, () -> selectLanguage("en"));
+    updateLanguageLabel();
 
     player = new VideoView(this);
     player.setBackground(shape(0xff182032, 18));
@@ -186,7 +202,7 @@ public final class JourneyImmersionActivity extends Activity {
     page.addView(sourceLabel);
     translationLabel = label("中文解释会显示在此处", 16, MUTED);
     page.addView(translationLabel);
-    tipsLabel = label("内置常见日语口语提示；不是完整 AI 讲解。", 13, MUTED);
+    tipsLabel = label("粤语口语词条可点选查看；非完整 AI 讲解。", 13, MUTED);
     page.addView(tipsLabel);
     counter = label("0 句字幕", 12, MUTED);
     page.addView(counter);
@@ -211,6 +227,30 @@ public final class JourneyImmersionActivity extends Activity {
     LinearLayout capture = row(page);
     button("收藏这一句", capture, this::saveCue);
     button("显示口语说明", capture, this::explain);
+    LinearLayout speakRow = row(page);
+    button("跟读识别 · 对照文本", speakRow, this::recognizeSpeech);
+    speechFeedback = label("请先选一条视频台词；或使用下方粤语练习句。\n系统识别结果不能视为发音或六声调评分。", 13, MUTED);
+    page.addView(speechFeedback);
+
+    cantonesePanel = new LinearLayout(this);
+    cantonesePanel.setOrientation(1);
+    cantonesePanel.setPadding(dp(14), dp(14), dp(14), dp(14));
+    cantonesePanel.setBackground(shape(Color.WHITE, 16));
+    LinearLayout.LayoutParams lessonBox = new LinearLayout.LayoutParams(-1, -2);
+    lessonBox.setMargins(0, dp(14), 0, dp(14));
+    page.addView(cantonesePanel, lessonBox);
+    TextView lessonTitle = label("粤语入门 · 粤拼 Jyutping", 18, INK);
+    lessonTitle.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+    cantonesePanel.addView(lessonTitle);
+    cantoneseLesson = label("", 17, INK);
+    cantonesePanel.addView(cantoneseLesson);
+    cantonesePanel.addView(label(JourneyCantonese.toneHelp(), 12, MUTED));
+    LinearLayout lessonControls = row(cantonesePanel);
+    button("上一句", lessonControls, () -> changeCantoneseLesson(-1));
+    button("练这句", lessonControls, () -> recognizeSpeech(true));
+    button("下一句", lessonControls, () -> changeCantoneseLesson(1));
+    updateCantoneseLesson();
+    cantonesePanel.setVisibility("yue".equals(language) ? View.VISIBLE : View.GONE);
 
     TextView transcript = label("逐句列表 · 点击跳转", 18, INK);
     transcript.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
@@ -261,6 +301,11 @@ public final class JourneyImmersionActivity extends Activity {
 
   @Override protected void onActivityResult(int request, int result, Intent data) {
     super.onActivityResult(request, result, data);
+    if (request == SPEECH_COMPARE) {
+      if (result == RESULT_OK && data != null) showSpeechComparison(data);
+      else if (speechFeedback != null) speechFeedback.setText("未取得识别结果；原视频与字幕不受影响。");
+      return;
+    }
     if (result != RESULT_OK || data == null || data.getData() == null) return;
     Uri uri = data.getData();
     if (request == EXPORT_ANKI) { writeBookmarks(uri); return; }
@@ -405,7 +450,86 @@ public final class JourneyImmersionActivity extends Activity {
     } catch (Exception e) { toast("导出失败：" + e.getMessage()); }
   }
 
+  private void updateLanguageLabel() {
+    if (languageLabel == null) return;
+    String name = "yue".equals(language) ? "粤语 · 粤拼 / 港式口语"
+        : "ja".equals(language) ? "日语 · 口语缩略" : "英语 · 字幕精听";
+    languageLabel.setText("当前学习语言：" + name + "（原文字幕需自行导入）");
+  }
+
+  private void selectLanguage(String target) {
+    language = target;
+    prefs.edit().putString("language", language).apply();
+    updateLanguageLabel();
+    if (cantonesePanel != null) {
+      cantonesePanel.setVisibility("yue".equals(language) ? View.VISIBLE : View.GONE);
+    }
+    int at = activeIndex;
+    activeIndex = -1;
+    showCue(at);
+    toast("已切换至" + ("yue".equals(target) ? "粤语" : "ja".equals(target) ? "日语" : "英语"));
+  }
+
+  private void updateCantoneseLesson() {
+    if (cantoneseLesson == null) return;
+    JourneyCantonese.Phrase p = JourneyCantonese.lesson(cantoneseLessonIndex);
+    cantoneseLesson.setText((cantoneseLessonIndex + 1) + " / " + JourneyCantonese.lessonCount()
+        + "\n" + p.hanzi + "\n" + p.jyutping + "\n" + p.mandarin
+        + "\n\n学习提示：" + p.hint);
+  }
+
+  private void changeCantoneseLesson(int offset) {
+    int count = JourneyCantonese.lessonCount();
+    cantoneseLessonIndex = Math.floorMod(cantoneseLessonIndex + offset, count);
+    updateCantoneseLesson();
+  }
+
+  private void recognizeSpeech() {
+    recognizeSpeech(false);
+  }
+
+  private void recognizeSpeech(boolean builtInLesson) {
+    if (builtInLesson && !"yue".equals(language)) return;
+    speechReference = builtInLesson ? JourneyCantonese.lesson(cantoneseLessonIndex).hanzi
+        : activeIndex >= 0 && activeIndex < source.size()
+          ? source.get(activeIndex).text
+          : "yue".equals(language) ? JourneyCantonese.lesson(cantoneseLessonIndex).hanzi : "";
+    if (speechReference.isEmpty()) {
+      toast("请先选择视频台词");
+      return;
+    }
+    if (player != null && player.isPlaying()) player.pause();
+    Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+    i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+    i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+        "yue".equals(language) ? "zh-HK" : "ja".equals(language) ? "ja-JP" : "en-US");
+    i.putExtra(RecognizerIntent.EXTRA_PROMPT, "请跟读：" + speechReference);
+    try {
+      startActivityForResult(i, SPEECH_COMPARE);
+      if (speechFeedback != null) speechFeedback.setText("正在调用系统语音识别…");
+    } catch (ActivityNotFoundException e) {
+      if (speechFeedback != null) speechFeedback.setText(
+          "手机未安装支持当前语言的语音识别服务。仍可通过视频原声复读与字幕学习。");
+    }
+  }
+
+  private void showSpeechComparison(Intent data) {
+    ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+    if (results == null || results.isEmpty()) {
+      speechFeedback.setText("未能识别这句；请检查系统语音服务。");
+      return;
+    }
+    String recognized = results.get(0);
+    String info = "原句：" + speechReference + "\n识别：" + recognized + "\n";
+    info += "yue".equals(language)
+        ? JourneyCantonese.transcriptFeedback(speechReference, recognized)
+        : "仅供转写文本对照。系统识别结果不能当作发音准确度评分。";
+    speechFeedback.setText(info);
+  }
+
   private String quickTip(String line) {
+    if ("yue".equals(language)) return JourneyCantonese.quickTip(line);
+    if ("en".equals(language)) return "英语精听：尝试跟随视频语速、停顿和重音；无自动音素评分。";
     if (line.contains("ちゃった")) return "ちゃった：てしまった 的口语缩略，可能表示完成或遗憾。";
     if (line.contains("じゃん")) return "じゃん：常见口语语尾，可表示确认、强调或提醒。";
     if (line.contains("っす")) return "っす：です 的口语缩略，常见于随意对话。";
@@ -416,9 +540,26 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void explain() {
     if (activeIndex < 0) { toast("请先选择一条台词"); return; }
-    new AlertDialog.Builder(this).setTitle("日语口语提示")
-        .setMessage(source.get(activeIndex).text + "\n\n" + quickTip(source.get(activeIndex).text)
-            + "\n\n这里提供少量离线规则；并非 Undertone 官方讲解，也不是完整语法分析。")
+    String line = source.get(activeIndex).text;
+    if ("yue".equals(language)) {
+      List<String> entries = JourneyCantonese.lookup(line);
+      if (entries.isEmpty()) {
+        new AlertDialog.Builder(this).setTitle("粤语口语解析")
+            .setMessage("当前字幕未命中内置词库，不能据此推断词义。\n\n"
+                + JourneyCantonese.toneHelp()).setPositiveButton("知道了", null).show();
+        return;
+      }
+      String[] names = entries.toArray(new String[0]);
+      new AlertDialog.Builder(this).setTitle("点击查看粤语词条")
+          .setItems(names, (d, which) -> new AlertDialog.Builder(this)
+              .setTitle("粤语词条").setMessage(names[which])
+              .setPositiveButton("知道了", null).show())
+          .setNegativeButton("关闭", null).show();
+      return;
+    }
+    new AlertDialog.Builder(this).setTitle("ja".equals(language) ? "日语口语提示" : "英语精听提示")
+        .setMessage(line + "\n\n" + quickTip(line)
+            + "\n\n内置少量离线规则，不是完整自动语法解析。")
         .setPositiveButton("知道了", null).show();
   }
 
