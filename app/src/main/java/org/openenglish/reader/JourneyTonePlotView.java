@@ -12,10 +12,13 @@ import android.view.View;
  */
 public final class JourneyTonePlotView extends View {
   private static final int PURPLE = 0xff5948cf;
+  private static final int TEAL = 0xff148b83;
   private static final int GRID = 0xffdce0e8;
   private static final int TEXT = 0xff5f6e83;
   private final Paint pen = new Paint(Paint.ANTI_ALIAS_FLAG);
   private double[] pitches = new double[0];
+  private double[] referencePitches = new double[0];
+  private double referenceHz;
   private double baseHz;
   private boolean valid;
 
@@ -26,6 +29,8 @@ public final class JourneyTonePlotView extends View {
 
   public void show(JourneyToneContour.Result result) {
     pitches = result == null ? new double[0] : result.pitchHz.clone();
+    referencePitches = new double[0];
+    referenceHz = 0;
     valid = result != null && result.valid;
     baseHz = valid ? result.medianHz : 0;
     String accessibility = !valid
@@ -34,6 +39,23 @@ public final class JourneyTonePlotView extends View {
             + String.format(java.util.Locale.US, "%+.1f", result.semitoneChange)
             + " 半音；图中空白段表示无法估计基频";
     setContentDescription(accessibility);
+    invalidate();
+  }
+
+  /** 对照：绿线是真实参考音，紫线是本次跟读，分别按中位音高归一化。 */
+  public void showComparison(JourneyToneCompare.Result comparison) {
+    if (comparison == null || !comparison.comparable) {
+      show(null);
+      return;
+    }
+    pitches = comparison.attempt.pitchHz.clone();
+    baseHz = comparison.attempt.medianHz;
+    referencePitches = comparison.reference.pitchHz.clone();
+    referenceHz = comparison.reference.medianHz;
+    valid = true;
+    setContentDescription("参考音和跟读的相对音高走势对比，误差约 "
+        + String.format(java.util.Locale.US, "%.1f", comparison.rmsSemitones)
+        + " 半音。绿色是参考，紫色是自己。不能作为粤语发音正确率。");
     invalidate();
   }
 
@@ -67,14 +89,27 @@ public final class JourneyTonePlotView extends View {
           (top + bottom) / 2, pen);
       return;
     }
-    pen.setColor(PURPLE);
+    if (referencePitches.length > 1 && referenceHz > 0) {
+      pen.setTextSize(11 * scale);
+      pen.setColor(TEAL);
+      canvas.drawText("绿：参考", left + 6 * scale, top + 13 * scale, pen);
+      pen.setColor(PURPLE);
+      canvas.drawText("紫：跟读", right - 65 * scale, top + 13 * scale, pen);
+      drawTrack(canvas, referencePitches, referenceHz, TEAL, left, right, top, bottom, scale);
+    }
+    drawTrack(canvas, pitches, baseHz, PURPLE, left, right, top, bottom, scale);
+  }
+
+  private void drawTrack(Canvas canvas, double[] track, double median, int color,
+                         float left, float right, float top, float bottom, float scale) {
+    pen.setColor(color);
     pen.setStrokeWidth(2.5f * scale);
     float px = 0, py = 0;
     boolean previous = false;
-    for (int i = 0; i < pitches.length; i++) {
-      if (pitches[i] <= 0) { previous = false; continue; }
-      double semi = 12 * Math.log(pitches[i] / baseHz) / Math.log(2.0);
-      float x = left + (right - left) * i / (pitches.length - 1);
+    for (int i = 0; i < track.length; i++) {
+      if (track[i] <= 0) { previous = false; continue; }
+      double semi = 12 * Math.log(track[i] / median) / Math.log(2.0);
+      float x = left + (right - left) * i / (track.length - 1);
       float y = yPosition(Math.max(-9, Math.min(9, semi)), top, bottom);
       if (previous) canvas.drawLine(px, py, x, y, pen);
       else canvas.drawCircle(x, y, 1.8f * scale, pen);
