@@ -68,6 +68,9 @@ public final class JourneyImmersionActivity extends Activity {
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
   private TextView languageLabel, referenceGuideLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private TextView phoneticDetail, contrastDetail;
+  private TextView quickPhrase, quickStatus;
+  private int quickIndex;
+  private String quickSpeechLanguage = "yue";
   private LinearLayout cantonesePanel;
   private JourneyTonePlotView tonePlot;
   private String language = "yue";
@@ -120,7 +123,13 @@ public final class JourneyImmersionActivity extends Activity {
   @Override public void onCreate(Bundle state) {
     super.onCreate(state);
     prefs = getSharedPreferences("everyone-immersion", MODE_PRIVATE);
-    language = prefs.getString("language", "yue");
+    language = JourneyQuickStart.normalizeLanguage(
+        getIntent().getStringExtra("quickLanguage") != null
+        ? getIntent().getStringExtra("quickLanguage")
+        : prefs.getString("language", "yue"));
+    quickSpeechLanguage = language;
+    quickIndex = Math.max(0, prefs.getInt("quickIndex_" + language, 0))
+        % JourneyQuickStart.size(language);
     saved.addAll(prefs.getStringSet("saved-phrases", Collections.emptySet()));
     pauseEach = prefs.getBoolean("pause", true);
     loopOne = prefs.getBoolean("loop", false);
@@ -203,6 +212,36 @@ public final class JourneyImmersionActivity extends Activity {
     referenceGuideLabel = label("", 13, MUTED);
     page.addView(referenceGuideLabel);
     updateLanguageLabel();
+
+    // The first screen is usable without videos, account login or an ASR backend.
+    LinearLayout quickCard = new LinearLayout(this);
+    quickCard.setOrientation(1);
+    quickCard.setPadding(dp(14), dp(12), dp(14), dp(12));
+    quickCard.setBackground(shape(Color.WHITE, 16));
+    LinearLayout.LayoutParams quickBox = new LinearLayout.LayoutParams(-1, -2);
+    quickBox.setMargins(0, dp(10), 0, dp(14));
+    page.addView(quickCard, quickBox);
+    TextView quickHeading = label("立即开口 · 免费速练", 19, INK);
+    quickHeading.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+    quickCard.addView(quickHeading);
+    quickCard.addView(label("免导入视频、免注册、免配置模型。先练一句，随后可以选择下方影视精听和高级纠音。", 12, MUTED));
+    quickPhrase = label("", 20, INK);
+    quickPhrase.setMinHeight(dp(126));
+    quickCard.addView(quickPhrase);
+    LinearLayout quickNavigate = row(quickCard);
+    button("上一句", quickNavigate, () -> changeQuick(-1));
+    button("下一句", quickNavigate, () -> changeQuick(1));
+    LinearLayout quickListen = row(quickCard);
+    button("听示范", quickListen, () -> speakQuick(false));
+    button("慢速听", quickListen, () -> speakQuick(true));
+    LinearLayout quickRecord = row(quickCard);
+    button("● 录音 / 停止", quickRecord, this::togglePractice);
+    button("▶ 回放", quickRecord, this::playPractice);
+    LinearLayout quickRecognize = row(quickCard);
+    button("识别我读的句子", quickRecognize, this::recognizeQuickSpeech);
+    quickStatus = label("开始：听一句 → 自己录音 → 停止 → 回放；不依赖服务器。", 12, MUTED);
+    quickCard.addView(quickStatus);
+    showQuick();
 
     player = new VideoView(this);
     player.setBackground(shape(0xff182032, 18));
@@ -601,9 +640,11 @@ public final class JourneyImmersionActivity extends Activity {
     practice.stopPlayback();
     if (speechGuide == null) speechGuide = new JourneySpeechGuide(this, message -> {
       if (speechFeedback != null) speechFeedback.setText(message);
+      if (quickStatus != null) quickStatus.setText(message);
     });
     String info = speechGuide.speak(words, lang, slow);
     if (speechFeedback != null) speechFeedback.setText(info);
+    if (quickStatus != null) quickStatus.setText(info);
   }
 
   private void configureYueAsr() {
@@ -843,8 +884,10 @@ public final class JourneyImmersionActivity extends Activity {
     if (toneBusy) { toast("请等待本机音高分析完成"); return; }
     if (practice.isRecording()) {
       boolean okay = practice.stop();
-      speechFeedback.setText(okay ? "录音已完成。点击“回放我的录音”听差异。"
-          : "录音太短或麦克风录音失败，请重试。");
+      String info = okay ? "录音完成。现在点「回放」，对比示范。"
+          : "录音太短或麦克风失败，请重新录一遍。";
+      speechFeedback.setText(info);
+      if (quickStatus != null) quickStatus.setText(info);
       return;
     }
     if (android.os.Build.VERSION.SDK_INT >= 23
@@ -864,6 +907,7 @@ public final class JourneyImmersionActivity extends Activity {
       if (tonePlot != null) tonePlot.show(null);
       recordingStartedAt = android.os.SystemClock.elapsedRealtime();
       speechFeedback.setText("● 正在录你的跟读……再次点击“录我的声音 / 停止”结束。");
+      if (quickStatus != null) quickStatus.setText("● 正在录音……再点一次「录音 / 停止」结束。");
       handler.postDelayed(() -> {
         if (!practice.isRecording()) return;
         if (android.os.SystemClock.elapsedRealtime() - recordingStartedAt < 30000L) return;
@@ -874,6 +918,7 @@ public final class JourneyImmersionActivity extends Activity {
       }, 30050);
     } catch (Exception e) {
       speechFeedback.setText("录音启动失败：" + e.getMessage());
+      if (quickStatus != null) quickStatus.setText("录音启动失败，请检查麦克风权限或其他录音应用。");
     }
   }
 
@@ -881,6 +926,9 @@ public final class JourneyImmersionActivity extends Activity {
     try {
       if (!practice.play()) {
         speechFeedback.setText("没有可回放的录音。请先录制一遍。");
+        if (quickStatus != null) quickStatus.setText("先点「录音 / 停止」开始练习。");
+      } else if (quickStatus != null) {
+        quickStatus.setText("▶ 正在回放刚才的录音。");
       }
     } catch (Exception e) {
       speechFeedback.setText("回放失败：" + e.getMessage());
@@ -893,6 +941,39 @@ public final class JourneyImmersionActivity extends Activity {
     if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) startPractice();
     else if (speechFeedback != null) speechFeedback.setText(
         "没有录音权限，可继续看字幕、听原声及使用外部系统语音识别。");
+  }
+
+  private JourneyQuickStart.Phrase currentQuick() {
+    return JourneyQuickStart.at(language, quickIndex);
+  }
+
+  private void showQuick() {
+    if (quickPhrase == null) return;
+    JourneyQuickStart.Phrase item = currentQuick();
+    String pron = item.pronunciation.isEmpty() ? "" : "\n" + item.pronunciation;
+    quickPhrase.setText((quickIndex + 1) + " / " + JourneyQuickStart.size(language)
+        + "    " + ("yue".equals(language) ? "港式粤语" : "ja".equals(language) ? "日语口语" : "英语表达")
+        + "\n" + item.original + pron + "\n" + item.meaning
+        + "\n提示：" + item.tip);
+  }
+
+  private void changeQuick(int offset) {
+    int total = JourneyQuickStart.size(language);
+    quickIndex = ((quickIndex + offset) % total + total) % total;
+    prefs.edit().putInt("quickIndex_" + language, quickIndex).apply();
+    showQuick();
+    if (quickStatus != null) quickStatus.setText("已切换到第 " + (quickIndex + 1) + " 句。先听示范，再跟读。");
+  }
+
+  private void speakQuick(boolean slow) {
+    if (quickStatus != null) quickStatus.setText(slow ? "准备慢速示范……" : "准备播放示范……");
+    startGuide(currentQuick().original, language, slow);
+  }
+
+  private void recognizeQuickSpeech() {
+    speechReference = currentQuick().original;
+    quickSpeechLanguage = language;
+    launchSpeechRecognition();
   }
 
   private void updateLanguageLabel() {
@@ -915,8 +996,13 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void selectLanguage(String target) {
-    language = target;
+    language = JourneyQuickStart.normalizeLanguage(target);
+    quickIndex = Math.max(0, prefs.getInt("quickIndex_" + language, 0))
+        % JourneyQuickStart.size(language);
+    quickSpeechLanguage = language;
     prefs.edit().putString("language", language).apply();
+    showQuick();
+    if (quickStatus != null) quickStatus.setText("已切换语言，可以直接开始练习。");
     updateLanguageLabel();
     if (speechGuide != null) speechGuide.stop();
     if (cantonesePanel != null) {
@@ -995,20 +1081,27 @@ public final class JourneyImmersionActivity extends Activity {
       toast("请先选择视频台词");
       return;
     }
+    quickSpeechLanguage = language;
+    launchSpeechRecognition();
+  }
+
+  private void launchSpeechRecognition() {
     if (player != null && player.isPlaying()) player.pause();
     if (practice.isRecording()) practice.stop();
     if (speechGuide != null) speechGuide.stop();
     Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
-        "yue".equals(language) ? "zh-HK" : "ja".equals(language) ? "ja-JP" : "en-US");
+        "yue".equals(quickSpeechLanguage) ? "zh-HK" : "ja".equals(quickSpeechLanguage) ? "ja-JP" : "en-US");
     i.putExtra(RecognizerIntent.EXTRA_PROMPT, "请跟读：" + speechReference);
     try {
       startActivityForResult(i, SPEECH_COMPARE);
       if (speechFeedback != null) speechFeedback.setText("正在调用系统语音识别…");
+      if (quickStatus != null) quickStatus.setText("正在调用手机已有的语音识别服务……");
     } catch (ActivityNotFoundException e) {
       if (speechFeedback != null) speechFeedback.setText(
           "手机未安装支持当前语言的语音识别服务。仍可通过视频原声复读与字幕学习。");
+      if (quickStatus != null) quickStatus.setText("系统缺少该语言识别服务。仍可听示范、录音和回放。");
     }
   }
 
@@ -1024,6 +1117,7 @@ public final class JourneyImmersionActivity extends Activity {
         ? JourneyCantonese.transcriptFeedback(speechReference, recognized)
         : "仅供转写文本对照。系统识别结果不能当作发音准确度评分。";
     speechFeedback.setText(info);
+    if (quickStatus != null) quickStatus.setText(info);
   }
 
   private String quickTip(String line) {
