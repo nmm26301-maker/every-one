@@ -62,14 +62,22 @@ public final class JourneyPracticeAudio {
 
   /** 回放用户自己的录音；当文件丢失时返回 false。 */
   public boolean play() throws IOException {
-    if (capturing) stop();
+    return play(null);
+  }
+
+  /** 回放完成后通知 UI，避免页面一直显示「正在回放」。 */
+  public boolean play(Runnable onComplete) throws IOException {
+    if (capturing) return false;
     if (recording == null || !recording.isFile()) return false;
     stopPlayback();
     MediaPlayer next = new MediaPlayer();
     try {
       next.setDataSource(recording.getAbsolutePath());
       next.prepare();
-      next.setOnCompletionListener(mp -> stopPlayback());
+      next.setOnCompletionListener(mp -> {
+        stopPlayback();
+        if (onComplete != null) onComplete.run();
+      });
       next.start();
       player = next;
       return true;
