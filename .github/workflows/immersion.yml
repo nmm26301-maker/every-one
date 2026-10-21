@@ -7,6 +7,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
       - 'app/src/main/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
@@ -18,6 +19,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
       - 'app/src/main/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
@@ -64,6 +66,7 @@ jobs:
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
 
       - name: Validate all compiled Journey sources and overlay scripts
@@ -107,6 +110,7 @@ jobs:
             -d build/immersion-preview/classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
           mapfile -t classes < <(find build/immersion-preview/classes -name '*.class' -print)
           "$buildtools/d8" --min-api 23 --lib "$jar" --output build/immersion-preview/dex "${classes[@]}"
@@ -125,17 +129,17 @@ jobs:
           "$buildtools/apksigner" sign \
             --ks build/immersion-preview/ephemeral.keystore \
             --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
-            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.2.apk \
             build/immersion-preview/aligned.apk
           "$buildtools/apksigner" verify --verbose \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.2.apk
           "$buildtools/aapt2" dump badging \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.2.apk \
             | head -n 8
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
-          name: Everyone-Immersion-Preview-5.0.1
-          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.1.apk
+          name: Everyone-Immersion-Preview-5.0.2
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.2.apk
           if-no-files-found: error
           retention-days: 14
