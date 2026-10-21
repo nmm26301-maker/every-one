@@ -28,9 +28,11 @@ class BackendProtocolTest(unittest.TestCase):
         self.worker.join(timeout=3)
         self.server.server_close()
 
-    def request(self, method, path, body=b"", token=True, content_type="audio/mp4"):
+    def request(self, method, path, body=b"", token=True, content_type="audio/mp4", claimed_length=None):
         conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=5)
         headers = {"Content-Type": content_type}
+        if claimed_length is not None:
+            headers["Content-Length"] = str(claimed_length)
         if token:
             headers["Authorization"] = "Bearer CantoneseToken1234567890"
         conn.request(method, path, body=body, headers=headers)
@@ -51,7 +53,8 @@ class BackendProtocolTest(unittest.TestCase):
         self.server.engine.infer.assert_not_called()
 
     def test_maximum_audio_limit(self):
-        status, _ = self.request("POST", app.TRANSCRIBE_PATH, b"a" * (app.MAX_BYTES + 1))
+        status, _ = self.request("POST", app.TRANSCRIBE_PATH, b"a" * 300,
+                                 claimed_length=app.MAX_BYTES + 1)
         self.assertEqual(status, 413)
         self.server.engine.infer.assert_not_called()
 
