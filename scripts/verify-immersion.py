@@ -1,4 +1,4 @@
-"""Verify unsigned Everyone 5.0.10 immersion APK without exposing private keys."""
+"""Verify unsigned Everyone 5.0.11 immersion APK without exposing private keys."""
 import json
 import pathlib
 import sys
@@ -49,8 +49,8 @@ with zipfile.ZipFile(base) as old_apk, zipfile.ZipFile(output) as new_apk:
     assert old_apk.read("AndroidManifest.xml") != new_apk.read("AndroidManifest.xml")
 
 report = {
-    "version_name": "5.0.10",
-    "version_code": 69,
+    "version_name": "5.0.11",
+    "version_code": 70,
     "previous_other_classes_unchanged": len(unchanged),
     "added_immersion_classes": len(added),
     "preserved_archive_entries": len(preserved),
