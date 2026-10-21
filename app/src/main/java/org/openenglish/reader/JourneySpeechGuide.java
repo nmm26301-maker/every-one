@@ -96,8 +96,16 @@ public final class JourneySpeechGuide {
     for (Voice v : voices) {
       if (v == null || v.getLocale() == null || v.isNetworkConnectionRequired()) continue;
       Locale locale = v.getLocale();
-      if (!tag.equalsIgnoreCase(locale.toLanguageTag())) continue;
-      if (best == null || v.getQuality() > best.getQuality()) best = v;
+      boolean matched = "zh-HK".equals(tag)
+          ? ("HK".equalsIgnoreCase(locale.getCountry())
+              && ("zh".equalsIgnoreCase(locale.getLanguage())
+                  || "yue".equalsIgnoreCase(locale.getLanguage())))
+          : tag.equalsIgnoreCase(locale.toLanguageTag());
+      if (!matched) continue;
+      if (best == null || ("yue".equals(locale.getLanguage())
+          && !"yue".equals(best.getLocale().getLanguage()))
+          || (locale.getLanguage().equals(best.getLocale().getLanguage())
+              && v.getQuality() > best.getQuality())) best = v;
     }
     return best;
   }
