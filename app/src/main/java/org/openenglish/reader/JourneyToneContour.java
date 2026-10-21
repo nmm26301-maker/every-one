@@ -5,33 +5,49 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 单音节粤语练习的离线基频轮廓实验。
- * 只检测音高随时间的趋势，不判断声母、韵母、绝对音高或完整声调正确率。
+ * 单音节粤语的本机基频轮廓实验，不是声母、韵母、六调的客观正确率评分。
+ * 明确拒绝过长、无声及多个分离发声段，避免给用户误导性的调型结论。
  */
 public final class JourneyToneContour {
   private static final double LOG2 = Math.log(2.0);
+  private static final int FRAME_MS = 45;
+  private static final int HOP_MS = 20;
+
   private JourneyToneContour() {}
 
-  /** 基频轮廓分析结果。voicedFrames 不满足要求时有效值为 false。 */
+  /** pitchHz 每点间隔 20ms，0 表示该帧无法可靠估计基频。 */
   public static final class Result {
     public final boolean valid;
     public final int voicedFrames;
     public final double medianHz;
     public final double semitoneChange;
     public final String trend;
-    Result(boolean ok, int frames, double median, double change, String name) {
-      valid = ok; voicedFrames = frames; medianHz = median;
-      semitoneChange = change; trend = name;
+    public final String reason;
+    public final double[] pitchHz;
+
+    Result(boolean valid, int frames, double median, double change,
+           String trend, String reason, double[] pitches) {
+      this.valid = valid;
+      voicedFrames = frames;
+      medianHz = median;
+      semitoneChange = change;
+      this.trend = trend;
+      this.reason = reason;
+      pitchHz = pitches.clone();
     }
+
     public String feedback(int tone) {
-      String expected = expectedTrend(tone);
-      if (!valid) return "音频里没有足够稳定的有声片段，无法可靠估计音高。请在安静环境只读一个音节，并避免拖长。";
+      if (!valid) return reason + "\n本练习只适合安静环境中的单个粤语音节。";
       String change = String.format(java.util.Locale.US, "%+.1f", semitoneChange);
-      String info = "测得单音节音高走势：" + trend + "（前后约 " + change + " 半音），目标：" + expected + "。";
-      boolean match = expected.equals(trend);
-      if (!match) info += "建议先模仿目标调型，再重新录一遍。";
-      else info += "走势大致接近目标，可继续和真人示范比较高低起点。";
-      return info + "\n注意：仅测得音高走势，无法判断声母、韵母、绝对调域，也不代表发音已正确。";
+      String expected = expectedTrend(tone);
+      String start = "实际音高走势：" + trend + "（首尾相差 " + change
+          + " 半音），目标声调的常见走势：" + expected + "。";
+      String advice = expected.equals(trend)
+          ? "走势大致接近，仍需比较起始高低和真人语音。"
+          : "走势不同，可先听原声并重新练一次。";
+      return start + "\n" + advice
+          + "\n注意：曲线仅表示本次测得的基频，不能判断声母、韵母、绝对调域，"
+          + "且平调 1、3、6 等不能凭走势单独区分。";
     }
   }
 
@@ -41,54 +57,78 @@ public final class JourneyToneContour {
     return "近似平稳";
   }
 
-  /** 从 16-bit mono PCM 中推断 F0，预处理与判定均在本机 CPU 内完成。 */
+  /** 分析单个 0.25–3 秒内的 16-bit PCM；约 20ms 取一个 F0 样本。 */
   public static Result analyze(short[] samples, int sampleRate) {
-    if (samples == null || sampleRate < 8000 || sampleRate > 96000) return invalid();
-    int length = sampleRate * 45 / 1000;
-    int stride = sampleRate * 20 / 1000;
-    if (samples.length < length * 3 || stride <= 0) return invalid();
+    if (samples == null || sampleRate < 8000 || sampleRate > 96000)
+      return invalid("采样率不受支持", new double[0]);
+    if (samples.length > sampleRate * 3L)
+      return invalid("录音超过 3 秒。请只读一个音节，录 0.5–1 秒即可", new double[0]);
+    int frame = sampleRate * FRAME_MS / 1000;
+    int hop = sampleRate * HOP_MS / 1000;
+    if (samples.length < sampleRate / 4 || hop <= 0)
+      return invalid("录音少于 0.25 秒，无法分析", new double[0]);
     int maxLag = sampleRate / 75;
     int minLag = sampleRate / 480;
-    if (maxLag >= length || minLag <= 1) return invalid();
-    List<Double> pitches = new ArrayList<>();
-    for (int start = 0; start + length <= samples.length; start += stride) {
-      double pitch = estimate(samples, start, length, sampleRate, minLag, maxLag);
-      if (pitch > 0) pitches.add(pitch);
+    if (maxLag >= frame || minLag <= 1) return invalid("录音不适合基频检测", new double[0]);
+    List<Double> track = new ArrayList<>();
+    for (int start = 0; start + frame <= samples.length; start += hop) {
+      double hz = estimate(samples, start, frame, sampleRate, minLag, maxLag);
+      track.add(hz > 0 ? hz : 0.0);
     }
-    if (pitches.size() < 7) return invalid();
-    // 降低单帧跳倍频的影响，逐个取邻域中值。
+    double[] pitches = new double[track.size()];
+    for (int i = 0; i < pitches.length; i++) pitches[i] = track.get(i);
+    if (separateSyllables(pitches))
+      return invalid("检测到多个分离的发声段。请只读一个音节", pitches);
+    List<Double> voiced = new ArrayList<>();
+    for (double hz : pitches) if (hz > 0) voiced.add(hz);
+    if (voiced.size() < 12)
+      return invalid("有效有声部分不足，无法稳定测量音高", pitches);
     List<Double> smooth = new ArrayList<>();
-    for (int i = 0; i < pitches.size(); i++) {
-      List<Double> small = new ArrayList<>();
-      for (int j = Math.max(0, i - 1); j <= Math.min(i + 1, pitches.size() - 1); j++)
-        small.add(pitches.get(j));
-      Collections.sort(small);
-      smooth.add(small.get(small.size() / 2));
+    // 局部中值仅对连续有效帧进行平滑，不跨越静音来拼接两个音节。
+    for (int i = 0; i < pitches.length; i++) {
+      if (pitches[i] <= 0) continue;
+      List<Double> local = new ArrayList<>();
+      for (int j = Math.max(0, i - 1); j <= Math.min(pitches.length - 1, i + 1); j++)
+        if (pitches[j] > 0) local.add(pitches[j]);
+      smooth.add(median(local));
     }
-    int portion = Math.max(2, smooth.size() / 3);
+    int portion = Math.max(3, smooth.size() / 3);
     double first = median(smooth.subList(0, portion));
     double last = median(smooth.subList(smooth.size() - portion, smooth.size()));
     double delta = 12.0 * Math.log(last / first) / LOG2;
     String trend = delta > 1.3 ? "上扬" : delta < -1.3 ? "下降" : "近似平稳";
-    return new Result(true, smooth.size(), median(smooth), delta, trend);
+    return new Result(true, smooth.size(), median(smooth), delta, trend, "", pitches);
   }
 
-  private static Result invalid() {
-    return new Result(false, 0, 0, 0, "无法判断");
+  /** 允许自然的短暂无声帧；两组至少 100ms 有声间隔 >=160ms 才拒绝。 */
+  private static boolean separateSyllables(double[] pitch) {
+    int firstGroup = 0, secondGroup = 0, gap = 0;
+    for (double hz : pitch) {
+      if (hz > 0) {
+        if (gap >= 8 && firstGroup >= 5) secondGroup++;
+        else if (secondGroup == 0) firstGroup++;
+        gap = 0;
+      } else if (firstGroup >= 5) {
+        gap++;
+      }
+    }
+    return secondGroup >= 5;
   }
 
-  private static double median(List<Double> vals) {
-    List<Double> sorted = new ArrayList<>(vals);
+  private static Result invalid(String reason, double[] track) {
+    return new Result(false, 0, 0, 0, "无法判断", reason, track);
+  }
+
+  private static double median(List<Double> values) {
+    if (values.isEmpty()) return 0;
+    List<Double> sorted = new ArrayList<>(values);
     Collections.sort(sorted);
     return sorted.get(sorted.size() / 2);
   }
 
-  /**
-   * YIN-style normalized difference method. A low normalized difference
-   * near one period identifies voiced frames; otherwise discard noisy frames.
-   */
-  private static double estimate(short[] audio, int start, int window, int rate,
-                                 int minLag, int maxLag) {
+  /** YIN 近似归一化差分：仅保留低差分率的浊音帧。 */
+  private static double estimate(short[] audio, int start, int window,
+                                 int rate, int minLag, int maxLag) {
     double sum = 0;
     for (int i = 0; i < window; i++) sum += audio[start + i];
     double dc = sum / window;
@@ -121,8 +161,6 @@ public final class JourneyToneContour {
         if (normalized < 0.09) break;
       }
     }
-    if (best < 0) return -1;
-    double f0 = (double) rate / best;
-    return f0 >= 75 && f0 <= 480 ? f0 : -1;
+    return best < 0 ? -1 : (double) rate / best;
   }
 }
