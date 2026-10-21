@@ -60,6 +60,7 @@ public final class JourneyImmersionActivity extends Activity {
   private VideoView player;
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
   private TextView languageLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
+  private TextView phoneticDetail, contrastDetail;
   private LinearLayout cantonesePanel;
   private JourneyTonePlotView tonePlot;
   private String language = "yue";
@@ -71,6 +72,7 @@ public final class JourneyImmersionActivity extends Activity {
   private int toneTarget = 1;
   private boolean toneBusy;
   private int cantoneseLessonIndex = 0;
+  private int contrastIndex = 0;
   private int subtitleOffsetMs = 0;
   private long recordingStartedAt = 0L;
   private LinearLayout playlist;
@@ -275,6 +277,10 @@ public final class JourneyImmersionActivity extends Activity {
     cantonesePanel.addView(lessonTitle);
     cantoneseLesson = label("", 17, INK);
     cantonesePanel.addView(cantoneseLesson);
+    LinearLayout parseRow = row(cantonesePanel);
+    button("拆解这句粤拼", parseRow, this::pickSyllable);
+    phoneticDetail = label("选择「拆解这句粤拼」，逐音节查看声母、韵腹、韵尾及声调。", 14, MUTED);
+    cantonesePanel.addView(phoneticDetail);
     cantonesePanel.addView(label(JourneyCantonese.toneHelp(), 12, MUTED));
     LinearLayout lessonControls = row(cantonesePanel);
     button("上一句", lessonControls, () -> changeCantoneseLesson(-1));
@@ -283,6 +289,18 @@ public final class JourneyImmersionActivity extends Activity {
     button("听粤语示范", lessonAudio, () -> speakExample(true, false));
     button("慢速示范", lessonAudio, () -> speakExample(true, true));
     button("下一句", lessonControls, () -> changeCantoneseLesson(1));
+    TextView contrastTitle = label("易混音对照 · 听辨与模仿", 18, INK);
+    contrastTitle.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+    cantonesePanel.addView(contrastTitle);
+    contrastDetail = label("", 15, INK);
+    cantonesePanel.addView(contrastDetail);
+    LinearLayout contrastControls = row(cantonesePanel);
+    button("上一组", contrastControls, () -> changeContrast(-1));
+    button("听①", contrastControls, () -> speakContrast(true));
+    button("听②", contrastControls, () -> speakContrast(false));
+    button("下一组", contrastControls, () -> changeContrast(1));
+    cantonesePanel.addView(label("注意：对照说明是静态教学提示。手机离线合成发音因音色而异，"
+        + "请优先比较影视真人原声；目前不能自动判断是否发准声母或韵母。", 12, MUTED));
     cantonesePanel.addView(label("六声调单音节 · 音高走势实验", 17, INK));
     toneLabel = label("", 15, INK);
     cantonesePanel.addView(toneLabel);
@@ -302,6 +320,9 @@ public final class JourneyImmersionActivity extends Activity {
     toneFeedback = label("尚未录制。只能分析单音节的音高走势，不能作为完整粤语发音评分。", 13, MUTED);
     cantonesePanel.addView(toneFeedback);
     toneTarget = Math.max(1, Math.min(6, prefs.getInt("toneTarget", 1)));
+    contrastIndex = Math.max(0, Math.min(JourneyJyutping.contrastCount() - 1,
+        prefs.getInt("contrastIndex", 0)));
+    updateContrast();
     updateToneTarget();
     updateCantoneseLesson();
     cantonesePanel.setVisibility("yue".equals(language) ? View.VISIBLE : View.GONE);
@@ -683,12 +704,51 @@ public final class JourneyImmersionActivity extends Activity {
     toast("已切换至" + ("yue".equals(target) ? "粤语" : "ja".equals(target) ? "日语" : "英语"));
   }
 
+  private void updateContrast() {
+    if (contrastDetail == null) return;
+    JourneyJyutping.Contrast c = JourneyJyutping.contrast(contrastIndex);
+    contrastDetail.setText((contrastIndex + 1) + " / " + JourneyJyutping.contrastCount()
+        + "\n" + c.display());
+  }
+
+  private void changeContrast(int direction) {
+    int size = JourneyJyutping.contrastCount();
+    contrastIndex = ((contrastIndex + direction) % size + size) % size;
+    prefs.edit().putInt("contrastIndex", contrastIndex).apply();
+    updateContrast();
+  }
+
+  private void speakContrast(boolean first) {
+    JourneyJyutping.Contrast c = JourneyJyutping.contrast(contrastIndex);
+    startGuide(first ? c.firstCharacter : c.secondCharacter, "yue", true);
+  }
+
+  private void pickSyllable() {
+    JourneyCantonese.Phrase lesson = JourneyCantonese.lesson(cantoneseLessonIndex);
+    List<JourneyJyutping.Syllable> tokens = JourneyJyutping.parseLine(lesson.jyutping);
+    if (tokens.isEmpty()) {
+      toast("这句粤拼未能拆解，不会猜测未知拼音");
+      return;
+    }
+    String[] choices = new String[tokens.size()];
+    for (int i = 0; i < tokens.size(); i++) {
+      choices[i] = (i + 1) + ". " + tokens.get(i).jyutping;
+    }
+    new AlertDialog.Builder(this).setTitle("选择要练习的音节")
+        .setItems(choices, (d, which) -> {
+          phoneticDetail.setText(tokens.get(which).detail());
+        }).setNegativeButton("关闭", null).show();
+  }
+
   private void updateCantoneseLesson() {
     if (cantoneseLesson == null) return;
     JourneyCantonese.Phrase p = JourneyCantonese.lesson(cantoneseLessonIndex);
     cantoneseLesson.setText((cantoneseLessonIndex + 1) + " / " + JourneyCantonese.lessonCount()
         + "\n" + p.hanzi + "\n" + p.jyutping + "\n" + p.mandarin
         + "\n\n学习提示：" + p.hint);
+    if (phoneticDetail != null)
+      phoneticDetail.setText("这句有 " + JourneyJyutping.parseLine(p.jyutping).size()
+          + " 个粤拼音节。点击「拆解这句粤拼」选择音节练习。");
   }
 
   private void changeCantoneseLesson(int offset) {
