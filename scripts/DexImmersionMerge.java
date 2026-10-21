@@ -18,13 +18,15 @@ public final class DexImmersionMerge {
   private static final String SUBTITLES = OWNER + "JourneySubtitles";
   private static final String CANTONESE = OWNER + "JourneyCantonese";
   private static final String AUDIO = OWNER + "JourneyPracticeAudio";
+  private static final String TONE = OWNER + "JourneyToneContour";
+  private static final String DECODE = OWNER + "JourneyToneAudio";
 
   private static boolean within(String type, String base) {
     return type.equals(base + ";") || type.startsWith(base + "$");
   }
 
   private static boolean selected(String type) {
-    return within(type, ENTRY) || within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO);
+    return within(type, ENTRY) || within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO) || within(type, TONE) || within(type, DECODE);
   }
 
   public static void main(String[] args) throws Exception {
@@ -36,12 +38,12 @@ public final class DexImmersionMerge {
     Set<String> originalTypes = new HashSet<>();
     Set<String> newTypes = new HashSet<>();
     List<ClassDef> output = new ArrayList<>();
-    int removed = 0, added = 0, activityRoot = 0, viewRoot = 0, subtitleRoot = 0, cantoneseRoot = 0, audioRoot = 0;
+    int removed = 0, added = 0, activityRoot = 0, viewRoot = 0, subtitleRoot = 0, cantoneseRoot = 0, audioRoot = 0, toneRoot = 0, decodeRoot = 0;
 
     for (ClassDef c : original.getClasses()) {
       String type = c.getType();
       if (!originalTypes.add(type)) throw new IllegalStateException("Duplicate source " + type);
-      if (within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO)) {
+      if (within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO) || within(type, TONE) || within(type, DECODE)) {
         throw new IllegalStateException("New immersion type already installed " + type);
       }
       if (within(type, ENTRY)) {
@@ -63,16 +65,18 @@ public final class DexImmersionMerge {
       if (type.equals(SUBTITLES + ";")) subtitleRoot++;
       if (type.equals(CANTONESE + ";")) cantoneseRoot++;
       if (type.equals(AUDIO + ";")) audioRoot++;
+      if (type.equals(TONE + ";")) toneRoot++;
+      if (type.equals(DECODE + ";")) decodeRoot++;
       if (originalTypes.contains(type) && !within(type, ENTRY)) {
         throw new IllegalStateException("Collision " + type);
       }
       output.add(c);
       added++;
     }
-    if (activityRoot != 1 || viewRoot != 1 || subtitleRoot != 1 || cantoneseRoot != 1 || audioRoot != 1) {
+    if (activityRoot != 1 || viewRoot != 1 || subtitleRoot != 1 || cantoneseRoot != 1 || audioRoot != 1 || toneRoot != 1 || decodeRoot != 1) {
       throw new IllegalStateException("Patch is missing an Activity or parser root class");
     }
-    if (added < removed + 4) {
+    if (added < removed + 6) {
       throw new IllegalStateException("Unexpected missing JourneyActivity synthetic definitions");
     }
     DexPool.writeTo(args[2], new ImmutableDexFile(original.getOpcodes(), output));
