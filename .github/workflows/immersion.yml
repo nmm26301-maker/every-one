@@ -13,6 +13,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
       - 'app/src/main/AndroidManifest.xml'
+      - 'preview/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
       - 'tests/JourneyToneContourTest.java'
@@ -29,6 +30,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
       - 'app/src/main/AndroidManifest.xml'
+      - 'preview/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
       - 'tests/JourneyToneContourTest.java'
@@ -59,7 +61,14 @@ jobs:
           assert any(x.get(android+'name') == '.JourneyImmersionActivity' and x.get(android+'exported') == 'false' for x in activities)
           home = Path('app/src/main/java/org/openenglish/reader/JourneyActivity.java').read_text()
           assert 'JourneyImmersionActivity.class' in home
-          print('Native immersion Activity wired to home')
+          preview = ET.parse('preview/AndroidManifest.xml').getroot()
+          queries = preview.find('queries')
+          assert queries is not None
+          assert any(a.get(android + 'name') == 'android.intent.action.TTS_SERVICE'
+                     for a in queries.findall('.//action')), 'TTS service must be visible on Android 11+'
+          assert not any(p.get(android + 'name') == 'android.permission.INTERNET'
+                         for p in preview.findall('uses-permission')), 'Preview must remain offline'
+          print('Native immersion Activity and offline TTS package visibility wired')
           PY
       - name: Compile native Android module with Android 35 API
         run: |
