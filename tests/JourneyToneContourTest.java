@@ -26,9 +26,23 @@ public final class JourneyToneContourTest {
     yes(down.valid && down.trend.equals("下降"), "falling syllable");
     yes(JourneyToneContour.expectedTrend(5).equals("上扬"), "tone 5");
     yes(JourneyToneContour.expectedTrend(6).equals("近似平稳"), "tone 6");
-    yes(up.feedback(2).contains("无法判断声母"), "not a full pronunciation score");
+    yes(up.feedback(2).contains("不能判断声母"), "not a full pronunciation score");
     yes(!JourneyToneContour.analyze(new short[rate], rate).valid, "silence invalid");
     yes(!JourneyToneContour.analyze(new short[12], rate).valid, "short invalid");
+    yes(!JourneyToneContour.analyze(generated(rate, 170, 170), 7000).valid, "bad sample rate");
+    short[] extended = new short[rate * 4];
+    yes(!JourneyToneContour.analyze(extended, rate).valid, "long file invalid");
+    yes(JourneyToneContour.analyze(extended, rate).reason.contains("超过 3 秒"),
+        "long file guidance");
+    short[] separated = new short[rate * 2];
+    short[] sample = generated(rate, 170, 170);
+    System.arraycopy(sample, 0, separated, 0, rate / 2);
+    System.arraycopy(sample, 0, separated, rate, rate / 2);
+    JourneyToneContour.Result two = JourneyToneContour.analyze(separated, rate);
+    yes(!two.valid && two.reason.contains("多个分离"), "two syllables rejected");
+    yes(up.pitchHz.length > 20 && up.pitchHz.length < 60, "fixed-time Hz curve");
+    yes(up.medianHz > 100 && up.medianHz < 260, "Hz curve scale");
+    yes(up.feedback(2).contains("平调 1、3、6"), "flat tone ambiguity is explicit");
     System.out.println("JourneyToneContour: OK");
   }
 }
