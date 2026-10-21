@@ -58,10 +58,16 @@ public final class JourneyImmersionActivity extends Activity {
   private SharedPreferences prefs;
   private VideoView player;
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
-  private TextView languageLabel, cantoneseLesson, speechFeedback, timingLabel;
+  private TextView languageLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private LinearLayout cantonesePanel;
   private String language = "yue";
   private String speechReference = "";
+  private static final String[] TONE_WORDS = {
+      "詩 si1 · 高平", "史 si2 · 高升", "試 si3 · 中平",
+      "時 si4 · 低降", "市 si5 · 低升", "事 si6 · 低平"
+  };
+  private int toneTarget = 1;
+  private boolean toneBusy;
   private int cantoneseLessonIndex = 0;
   private int subtitleOffsetMs = 0;
   private long recordingStartedAt = 0L;
@@ -269,6 +275,20 @@ public final class JourneyImmersionActivity extends Activity {
     button("上一句", lessonControls, () -> changeCantoneseLesson(-1));
     button("练这句", lessonControls, () -> recognizeSpeech(true));
     button("下一句", lessonControls, () -> changeCantoneseLesson(1));
+    cantonesePanel.addView(label("六声调单音节 · 音高走势实验", 17, INK));
+    toneLabel = label("", 15, INK);
+    cantonesePanel.addView(toneLabel);
+    cantonesePanel.addView(label("练习方法：选一个 si 音节，单独读 0.5–1 秒。"
+        + "音高趋势由录音波形真实计算，但仅能粗略区分上扬、下降与平稳。", 12, MUTED));
+    LinearLayout toneControls = row(cantonesePanel);
+    button("选择目标调", toneControls, this::pickTone);
+    button("录 / 停单音节", toneControls, this::togglePractice);
+    LinearLayout toneAnalyzeRow = row(cantonesePanel);
+    button("分析刚才的音高走势", toneAnalyzeRow, this::analyzeTone);
+    toneFeedback = label("尚未录制。只能分析单音节的音高走势，不能作为完整粤语发音评分。", 13, MUTED);
+    cantonesePanel.addView(toneFeedback);
+    toneTarget = Math.max(1, Math.min(6, prefs.getInt("toneTarget", 1)));
+    updateToneTarget();
     updateCantoneseLesson();
     cantonesePanel.setVisibility("yue".equals(language) ? View.VISIBLE : View.GONE);
 
@@ -490,7 +510,59 @@ public final class JourneyImmersionActivity extends Activity {
         + String.format(java.util.Locale.US, "%.1f 秒", Math.abs(subtitleOffsetMs / 1000.0)));
   }
 
+  private void updateToneTarget() {
+    if (toneLabel != null) toneLabel.setText("目标：" + TONE_WORDS[toneTarget - 1]
+        + " · 预期走势：" + JourneyToneContour.expectedTrend(toneTarget));
+  }
+
+  private void pickTone() {
+    new AlertDialog.Builder(this).setTitle("选择六声调单音节")
+        .setSingleChoiceItems(TONE_WORDS, toneTarget - 1, (dialog, n) -> {
+          toneTarget = n + 1;
+          prefs.edit().putInt("toneTarget", toneTarget).apply();
+          updateToneTarget();
+          if (toneFeedback != null)
+            toneFeedback.setText("目标已更换。请只录读“" + TONE_WORDS[n] + "”中的那个单音节。");
+          dialog.dismiss();
+        }).setNegativeButton("取消", null).show();
+  }
+
+  private void analyzeTone() {
+    if (toneBusy) { toast("正在计算音高走势"); return; }
+    if (practice.isRecording()) {
+      if (toneFeedback != null) toneFeedback.setText("请先停止录音，再分析。");
+      return;
+    }
+    java.io.File audio = practice.recordingFile();
+    if (audio == null) {
+      if (toneFeedback != null) toneFeedback.setText("请先在本页录制一段清晰的单音节声音。");
+      return;
+    }
+    toneBusy = true;
+    final int tone = toneTarget;
+    toneFeedback.setText("正在本机解析录音并计算基频轮廓，不会上传音频……");
+    new Thread(() -> {
+      String result;
+      try {
+        JourneyToneAudio.Samples decoded = JourneyToneAudio.decode(audio);
+        JourneyToneContour.Result contour =
+            JourneyToneContour.analyze(decoded.monoPcm, decoded.sampleRate);
+        result = contour.feedback(tone);
+      } catch (Exception e) {
+        result = "音高分析失败：" + (e.getMessage() == null ? "请录制更清晰的单音节再试" : e.getMessage());
+      }
+      final String message = result;
+      runOnUiThread(() -> {
+        toneBusy = false;
+        if (!isFinishing() && !isDestroyed() && toneFeedback != null) {
+          toneFeedback.setText("目标：" + TONE_WORDS[tone - 1] + "\n" + message);
+        }
+      });
+    }, "everyone-tone-contour").start();
+  }
+
   private void togglePractice() {
+    if (toneBusy) { toast("请等待本机音高分析完成"); return; }
     if (practice.isRecording()) {
       boolean okay = practice.stop();
       speechFeedback.setText(okay ? "录音已完成。点击“回放我的录音”听差异。"
@@ -509,6 +581,7 @@ public final class JourneyImmersionActivity extends Activity {
     if (player != null && player.isPlaying()) player.pause();
     try {
       practice.start(getCacheDir());
+      if (toneFeedback != null) toneFeedback.setText("开始录制新声音：分析将以新录音为准。");
       recordingStartedAt = android.os.SystemClock.elapsedRealtime();
       speechFeedback.setText("● 正在录你的跟读……再次点击“录我的声音 / 停止”结束。");
       handler.postDelayed(() -> {
@@ -572,7 +645,7 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void changeCantoneseLesson(int offset) {
     int count = JourneyCantonese.lessonCount();
-    cantoneseLessonIndex = Math.floorMod(cantoneseLessonIndex + offset, count);
+    cantoneseLessonIndex = ((cantoneseLessonIndex + offset) % count + count) % count;
     updateCantoneseLesson();
   }
 
