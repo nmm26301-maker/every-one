@@ -102,10 +102,18 @@ public final class JourneyPracticeAudio {
     recording = null;
   }
 
-  /** 页面退出/切后台停止麦克风，释放资源；页面销毁时删除音频。 */
-  public void close() {
-    stop();
+  /**
+   * 快捷练习切换句子时清理上一句录音，避免把旧录音误认作新句练习。
+   * 仅删除本 Activity 创建的私有临时文件，不影响课程记录。
+   */
+  public void discard() {
+    if (capturing) stop();
     stopPlayback();
     deleteRecording();
+  }
+
+  /** 页面退出/切后台停止麦克风，释放资源；页面销毁时删除音频。 */
+  public void close() {
+    discard();
   }
 }
