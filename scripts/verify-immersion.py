@@ -1,4 +1,4 @@
-"""Verify unsigned Everyone 5.0.6 immersion APK without exposing private keys."""
+"""Verify unsigned Everyone 5.0.7 immersion APK without exposing private keys."""
 import json
 import pathlib
 import sys
@@ -14,7 +14,7 @@ new = {str(p.relative_to(new_dir)): p.read_bytes() for p in new_dir.rglob("*.sma
 def in_scope(name):
     prefix = "org/openenglish/reader/"
     targets = ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles",
-               "JourneyCantonese", "JourneyPracticeAudio", "JourneyToneContour", "JourneyToneAudio", "JourneySpeechGuide", "JourneyTonePlotView", "JourneyJyutping", "JourneyCantoneseAsr")
+               "JourneyCantonese", "JourneyPracticeAudio", "JourneyToneContour", "JourneyToneAudio", "JourneySpeechGuide", "JourneyTonePlotView", "JourneyJyutping", "JourneyCantoneseAsr", "JourneyToneCompare")
     return name.startswith(tuple(prefix + target for target in targets))
 
 unchanged = [name for name in old if not in_scope(name)]
@@ -33,6 +33,7 @@ assert any(name.endswith("/JourneySpeechGuide.smali") for name in added)
 assert any(name.endswith("/JourneyTonePlotView.smali") for name in added)
 assert any(name.endswith("/JourneyJyutping.smali") for name in added)
 assert any(name.endswith("/JourneyCantoneseAsr.smali") for name in added)
+assert any(name.endswith("/JourneyToneCompare.smali") for name in added)
 assert any(name.endswith("/JourneyActivity.smali") for name in old)
 assert any(name.endswith("/JourneyActivity.smali") for name in new)
 
@@ -47,8 +48,8 @@ with zipfile.ZipFile(base) as old_apk, zipfile.ZipFile(output) as new_apk:
     assert old_apk.read("AndroidManifest.xml") != new_apk.read("AndroidManifest.xml")
 
 report = {
-    "version_name": "5.0.6",
-    "version_code": 65,
+    "version_name": "5.0.7",
+    "version_code": 66,
     "previous_other_classes_unchanged": len(unchanged),
     "added_immersion_classes": len(added),
     "preserved_archive_entries": len(preserved),
