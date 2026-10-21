@@ -61,6 +61,7 @@ public final class JourneyImmersionActivity extends Activity {
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
   private TextView languageLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private LinearLayout cantonesePanel;
+  private JourneyTonePlotView tonePlot;
   private String language = "yue";
   private String speechReference = "";
   private static final String[] TONE_WORDS = {
@@ -292,6 +293,10 @@ public final class JourneyImmersionActivity extends Activity {
     button("录 / 停单音节", toneControls, this::togglePractice);
     LinearLayout toneAnalyzeRow = row(cantonesePanel);
     button("分析刚才的音高走势", toneAnalyzeRow, this::analyzeTone);
+    tonePlot = new JourneyTonePlotView(this);
+    LinearLayout.LayoutParams chartBox = new LinearLayout.LayoutParams(-1, dp(172));
+    chartBox.setMargins(0, dp(12), 0, dp(12));
+    cantonesePanel.addView(tonePlot, chartBox);
     LinearLayout toneListenRow = row(cantonesePanel);
     button("听所选单音节", toneListenRow, this::speakToneExample);
     toneFeedback = label("尚未录制。只能分析单音节的音高走势，不能作为完整粤语发音评分。", 13, MUTED);
@@ -584,6 +589,10 @@ public final class JourneyImmersionActivity extends Activity {
         JourneyToneContour.Result contour =
             JourneyToneContour.analyze(decoded.monoPcm, decoded.sampleRate);
         result = contour.feedback(tone);
+        final JourneyToneContour.Result plotted = contour;
+        runOnUiThread(() -> {
+          if (!isFinishing() && !isDestroyed() && tonePlot != null) tonePlot.show(plotted);
+        });
       } catch (Exception e) {
         result = "音高分析失败：" + (e.getMessage() == null ? "请录制更清晰的单音节再试" : e.getMessage());
       }
@@ -619,6 +628,7 @@ public final class JourneyImmersionActivity extends Activity {
     try {
       practice.start(getCacheDir());
       if (toneFeedback != null) toneFeedback.setText("开始录制新声音：分析将以新录音为准。");
+      if (tonePlot != null) tonePlot.show(null);
       recordingStartedAt = android.os.SystemClock.elapsedRealtime();
       speechFeedback.setText("● 正在录你的跟读……再次点击“录我的声音 / 停止”结束。");
       handler.postDelayed(() -> {
