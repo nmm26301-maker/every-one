@@ -162,3 +162,9 @@ GitHub Actions 的 `immersion.yml` 会检查 Android Activity 注册、使用 An
 ## 版本与安装
 
 本分支代码持续集成到原签名 APK。完整包在私有仓库 [Zizai Releases](https://github.com/nmm26301-maker/Zizai/releases) 提供，须通过与原版签名一致性、资源完整性及 DEX 类校验后才能发布。**以上自动检查不等于已经在真机验收。**安装正式完整版前备份数据，直接覆盖原 Everyone，不要先卸载。
+
+## 5.0.12 完整覆盖交付（2026-10-21）
+
+统一完整包版本为 5.0.12 / versionCode 71，收录 5.0.12-preview 对应的全部速练及影视功能。保留 `org.openenglish.reader`、原证书、原有英语课程、OpenPronounce 及全部原有模型资源。没有新增声学识别模型；粤语仍为粤拼听辨、录音、音高对照和可选 SenseVoice 转写。系统示范依赖已安装的对应离线音色。
+
+构建后输出实际 DEX 与归档校验报告，版本号从源清单读取；签名、签名包恢复校验、完整源码快照、私有签名备份引用与模拟器 UI 检查记录一起保存。x86 UI 测试副本省略 ARM 库，不能代替用户 ARM 手机上的真实录音音质、TTS 或推理验收。

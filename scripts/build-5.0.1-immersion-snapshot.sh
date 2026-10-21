@@ -88,5 +88,6 @@ PY
 java -cp "$smali_cp" org.jf.baksmali.Main disassemble "$dir/base.dex" -o "$dir/old-smali"
 java -cp "$smali_cp" org.jf.baksmali.Main disassemble "$dir/merged.dex" -o "$dir/new-smali"
 python3 scripts/verify-immersion.py "$base_apk" "$output_apk" "$dir"
+cp "$dir/immersion-verification.json" "${output_apk%.apk}-verification.json"
 echo "Unsigned, aligned APK: $output_apk"
 echo "Sign locally with the existing Everyone signing key before any Android install."

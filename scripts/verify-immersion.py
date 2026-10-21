@@ -1,8 +1,9 @@
-"""Verify unsigned Everyone 5.0.11 immersion APK without exposing private keys."""
+"""Verify unsigned immersion APK against the current source manifest."""
 import json
 import pathlib
 import sys
 import zipfile
+import xml.etree.ElementTree as ET
 
 if len(sys.argv) != 4:
     raise SystemExit("usage: verify-immersion.py BASE.apk UNSIGNED.apk BUILD_DIR")
@@ -48,9 +49,11 @@ with zipfile.ZipFile(base) as old_apk, zipfile.ZipFile(output) as new_apk:
     assert old_apk.read("classes.dex") != new_apk.read("classes.dex")
     assert old_apk.read("AndroidManifest.xml") != new_apk.read("AndroidManifest.xml")
 
+manifest = ET.parse(pathlib.Path(__file__).resolve().parents[1] / "app/src/main/AndroidManifest.xml").getroot()
+android = "{http://schemas.android.com/apk/res/android}"
 report = {
-    "version_name": "5.0.11",
-    "version_code": 70,
+    "version_name": manifest.get(android + "versionName"),
+    "version_code": int(manifest.get(android + "versionCode")),
     "previous_other_classes_unchanged": len(unchanged),
     "added_immersion_classes": len(added),
     "preserved_archive_entries": len(preserved),
