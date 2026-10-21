@@ -905,6 +905,16 @@ public final class JourneyImmersionActivity extends Activity {
     togglePractice();
   }
 
+  private void markQuickRecorded(boolean valid) {
+    if (!currentQuickTake) return;
+    currentQuickTake = false;
+    if (!valid) return;
+    String key = "quickRecords_" + language + "_" + quickIndex;
+    int old = Math.max(0, prefs.getInt(key, 0));
+    prefs.edit().putInt(key, Math.min(1000000, old + 1)).apply();
+    showQuick();
+  }
+
   private void refreshQuickRecordButton() {
     if (quickRecordButton != null)
       quickRecordButton.setText(practice.isRecording() ? "■ 停止录音" : "● 开始录音");
@@ -936,6 +946,7 @@ public final class JourneyImmersionActivity extends Activity {
       quickRecordRequested = false;
       boolean okay = practice.stop();
       recordingSession++;
+      markQuickRecorded(okay);
       refreshQuickRecordButton();
       String info = okay ? "录音完成。现在点「回放」，对比示范。"
           : "录音太短或麦克风失败，请重新录一遍。";
@@ -973,6 +984,7 @@ public final class JourneyImmersionActivity extends Activity {
         if (android.os.SystemClock.elapsedRealtime() - recordingStartedAt < limit) return;
         boolean ok = practice.stop();
         recordingSession++;
+        markQuickRecorded(ok);
         refreshQuickRecordButton();
         String info = ok ? "录音已自动停止，可点「回放」听刚才的声音。"
             : "录音未完成，请重新录制。";
@@ -997,7 +1009,11 @@ public final class JourneyImmersionActivity extends Activity {
     if (speechGuide != null) speechGuide.stop();
     if (player != null && player.isPlaying()) player.pause();
     try {
-      if (!practice.play()) {
+      final long session = recordingSession;
+      if (!practice.play(() -> {
+        if (session != recordingSession || isFinishing() || isDestroyed()) return;
+        if (quickStatus != null) quickStatus.setText("回放结束。可以再跟读一次，或点「下一句」。");
+      })) {
         speechFeedback.setText("没有可回放的录音。请先录制一遍。");
         if (quickStatus != null) quickStatus.setText("先点「录音 / 停止」开始练习。");
       } else if (quickStatus != null) {
@@ -1047,10 +1063,13 @@ public final class JourneyImmersionActivity extends Activity {
     if (quickPhrase == null) return;
     JourneyQuickStart.Phrase item = currentQuick();
     String pron = item.pronunciation.isEmpty() ? "" : "\n" + item.pronunciation;
+    String key = "quickRecords_" + language + "_" + quickIndex;
+    int recordings = Math.max(0, prefs.getInt(key, 0));
     quickPhrase.setText((quickIndex + 1) + " / " + JourneyQuickStart.size(language)
         + "    " + ("yue".equals(language) ? "港式粤语" : "ja".equals(language) ? "日语口语" : "英语表达")
         + "\n" + item.original + pron + "\n" + item.meaning
-        + "\n提示：" + item.tip);
+        + "\n提示：" + item.tip
+        + "\n本句录音 " + recordings + " 次（不代表发音正确）");
   }
 
   private void changeQuick(int offset) {
