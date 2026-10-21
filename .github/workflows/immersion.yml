@@ -7,6 +7,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyQuickStart.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
@@ -20,6 +21,7 @@ on:
       - 'preview/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
+      - 'tests/JourneyQuickStartTest.java'
       - 'tests/JourneyJyutpingTest.java'
       - 'tests/test_sensevoice_yue.py'
       - 'server/sensevoice_yue.py'
@@ -32,6 +34,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyQuickStart.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
@@ -45,6 +48,7 @@ on:
       - 'preview/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
+      - 'tests/JourneyQuickStartTest.java'
       - 'tests/JourneyJyutpingTest.java'
       - 'tests/test_sensevoice_yue.py'
       - 'server/sensevoice_yue.py'
@@ -101,6 +105,7 @@ jobs:
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyQuickStart.java \
             app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
             app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
             app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
@@ -152,6 +157,7 @@ jobs:
             -d build/immersion-preview/classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyQuickStart.java \
             app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
             app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
             app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
@@ -178,17 +184,17 @@ jobs:
           "$buildtools/apksigner" sign \
             --ks build/immersion-preview/ephemeral.keystore \
             --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
-            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.10.apk \
             build/immersion-preview/aligned.apk
           "$buildtools/apksigner" verify --verbose \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.10.apk
           "$buildtools/aapt2" dump badging \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.10.apk \
             | head -n 8
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
-          name: Everyone-Immersion-Preview-5.0.9
-          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk
+          name: Everyone-Immersion-Preview-5.0.10
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.10.apk
           if-no-files-found: error
           retention-days: 14
