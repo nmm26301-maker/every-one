@@ -79,6 +79,11 @@ public final class JourneyPracticeAudio {
     }
   }
 
+  /** 仅返回已停止录制的私有录音，供本机音高分析使用。 */
+  public File recordingFile() {
+    return !capturing && recording != null && recording.isFile() ? recording : null;
+  }
+
   public boolean isRecording() {
     return capturing;
   }
