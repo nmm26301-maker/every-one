@@ -1,10 +1,12 @@
 package org.openenglish.reader;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -42,23 +44,27 @@ public final class JourneyImmersionActivity extends Activity {
   private static final int PICK_TRANSLATION = 63;
   private static final int EXPORT_ANKI = 64;
   private static final int SPEECH_COMPARE = 65;
+  private static final int RECORD_PERMISSION = 66;
   private static final int INK = 0xff19263b;
   private static final int MUTED = 0xff5f6e83;
   private static final int ACCENT = 0xff5948cf;
   private static final int BG = 0xfff5f6fa;
 
   private final Handler handler = new Handler(Looper.getMainLooper());
+  private final JourneyPracticeAudio practice = new JourneyPracticeAudio();
   private final List<JourneySubtitles.Cue> source = new ArrayList<>();
   private final List<JourneySubtitles.Cue> translated = new ArrayList<>();
   private final Set<String> saved = new LinkedHashSet<>();
   private SharedPreferences prefs;
   private VideoView player;
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
-  private TextView languageLabel, cantoneseLesson, speechFeedback;
+  private TextView languageLabel, cantoneseLesson, speechFeedback, timingLabel;
   private LinearLayout cantonesePanel;
   private String language = "yue";
   private String speechReference = "";
   private int cantoneseLessonIndex = 0;
+  private int subtitleOffsetMs = 0;
+  private long recordingStartedAt = 0L;
   private LinearLayout playlist;
   private Button pauseButton, loopButton;
   private Uri videoUri;
@@ -72,13 +78,14 @@ public final class JourneyImmersionActivity extends Activity {
     @Override public void run() {
       if (!foreground || player == null) return;
       int ms = player.getCurrentPosition();
-      int next = JourneySubtitles.at(source, ms);
+      int next = JourneySubtitles.at(source, Math.max(0, ms - subtitleOffsetMs));
       if (next != activeIndex) showCue(next);
       if (next >= 0 && player.isPlaying()) {
         JourneySubtitles.Cue cue = source.get(next);
-        if (ms >= cue.endMs - 120 && ms < cue.endMs + 550) {
+        int actualEnd = cue.endMs + subtitleOffsetMs;
+        if (ms >= actualEnd - 120 && ms < actualEnd + 550) {
           if (loopOne) {
-            player.seekTo(cue.startMs + 35);
+            player.seekTo(Math.max(0, cue.startMs + subtitleOffsetMs + 35));
           } else if (pauseEach && pausedAt != next) {
             pausedAt = next;
             player.pause();
@@ -96,6 +103,7 @@ public final class JourneyImmersionActivity extends Activity {
     saved.addAll(prefs.getStringSet("saved-phrases", Collections.emptySet()));
     pauseEach = prefs.getBoolean("pause", true);
     loopOne = prefs.getBoolean("loop", false);
+    subtitleOffsetMs = Math.max(-10000, Math.min(10000, prefs.getInt("subtitleOffsetMs", 0)));
     getWindow().setStatusBarColor(BG);
     getWindow().setNavigationBarColor(BG);
     draw();
@@ -186,6 +194,13 @@ public final class JourneyImmersionActivity extends Activity {
     });
     status = label("先选择本地视频，再导入原文字幕。", 13, MUTED);
     page.addView(status);
+    timingLabel = label("", 12, MUTED);
+    page.addView(timingLabel);
+    LinearLayout syncRow = row(page);
+    button("字幕提前 0.5s", syncRow, () -> adjustSync(-500));
+    button("同步重置", syncRow, () -> adjustSync(-subtitleOffsetMs));
+    button("字幕延后 0.5s", syncRow, () -> adjustSync(500));
+    showSync();
 
     LinearLayout files1 = row(page);
     button("选视频", files1, () -> pick(PICK_VIDEO, "video/*"));
@@ -229,8 +244,13 @@ public final class JourneyImmersionActivity extends Activity {
     button("显示口语说明", capture, this::explain);
     LinearLayout speakRow = row(page);
     button("跟读识别 · 对照文本", speakRow, this::recognizeSpeech);
+    LinearLayout recordings = row(page);
+    button("● 录我的声音 / 停止", recordings, this::togglePractice);
+    button("▶ 回放我的录音", recordings, this::playPractice);
     speechFeedback = label("请先选一条视频台词；或使用下方粤语练习句。\n系统识别结果不能视为发音或六声调评分。", 13, MUTED);
     page.addView(speechFeedback);
+    page.addView(label("录音只保存在临时缓存中，离开这个页面就会删除；最长 30 秒。"
+        + " 可以与视频原声反复比较，但不自动评判粤语声调。", 12, MUTED));
 
     cantonesePanel = new LinearLayout(this);
     cantonesePanel.setOrientation(1);
@@ -401,7 +421,7 @@ public final class JourneyImmersionActivity extends Activity {
       return;
     }
     pausedAt = -1;
-    player.seekTo(source.get(n).startMs + 35);
+    player.seekTo(Math.max(0, source.get(n).startMs + subtitleOffsetMs + 35));
     player.start();
     showCue(n);
   }
@@ -448,6 +468,78 @@ public final class JourneyImmersionActivity extends Activity {
       }
       toast("已导出 " + saved.size() + " 句，可从 Anki 导入 TSV");
     } catch (Exception e) { toast("导出失败：" + e.getMessage()); }
+  }
+
+  /** 正值表示字幕整体后移；视频和中外文字幕统一使用相同偏移量。 */
+  private void adjustSync(int delta) {
+    subtitleOffsetMs = Math.max(-10000, Math.min(10000, subtitleOffsetMs + delta));
+    prefs.edit().putInt("subtitleOffsetMs", subtitleOffsetMs).apply();
+    showSync();
+    activeIndex = -1;
+    if (player != null && videoUri != null) {
+      showCue(JourneySubtitles.at(source,
+          Math.max(0, player.getCurrentPosition() - subtitleOffsetMs)));
+    }
+  }
+
+  private void showSync() {
+    if (timingLabel == null) return;
+    String label = subtitleOffsetMs > 0 ? "延后"
+        : subtitleOffsetMs < 0 ? "提前" : "已同步";
+    timingLabel.setText("字幕偏移：" + label + " "
+        + String.format(java.util.Locale.US, "%.1f 秒", Math.abs(subtitleOffsetMs / 1000.0)));
+  }
+
+  private void togglePractice() {
+    if (practice.isRecording()) {
+      boolean okay = practice.stop();
+      speechFeedback.setText(okay ? "录音已完成。点击“回放我的录音”听差异。"
+          : "录音太短或麦克风录音失败，请重试。");
+      return;
+    }
+    if (android.os.Build.VERSION.SDK_INT >= 23
+        && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+      requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_PERMISSION);
+      return;
+    }
+    startPractice();
+  }
+
+  private void startPractice() {
+    if (player != null && player.isPlaying()) player.pause();
+    try {
+      practice.start(getCacheDir());
+      recordingStartedAt = android.os.SystemClock.elapsedRealtime();
+      speechFeedback.setText("● 正在录你的跟读……再次点击“录我的声音 / 停止”结束。");
+      handler.postDelayed(() -> {
+        if (!practice.isRecording()) return;
+        if (android.os.SystemClock.elapsedRealtime() - recordingStartedAt < 30000L) return;
+        boolean ok = practice.stop();
+        if (speechFeedback != null) speechFeedback.setText(ok
+            ? "已录满 30 秒并自动停止。现在可以回放。"
+            : "录音未完成，请重试。");
+      }, 30050);
+    } catch (Exception e) {
+      speechFeedback.setText("录音启动失败：" + e.getMessage());
+    }
+  }
+
+  private void playPractice() {
+    try {
+      if (!practice.play()) {
+        speechFeedback.setText("没有可回放的录音。请先录制一遍。");
+      }
+    } catch (Exception e) {
+      speechFeedback.setText("回放失败：" + e.getMessage());
+    }
+  }
+
+  @Override public void onRequestPermissionsResult(int request, String[] permissions, int[] results) {
+    super.onRequestPermissionsResult(request, permissions, results);
+    if (request != RECORD_PERMISSION) return;
+    if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) startPractice();
+    else if (speechFeedback != null) speechFeedback.setText(
+        "没有录音权限，可继续看字幕、听原声及使用外部系统语音识别。");
   }
 
   private void updateLanguageLabel() {
@@ -499,6 +591,7 @@ public final class JourneyImmersionActivity extends Activity {
       return;
     }
     if (player != null && player.isPlaying()) player.pause();
+    if (practice.isRecording()) practice.stop();
     Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
@@ -578,12 +671,20 @@ public final class JourneyImmersionActivity extends Activity {
     foreground = false;
     handler.removeCallbacks(progress);
     if (player != null) player.pause();
+    if (practice.isRecording()) {
+      boolean result = practice.stop();
+      if (speechFeedback != null) speechFeedback.setText(result
+          ? "已暂停麦克风录音，可继续回放。"
+          : "录音中断，请重新录制。");
+    }
+    practice.stopPlayback();
     super.onStop();
   }
 
   @Override protected void onDestroy() {
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
+    practice.close();
     super.onDestroy();
   }
 }
