@@ -5,6 +5,9 @@
     android:versionName="5.0.4-preview">
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <queries>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    </queries>
     <application
         android:allowBackup="false"
         android:label="Everyone 影视精听·预览"
