@@ -78,7 +78,7 @@ public final class JourneyImmersionActivity extends Activity {
     @Override public void run() {
       if (!foreground || player == null) return;
       int ms = player.getCurrentPosition();
-      int next = JourneySubtitles.at(source, Math.max(0, ms - subtitleOffsetMs));
+      int next = JourneySubtitles.at(source, ms - subtitleOffsetMs);
       if (next != activeIndex) showCue(next);
       if (next >= 0 && player.isPlaying()) {
         JourneySubtitles.Cue cue = source.get(next);
@@ -478,7 +478,7 @@ public final class JourneyImmersionActivity extends Activity {
     activeIndex = -1;
     if (player != null && videoUri != null) {
       showCue(JourneySubtitles.at(source,
-          Math.max(0, player.getCurrentPosition() - subtitleOffsetMs)));
+          player.getCurrentPosition() - subtitleOffsetMs));
     }
   }
 
