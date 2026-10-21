@@ -286,8 +286,8 @@ public final class JourneyImmersionActivity extends Activity {
     cantonesePanel.addView(label("六声调单音节 · 音高走势实验", 17, INK));
     toneLabel = label("", 15, INK);
     cantonesePanel.addView(toneLabel);
-    cantonesePanel.addView(label("练习方法：选一个 si 音节，单独读 0.5–1 秒。"
-        + "音高趋势由录音波形真实计算，但仅能粗略区分上扬、下降与平稳。", 12, MUTED));
+    cantonesePanel.addView(label("练习方法：选一个 si 音节，单独读 0.5–1 秒（最长 3 秒）。"
+        + "图表显示相对音高轨迹；无法判定 1/3/6 平调的音区和声母韵母。", 12, MUTED));
     LinearLayout toneControls = row(cantonesePanel);
     button("选择目标调", toneControls, this::pickTone);
     button("录 / 停单音节", toneControls, this::togglePractice);
