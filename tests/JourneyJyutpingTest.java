@@ -33,7 +33,7 @@ public final class JourneyJyutpingTest {
     yes(JourneyJyutping.parse("bad") == null, "missing tone number");
     yes(JourneyJyutping.parse("abc9") == null, "invalid tone");
     yes(JourneyJyutping.parse("abc1") == null, "unknown final");
-    yes(JourneyJyutping.parse("nei5 hou2").equals(null), "single syllable parser");
+    yes(JourneyJyutping.parse("nei5 hou2") == null, "single syllable parser");
     yes(JourneyJyutping.parseLine("nei5 hou2").size() == 2, "line split");
     for (int i = 0; i < JourneyCantonese.lessonCount(); i++) {
       JourneyCantonese.Phrase lesson = JourneyCantonese.lesson(i);
