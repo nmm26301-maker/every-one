@@ -18,6 +18,8 @@ import android.speech.RecognizerIntent;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.text.InputType;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.ScrollView;
@@ -71,6 +73,9 @@ public final class JourneyImmersionActivity extends Activity {
   };
   private int toneTarget = 1;
   private boolean toneBusy;
+  private boolean yueAsrBusy;
+  private String yueAsrEndpoint = "";
+  private String yueAsrToken = "";
   private int cantoneseLessonIndex = 0;
   private int contrastIndex = 0;
   private int subtitleOffsetMs = 0;
@@ -114,6 +119,7 @@ public final class JourneyImmersionActivity extends Activity {
     pauseEach = prefs.getBoolean("pause", true);
     loopOne = prefs.getBoolean("loop", false);
     subtitleOffsetMs = Math.max(-10000, Math.min(10000, prefs.getInt("subtitleOffsetMs", 0)));
+    yueAsrEndpoint = prefs.getString("yueAsrEndpoint", "");
     getWindow().setStatusBarColor(BG);
     getWindow().setNavigationBarColor(BG);
     draw();
@@ -301,6 +307,16 @@ public final class JourneyImmersionActivity extends Activity {
     button("下一组", contrastControls, () -> changeContrast(1));
     cantonesePanel.addView(label("注意：对照说明是静态教学提示。手机离线合成发音因音色而异，"
         + "请优先比较影视真人原声；目前不能自动判断是否发准声母或韵母。", 12, MUTED));
+    TextView modelTitle = label("开源粤语识别 · 可选 SenseVoiceSmall", 18, INK);
+    modelTitle.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+    cantonesePanel.addView(modelTitle);
+    cantonesePanel.addView(label("不预装大型模型、不默认上传录音。只有主动配置你自己的 HTTPS 服务，"
+        + "并且每次明确确认后，才发送刚录的 M4A。转写文字不能当作音素纠音评分。", 12, MUTED));
+    LinearLayout yueAsrRow = row(cantonesePanel);
+    button("配置我的识别服务", yueAsrRow, this::configureYueAsr);
+    button("用 SenseVoice 识别", yueAsrRow, this::confirmYueAsr);
+    cantonesePanel.addView(label("需自行部署开源 SenseVoiceSmall（见仓库 server/）；"
+        + "没有服务器时可继续使用本地音高曲线、系统语音识别和影视精听。", 12, MUTED));
     cantonesePanel.addView(label("六声调单音节 · 音高走势实验", 17, INK));
     toneLabel = label("", 15, INK);
     cantonesePanel.addView(toneLabel);
@@ -572,6 +588,91 @@ public final class JourneyImmersionActivity extends Activity {
     if (speechFeedback != null) speechFeedback.setText(info);
   }
 
+  private void configureYueAsr() {
+    LinearLayout form = new LinearLayout(this);
+    form.setOrientation(LinearLayout.VERTICAL);
+    form.setPadding(dp(20), dp(5), dp(20), 0);
+    EditText endpoint = new EditText(this);
+    endpoint.setSingleLine(true);
+    endpoint.setText(yueAsrEndpoint);
+    endpoint.setHint("https://我的域名/v1/yue/transcribe");
+    endpoint.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+    form.addView(endpoint, new LinearLayout.LayoutParams(-1, dp(56)));
+    EditText token = new EditText(this);
+    token.setSingleLine(true);
+    token.setHint("服务端访问令牌（仅本次打开 App 有效）");
+    token.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+    form.addView(token, new LinearLayout.LayoutParams(-1, dp(56)));
+    new AlertDialog.Builder(this).setTitle("自建 SenseVoice 粤语识别")
+        .setMessage("只接受 HTTPS。地址会保存在本机，但令牌不持久存储；"
+            + "每次上传录音前仍需确认，服务端由你自行控制。")
+        .setView(form).setPositiveButton("保存设置", (dialog, which) -> {
+          String next = endpoint.getText().toString().trim();
+          if (!JourneyCantoneseAsr.validEndpoint(next)) {
+            toast("地址无效：必须是 HTTPS，路径为 /v1/yue/transcribe");
+            return;
+          }
+          String key = token.getText().toString().trim();
+          if (key.length() < 16) { toast("令牌至少需要 16 字符，未保存"); return; }
+          yueAsrEndpoint = next;
+          yueAsrToken = key;
+          prefs.edit().putString("yueAsrEndpoint", next).apply();
+          toast("服务地址已保存；令牌仅在本次运行有效");
+        }).setNegativeButton("取消", null).show();
+  }
+
+  private void confirmYueAsr() {
+    if (yueAsrBusy) { toast("粤语转写处理中"); return; }
+    if (!JourneyCantoneseAsr.validEndpoint(yueAsrEndpoint)
+        || yueAsrToken.length() < 16) {
+      configureYueAsr();
+      return;
+    }
+    if (practice.isRecording()) { toast("请先停止录音"); return; }
+    java.io.File audio = practice.recordingFile();
+    if (audio == null) { toast("请先用“录我的声音”录制一句粤语"); return; }
+    if (audio.length() > JourneyCantoneseAsr.MAX_AUDIO_BYTES) {
+      toast("录音超过 2MB，不能发送");
+      return;
+    }
+    new AlertDialog.Builder(this).setTitle("确认上传本次录音？")
+        .setMessage("将把当前这段 M4A 声音经 HTTPS 上传到你配置的服务器："
+            + "\n" + yueAsrEndpoint + "\n"
+            + "仅用于转写粤语文本，不分析声母韵母错误，也不会传输其他视频或历史录音。")
+        .setPositiveButton("同意并识别", (d, n) -> runYueAsr(audio))
+        .setNegativeButton("取消", null).show();
+  }
+
+  private void runYueAsr(java.io.File audio) {
+    if (yueAsrBusy) return;
+    yueAsrBusy = true;
+    final String endpoint = yueAsrEndpoint;
+    final String token = yueAsrToken;
+    final String reference = activeIndex >= 0 && activeIndex < source.size()
+        ? source.get(activeIndex).text : JourneyCantonese.lesson(cantoneseLessonIndex).hanzi;
+    speechFeedback.setText("正在通过你的 HTTPS 服务识别粤语……");
+    new Thread(() -> {
+      String result;
+      try {
+        JourneyCantoneseAsr.Transcript response =
+            JourneyCantoneseAsr.transcribe(endpoint, token, audio);
+        result = "SenseVoice (" + response.language + ") 识别：" + response.text
+            + "\n参考台词：" + reference + "\n"
+            + JourneyCantonese.transcriptFeedback(reference, response.text)
+            + "\nASR 文字差异不代表发音的声母、韵母或六声调错误。";
+      } catch (Exception e) {
+        result = "粤语识别失败：" + (e.getMessage() == null ? "网络或模型异常" : e.getMessage())
+            + "\n本地录音和音高分析仍可使用。";
+      }
+      final String message = result;
+      runOnUiThread(() -> {
+        yueAsrBusy = false;
+        if (!isFinishing() && !isDestroyed() && speechFeedback != null)
+          speechFeedback.setText(message);
+      });
+    }, "everyone-self-hosted-yue-asr").start();
+  }
+
   private void updateToneTarget() {
     if (toneLabel != null) toneLabel.setText("目标：" + TONE_WORDS[toneTarget - 1]
         + " · 预期走势：" + JourneyToneContour.expectedTrend(toneTarget));
@@ -628,6 +729,7 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void togglePractice() {
+    if (yueAsrBusy) { toast("粤语转写进行中，请勿覆盖录音"); return; }
     if (toneBusy) { toast("请等待本机音高分析完成"); return; }
     if (practice.isRecording()) {
       boolean okay = practice.stop();
