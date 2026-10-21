@@ -103,10 +103,12 @@ public final class JourneyToneContour {
   /** 允许自然的短暂无声帧；两组至少 100ms 有声间隔 >=160ms 才拒绝。 */
   private static boolean separateSyllables(double[] pitch) {
     int firstGroup = 0, secondGroup = 0, gap = 0;
+    boolean split = false;
     for (double hz : pitch) {
       if (hz > 0) {
-        if (gap >= 8 && firstGroup >= 5) secondGroup++;
-        else if (secondGroup == 0) firstGroup++;
+        if (!split && gap >= 8 && firstGroup >= 5) split = true;
+        if (split) secondGroup++;
+        else firstGroup++;
         gap = 0;
       } else if (firstGroup >= 5) {
         gap++;
