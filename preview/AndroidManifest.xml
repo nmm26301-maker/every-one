@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.openenglish.reader.preview"
-    android:versionCode="1"
-    android:versionName="5.0.1-preview">
+    android:versionCode="2"
+    android:versionName="5.0.2-preview">
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <application
         android:allowBackup="false"
         android:label="Everyone 影视精听·预览"
