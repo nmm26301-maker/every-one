@@ -14,5 +14,5 @@ for i,u in enumerate(lessons):
 root=E.parse('app/src/main/AndroidManifest.xml').getroot();ns='{http://schemas.android.com/apk/res/android}'
 launch=[a.get(ns+'name') for a in root.findall('application/activity') if any(c.get(ns+'name')=='android.intent.category.LAUNCHER' for c in a.findall('intent-filter/category'))]
 assert launch==['.JourneyActivity']
-assert (root.get(ns+'versionName'), root.get(ns+'versionCode')) in {('5.0.0','59'), ('5.0.1','60'), ('5.0.2','61'), ('5.0.3','62')}
+assert (root.get(ns+'versionName'), root.get(ns+'versionCode')) in {('5.0.0','59'), ('5.0.1','60'), ('5.0.2','61'), ('5.0.3','62'), ('5.0.4','63')}
 print('Curriculum: 48 distinct lessons / 144 bilingual utterances, level sequence, recording-length budget and unique launcher verified')
