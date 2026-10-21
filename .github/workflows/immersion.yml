@@ -8,6 +8,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneContour.java'
@@ -19,6 +20,8 @@ on:
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
       - 'tests/JourneyJyutpingTest.java'
+      - 'tests/test_sensevoice_yue.py'
+      - 'server/sensevoice_yue.py'
       - 'tests/JourneyToneContourTest.java'
       - 'tests/test-journey-subtitles.sh'
       - '.github/workflows/immersion.yml'
@@ -28,6 +31,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneContour.java'
@@ -39,6 +43,8 @@ on:
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
       - 'tests/JourneyJyutpingTest.java'
+      - 'tests/test_sensevoice_yue.py'
+      - 'server/sensevoice_yue.py'
       - 'tests/JourneyToneContourTest.java'
       - 'tests/test-journey-subtitles.sh'
       - '.github/workflows/immersion.yml'
@@ -56,6 +62,8 @@ jobs:
           java-version: '17'
       - name: Parse real subtitles without Android dependencies
         run: bash tests/test-journey-subtitles.sh
+      - name: Test optional self-hosted Cantonese ASR protocol with mocked model
+        run: python3 -m unittest discover -s tests -p 'test_sensevoice_yue.py' -v
       - name: Check existing manifest and home entry
         run: |
           python3 - <<'PY'
@@ -72,8 +80,8 @@ jobs:
           assert queries is not None
           assert any(a.get(android + 'name') == 'android.intent.action.TTS_SERVICE'
                      for a in queries.findall('.//action')), 'TTS service must be visible on Android 11+'
-          assert not any(p.get(android + 'name') == 'android.permission.INTERNET'
-                         for p in preview.findall('uses-permission')), 'Preview must remain offline'
+          assert any(p.get(android + 'name') == 'android.permission.INTERNET'
+                         for p in preview.findall('uses-permission')), 'Opt-in HTTPS client needs permission'
           print('Native immersion Activity and offline TTS package visibility wired')
           PY
       - name: Compile native Android module with Android 35 API
@@ -90,6 +98,7 @@ jobs:
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
             app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
+            app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
             app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
@@ -139,6 +148,7 @@ jobs:
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
             app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
+            app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
             app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
@@ -162,17 +172,17 @@ jobs:
           "$buildtools/apksigner" sign \
             --ks build/immersion-preview/ephemeral.keystore \
             --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
-            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.7.apk \
             build/immersion-preview/aligned.apk
           "$buildtools/apksigner" verify --verbose \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.7.apk
           "$buildtools/aapt2" dump badging \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.7.apk \
             | head -n 8
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
-          name: Everyone-Immersion-Preview-5.0.6
-          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk
+          name: Everyone-Immersion-Preview-5.0.7
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.7.apk
           if-no-files-found: error
           retention-days: 14
