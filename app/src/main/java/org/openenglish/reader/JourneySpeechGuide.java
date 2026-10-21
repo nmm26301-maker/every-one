@@ -21,6 +21,7 @@ public final class JourneySpeechGuide {
   private final Notice notice;
   private TextToSpeech engine;
   private boolean ready;
+  private boolean initialized;
   private boolean stopped;
   private Pending pending;
 
@@ -35,6 +36,7 @@ public final class JourneySpeechGuide {
     engine = new TextToSpeech(context.getApplicationContext(), status ->
         main.post(() -> {
           if (stopped) return;
+          initialized = true;
           ready = status == TextToSpeech.SUCCESS;
           if (!ready) {
             pending = null;
@@ -54,6 +56,8 @@ public final class JourneySpeechGuide {
     String tag = "yue".equals(language) ? "zh-HK"
         : "ja".equals(language) ? "ja-JP" : "en-US";
     Pending item = new Pending(text.trim(), tag, slow);
+    if (initialized && !ready)
+      return "手机未能启动系统离线朗读，请检查系统「文字转语音输出」设置。可以继续录音和回放。";
     if (!ready) {
       pending = item;
       return "正在初始化手机语音引擎……";
