@@ -27,6 +27,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +51,7 @@ public final class JourneyImmersionActivity extends Activity {
   private static final int EXPORT_ANKI = 64;
   private static final int SPEECH_COMPARE = 65;
   private static final int RECORD_PERMISSION = 66;
+  private static final int PICK_TONE_REFERENCE = 67;
   private static final int INK = 0xff19263b;
   private static final int MUTED = 0xff5f6e83;
   private static final int ACCENT = 0xff5948cf;
@@ -73,6 +78,7 @@ public final class JourneyImmersionActivity extends Activity {
   };
   private int toneTarget = 1;
   private boolean toneBusy;
+  private File toneReference;
   private boolean yueAsrBusy;
   private String yueAsrEndpoint = "";
   private String yueAsrToken = "";
@@ -327,6 +333,15 @@ public final class JourneyImmersionActivity extends Activity {
     button("录 / 停单音节", toneControls, this::togglePractice);
     LinearLayout toneAnalyzeRow = row(cantonesePanel);
     button("分析刚才的音高走势", toneAnalyzeRow, this::analyzeTone);
+    cantonesePanel.addView(label("真人参考音 vs 你的跟读 · 音高曲线对照", 16, INK));
+    LinearLayout referenceRow = row(cantonesePanel);
+    button("导入参考 M4A", referenceRow, () -> pick(PICK_TONE_REFERENCE, "audio/*"));
+    button("将当前录音存为参考", referenceRow, this::saveRecordedReference);
+    LinearLayout comparisonRow = row(cantonesePanel);
+    button("对比两段音高", comparisonRow, this::compareToneReference);
+    cantonesePanel.addView(label("仅接受本地 AAC/M4A 单音节，参考与跟读各 0.25–3 秒。"
+        + "参考可以是真人示范音或自己之前的练习音。音频只暂存本机并在退出页面后删除。"
+        + "这里按各自中位音高归一化，因此不能判断高平/中平/低平的绝对音区。", 12, MUTED));
     tonePlot = new JourneyTonePlotView(this);
     LinearLayout.LayoutParams chartBox = new LinearLayout.LayoutParams(-1, dp(172));
     chartBox.setMargins(0, dp(12), 0, dp(12));
@@ -400,6 +415,7 @@ public final class JourneyImmersionActivity extends Activity {
     if (result != RESULT_OK || data == null || data.getData() == null) return;
     Uri uri = data.getData();
     if (request == EXPORT_ANKI) { writeBookmarks(uri); return; }
+    if (request == PICK_TONE_REFERENCE) { importToneReference(uri); return; }
     try {
       final int flags = data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
       getContentResolver().takePersistableUriPermission(uri, flags);
@@ -671,6 +687,98 @@ public final class JourneyImmersionActivity extends Activity {
           speechFeedback.setText(message);
       });
     }, "everyone-self-hosted-yue-asr").start();
+  }
+
+  private void importToneReference(Uri uri) {
+    if (toneBusy || yueAsrBusy || practice.isRecording()) {
+      toast("请先完成当前录音或音高分析");
+      return;
+    }
+    try (InputStream stream = getContentResolver().openInputStream(uri)) {
+      if (stream == null) throw new IOException("无法读取所选录音");
+      setToneReference(stream);
+      toneFeedback.setText("参考音已导入。请录一次同样的单音节，然后点击「对比两段音高」。");
+    } catch (Exception e) {
+      toneFeedback.setText("导入参考音失败：" + e.getMessage());
+    }
+  }
+
+  private void saveRecordedReference() {
+    if (toneBusy || yueAsrBusy || practice.isRecording()) {
+      toast("请先结束录音或分析");
+      return;
+    }
+    File current = practice.recordingFile();
+    if (current == null) {
+      toneFeedback.setText("还没有可作为参考的录音；请先录一个音节。");
+      return;
+    }
+    try (InputStream stream = new FileInputStream(current)) {
+      setToneReference(stream);
+      toneFeedback.setText("当前录音已复制为参考。请重新录同一音节，再点「对比两段音高」。");
+    } catch (Exception e) {
+      toneFeedback.setText("保存参考音失败：" + e.getMessage());
+    }
+  }
+
+  /** 只有成功完整复制小型录音后才替换旧参考；页面关闭即删除。 */
+  private void setToneReference(InputStream stream) throws IOException {
+    File candidate = File.createTempFile("everyone-yue-reference-", ".m4a", getCacheDir());
+    boolean saved = false;
+    try (FileOutputStream out = new FileOutputStream(candidate)) {
+      int total = 0;
+      byte[] bytes = new byte[8192];
+      int count;
+      while ((count = stream.read(bytes)) >= 0) {
+        total += count;
+        if (total > JourneyCantoneseAsr.MAX_AUDIO_BYTES)
+          throw new IOException("参考音超过 2MB，无法用于单音节对照");
+        out.write(bytes, 0, count);
+      }
+      if (total < 256) throw new IOException("参考录音内容太短或无法读取");
+      saved = true;
+    } finally {
+      if (!saved) candidate.delete();
+    }
+    if (toneReference != null) toneReference.delete();
+    toneReference = candidate;
+  }
+
+  private void compareToneReference() {
+    if (toneBusy || yueAsrBusy || practice.isRecording()) {
+      toast("请先结束录音与分析任务");
+      return;
+    }
+    File learner = practice.recordingFile();
+    if (toneReference == null || !toneReference.isFile() || learner == null) {
+      toneFeedback.setText("先导入/保存参考音，再重新录一次同音节跟读。");
+      return;
+    }
+    toneBusy = true;
+    toneFeedback.setText("正在本机解码两段录音并对齐音高轮廓，不会上传音频……");
+    final File original = toneReference;
+    new Thread(() -> {
+      String feedback;
+      JourneyToneCompare.Result result = null;
+      try {
+        JourneyToneAudio.Samples reference = JourneyToneAudio.decode(original);
+        JourneyToneAudio.Samples attempted = JourneyToneAudio.decode(learner);
+        result = JourneyToneCompare.compare(reference.monoPcm, reference.sampleRate,
+            attempted.monoPcm, attempted.sampleRate);
+        feedback = result.feedback;
+      } catch (Exception e) {
+        feedback = "对照失败：" + e.getMessage();
+      }
+      final String message = feedback;
+      final JourneyToneCompare.Result show = result;
+      runOnUiThread(() -> {
+        toneBusy = false;
+        if (!isFinishing() && !isDestroyed()) {
+          if (tonePlot != null) tonePlot.showComparison(show);
+          if (toneFeedback != null) toneFeedback.setText(message);
+        }
+      });
+    }, "everyone-yue-tone-reference").start();
   }
 
   private void updateToneTarget() {
@@ -970,6 +1078,7 @@ public final class JourneyImmersionActivity extends Activity {
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
     practice.close();
+    if (toneReference != null) toneReference.delete();
     if (speechGuide != null) speechGuide.close();
     super.onDestroy();
   }
