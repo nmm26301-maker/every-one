@@ -178,17 +178,17 @@ jobs:
           "$buildtools/apksigner" sign \
             --ks build/immersion-preview/ephemeral.keystore \
             --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
-            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.8.apk \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk \
             build/immersion-preview/aligned.apk
           "$buildtools/apksigner" verify --verbose \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.8.apk
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk
           "$buildtools/aapt2" dump badging \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.8.apk \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk \
             | head -n 8
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
-          name: Everyone-Immersion-Preview-5.0.8
-          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.8.apk
+          name: Everyone-Immersion-Preview-5.0.9
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.9.apk
           if-no-files-found: error
           retention-days: 14
