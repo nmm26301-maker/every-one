@@ -640,7 +640,11 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void startGuide(String words, String lang, boolean slow) {
     if (player != null && player.isPlaying()) player.pause();
-    if (practice.isRecording()) practice.stop();
+    if (practice.isRecording()) {
+      practice.stop();
+      recordingSession++;
+      refreshQuickRecordButton();
+    }
     practice.stopPlayback();
     if (speechGuide == null) speechGuide = new JourneySpeechGuide(this, message -> {
       if (speechFeedback != null) speechFeedback.setText(message);
@@ -905,9 +909,18 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void togglePractice() {
-    if (yueAsrBusy) { toast("粤语转写进行中，请勿覆盖录音"); return; }
-    if (toneBusy) { toast("请等待本机音高分析完成"); return; }
+    if (yueAsrBusy) {
+      quickRecordRequested = false;
+      toast("粤语转写进行中，请勿覆盖录音");
+      return;
+    }
+    if (toneBusy) {
+      quickRecordRequested = false;
+      toast("请等待本机音高分析完成");
+      return;
+    }
     if (practice.isRecording()) {
+      quickRecordRequested = false;
       boolean okay = practice.stop();
       recordingSession++;
       refreshQuickRecordButton();
@@ -1146,7 +1159,11 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void launchSpeechRecognition() {
     if (player != null && player.isPlaying()) player.pause();
-    if (practice.isRecording()) practice.stop();
+    if (practice.isRecording()) {
+      practice.stop();
+      recordingSession++;
+      refreshQuickRecordButton();
+    }
     if (speechGuide != null) speechGuide.stop();
     Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
