@@ -7,6 +7,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneContour.java'
@@ -17,6 +18,7 @@ on:
       - 'preview/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
+      - 'tests/JourneyJyutpingTest.java'
       - 'tests/JourneyToneContourTest.java'
       - 'tests/test-journey-subtitles.sh'
       - '.github/workflows/immersion.yml'
@@ -25,6 +27,7 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneAudio.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyToneContour.java'
@@ -35,6 +38,7 @@ on:
       - 'preview/AndroidManifest.xml'
       - 'tests/JourneySubtitlesTest.java'
       - 'tests/JourneyCantoneseTest.java'
+      - 'tests/JourneyJyutpingTest.java'
       - 'tests/JourneyToneContourTest.java'
       - 'tests/test-journey-subtitles.sh'
       - '.github/workflows/immersion.yml'
@@ -85,6 +89,7 @@ jobs:
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
             app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
@@ -133,6 +138,7 @@ jobs:
             -d build/immersion-preview/classes \
             app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
             app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
             app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
             app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
@@ -156,17 +162,17 @@ jobs:
           "$buildtools/apksigner" sign \
             --ks build/immersion-preview/ephemeral.keystore \
             --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
-            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.5.apk \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk \
             build/immersion-preview/aligned.apk
           "$buildtools/apksigner" verify --verbose \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.5.apk
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk
           "$buildtools/aapt2" dump badging \
-            build/immersion-preview/Everyone-Immersion-Preview-5.0.5.apk \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk \
             | head -n 8
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
-          name: Everyone-Immersion-Preview-5.0.5
-          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.5.apk
+          name: Everyone-Immersion-Preview-5.0.6
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.6.apk
           if-no-files-found: error
           retention-days: 14
