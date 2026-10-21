@@ -13,7 +13,9 @@ new = {str(p.relative_to(new_dir)): p.read_bytes() for p in new_dir.rglob("*.sma
 
 def in_scope(name):
     prefix = "org/openenglish/reader/"
-    return name.startswith(prefix + ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles", "JourneyCantonese", "JourneyPracticeAudio"))
+    targets = ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles",
+               "JourneyCantonese", "JourneyPracticeAudio")
+    return name.startswith(tuple(prefix + target for target in targets))
 
 unchanged = [name for name in old if not in_scope(name)]
 for name in unchanged:
