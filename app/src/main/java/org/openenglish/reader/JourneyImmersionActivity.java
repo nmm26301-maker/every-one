@@ -69,7 +69,8 @@ public final class JourneyImmersionActivity extends Activity {
   private TextView languageLabel, referenceGuideLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private TextView phoneticDetail, contrastDetail;
   private TextView quickPhrase, quickStatus;
-  private Button quickRecordButton;
+  private Button quickRecordButton, advancedToggleButton;
+  private LinearLayout advancedArea;
   private boolean quickRecordRequested;
   private boolean currentQuickTake;
   private long recordingSession;
@@ -205,8 +206,7 @@ public final class JourneyImmersionActivity extends Activity {
     header.addView(brand, new LinearLayout.LayoutParams(0, -2, 1));
     button("返回", header, this::finish);
 
-    page.addView(label("双语字幕 · 逐句复读 · 口语提示 · 收藏导出", 14, MUTED));
-    page.addView(label("选择你有权播放的本地视频及 SRT/VTT 字幕。无需上传个人视频。", 13, MUTED));
+    page.addView(label("选择语言 → 听一句 → 跟读 → 回放。高级影视学习工具可按需展开。", 13, MUTED));
     languageLabel = label("", 13, MUTED);
     page.addView(languageLabel);
     LinearLayout languages = row(page);
@@ -214,7 +214,6 @@ public final class JourneyImmersionActivity extends Activity {
     button("日语", languages, () -> selectLanguage("ja"));
     button("英语", languages, () -> selectLanguage("en"));
     referenceGuideLabel = label("", 13, MUTED);
-    page.addView(referenceGuideLabel);
     updateLanguageLabel();
 
     // The first screen is usable without videos, account login or an ASR backend.
@@ -228,7 +227,7 @@ public final class JourneyImmersionActivity extends Activity {
     TextView quickHeading = label("立即开口 · 免费速练", 19, INK);
     quickHeading.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
     quickCard.addView(quickHeading);
-    quickCard.addView(label("免导入视频、免注册、免配置模型。先练一句，随后可以选择下方影视精听和高级纠音。", 12, MUTED));
+    quickCard.addView(label("不导入视频、不登录账号、不配置模型，也能马上练习。", 12, MUTED));
     quickPhrase = label("", 20, INK);
     quickPhrase.setMinHeight(dp(126));
     quickCard.addView(quickPhrase);
@@ -247,11 +246,25 @@ public final class JourneyImmersionActivity extends Activity {
     quickCard.addView(quickStatus);
     showQuick();
 
+    LinearLayout advancedControls = row(page);
+    advancedToggleButton = button("展开影视精听与高级工具", advancedControls,
+        this::toggleAdvanced);
+    advancedArea = new LinearLayout(this);
+    advancedArea.setOrientation(1);
+    advancedArea.addView(label("影视精听 / 自选本地视频与 SRT、WebVTT 字幕", 16, INK));
+    advancedArea.addView(label("此区域包括视频逐句循环、粤拼拆解及实验性声调比较。"
+        + "只有在需要时展开，不影响上面的零配置速练。", 12, MUTED));
+    advancedArea.addView(referenceGuideLabel);
+    page.addView(advancedArea);
+    advancedArea.setVisibility(prefs.getBoolean("advancedExpanded", false)
+        ? View.VISIBLE : View.GONE);
+    refreshAdvancedButton();
+
     player = new VideoView(this);
     player.setBackground(shape(0xff182032, 18));
     LinearLayout.LayoutParams videoBox = new LinearLayout.LayoutParams(-1, dp(218));
     videoBox.setMargins(0, dp(8), 0, dp(8));
-    page.addView(player, videoBox);
+    advancedArea.addView(player, videoBox);
     MediaController controller = new MediaController(this);
     controller.setAnchorView(player);
     player.setMediaController(controller);
@@ -260,40 +273,40 @@ public final class JourneyImmersionActivity extends Activity {
       return true;
     });
     status = label("先选择本地视频，再导入原文字幕。", 13, MUTED);
-    page.addView(status);
+    advancedArea.addView(status);
     timingLabel = label("", 12, MUTED);
-    page.addView(timingLabel);
-    LinearLayout syncRow = row(page);
+    advancedArea.addView(timingLabel);
+    LinearLayout syncRow = row(advancedArea);
     button("字幕提前 0.5s", syncRow, () -> adjustSync(-500));
     button("同步重置", syncRow, () -> adjustSync(-subtitleOffsetMs));
     button("字幕延后 0.5s", syncRow, () -> adjustSync(500));
     showSync();
 
-    LinearLayout files1 = row(page);
+    LinearLayout files1 = row(advancedArea);
     button("选视频", files1, () -> pick(PICK_VIDEO, "video/*"));
     button("原文字幕", files1, () -> pick(PICK_SOURCE, "*/*"));
-    LinearLayout files2 = row(page);
+    LinearLayout files2 = row(advancedArea);
     button("中文字幕", files2, () -> pick(PICK_TRANSLATION, "*/*"));
     button("导出 Anki", files2, this::exportBookmarks);
 
     TextView segment = label("当前台词", 13, ACCENT);
     segment.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-    page.addView(segment);
+    advancedArea.addView(segment);
     sourceLabel = label("字幕导入后，在这里跟随播放", 21, INK);
     sourceLabel.setMinHeight(dp(72));
-    page.addView(sourceLabel);
+    advancedArea.addView(sourceLabel);
     translationLabel = label("中文解释会显示在此处", 16, MUTED);
-    page.addView(translationLabel);
+    advancedArea.addView(translationLabel);
     tipsLabel = label("粤语口语词条可点选查看；非完整 AI 讲解。", 13, MUTED);
-    page.addView(tipsLabel);
+    advancedArea.addView(tipsLabel);
     counter = label("0 句字幕", 12, MUTED);
-    page.addView(counter);
+    advancedArea.addView(counter);
 
-    LinearLayout control = row(page);
+    LinearLayout control = row(advancedArea);
     button("上一句", control, () -> move(-1));
     button("重播", control, this::replay);
     button("下一句", control, () -> move(1));
-    LinearLayout options = row(page);
+    LinearLayout options = row(advancedArea);
     pauseButton = button("", options, () -> {
       pauseEach = !pauseEach;
       if (pauseEach) loopOne = false;
@@ -306,20 +319,20 @@ public final class JourneyImmersionActivity extends Activity {
     });
     storeOptions();
 
-    LinearLayout capture = row(page);
+    LinearLayout capture = row(advancedArea);
     button("收藏这一句", capture, this::saveCue);
     button("显示口语说明", capture, this::explain);
-    LinearLayout speakRow = row(page);
+    LinearLayout speakRow = row(advancedArea);
     button("跟读识别 · 对照文本", speakRow, this::recognizeSpeech);
-    LinearLayout recordings = row(page);
+    LinearLayout recordings = row(advancedArea);
     button("● 录我的声音 / 停止", recordings, this::togglePractice);
     button("▶ 回放我的录音", recordings, this::playPractice);
-    LinearLayout synthesized = row(page);
+    LinearLayout synthesized = row(advancedArea);
     button("▷ 系统示范发音", synthesized, () -> speakExample(false, false));
     button("▷ 慢速示范", synthesized, () -> speakExample(false, true));
     speechFeedback = label("请先选一条视频台词；或使用下方粤语练习句。\n系统识别结果不能视为发音或六声调评分。", 13, MUTED);
-    page.addView(speechFeedback);
-    page.addView(label("录音只保存在临时缓存中，离开这个页面就会删除；最长 30 秒。"
+    advancedArea.addView(speechFeedback);
+    advancedArea.addView(label("录音只保存在临时缓存中，离开这个页面就会删除；最长 30 秒。"
         + " 可以与视频原声反复比较，但不自动评判粤语声调。", 12, MUTED));
 
     cantonesePanel = new LinearLayout(this);
@@ -328,7 +341,7 @@ public final class JourneyImmersionActivity extends Activity {
     cantonesePanel.setBackground(shape(Color.WHITE, 16));
     LinearLayout.LayoutParams lessonBox = new LinearLayout.LayoutParams(-1, -2);
     lessonBox.setMargins(0, dp(14), 0, dp(14));
-    page.addView(cantonesePanel, lessonBox);
+    advancedArea.addView(cantonesePanel, lessonBox);
     TextView lessonTitle = label("粤语入门 · 粤拼 Jyutping", 18, INK);
     lessonTitle.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
     cantonesePanel.addView(lessonTitle);
@@ -405,10 +418,10 @@ public final class JourneyImmersionActivity extends Activity {
 
     TextView transcript = label("逐句列表 · 点击跳转", 18, INK);
     transcript.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-    page.addView(transcript);
+    advancedArea.addView(transcript);
     playlist = new LinearLayout(this);
     playlist.setOrientation(1);
-    page.addView(playlist);
+    advancedArea.addView(playlist);
     renderTranscript(0);
     setContentView(outer);
   }
@@ -1009,6 +1022,21 @@ public final class JourneyImmersionActivity extends Activity {
       if (quickStatus != null) quickStatus.setText(
           "未获得麦克风权限。可在系统应用设置中允许录音后重试。");
     }
+  }
+
+  private void refreshAdvancedButton() {
+    if (advancedToggleButton == null || advancedArea == null) return;
+    advancedToggleButton.setText(advancedArea.getVisibility() == View.VISIBLE
+        ? "收起高级工具 · 返回快速练习" : "展开影视精听与高级工具");
+  }
+
+  private void toggleAdvanced() {
+    if (advancedArea == null) return;
+    boolean visible = advancedArea.getVisibility() != View.VISIBLE;
+    advancedArea.setVisibility(visible ? View.VISIBLE : View.GONE);
+    prefs.edit().putBoolean("advancedExpanded", visible).apply();
+    if (!visible && player != null && player.isPlaying()) player.pause();
+    refreshAdvancedButton();
   }
 
   private JourneyQuickStart.Phrase currentQuick() {
