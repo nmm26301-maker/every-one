@@ -52,6 +52,7 @@ public final class JourneyImmersionActivity extends Activity {
 
   private final Handler handler = new Handler(Looper.getMainLooper());
   private final JourneyPracticeAudio practice = new JourneyPracticeAudio();
+  private JourneySpeechGuide speechGuide;
   private final List<JourneySubtitles.Cue> source = new ArrayList<>();
   private final List<JourneySubtitles.Cue> translated = new ArrayList<>();
   private final Set<String> saved = new LinkedHashSet<>();
@@ -253,6 +254,9 @@ public final class JourneyImmersionActivity extends Activity {
     LinearLayout recordings = row(page);
     button("● 录我的声音 / 停止", recordings, this::togglePractice);
     button("▶ 回放我的录音", recordings, this::playPractice);
+    LinearLayout synthesized = row(page);
+    button("▷ 系统示范发音", synthesized, () -> speakExample(false, false));
+    button("▷ 慢速示范", synthesized, () -> speakExample(false, true));
     speechFeedback = label("请先选一条视频台词；或使用下方粤语练习句。\n系统识别结果不能视为发音或六声调评分。", 13, MUTED);
     page.addView(speechFeedback);
     page.addView(label("录音只保存在临时缓存中，离开这个页面就会删除；最长 30 秒。"
@@ -274,6 +278,9 @@ public final class JourneyImmersionActivity extends Activity {
     LinearLayout lessonControls = row(cantonesePanel);
     button("上一句", lessonControls, () -> changeCantoneseLesson(-1));
     button("练这句", lessonControls, () -> recognizeSpeech(true));
+    LinearLayout lessonAudio = row(cantonesePanel);
+    button("听粤语示范", lessonAudio, () -> speakExample(true, false));
+    button("慢速示范", lessonAudio, () -> speakExample(true, true));
     button("下一句", lessonControls, () -> changeCantoneseLesson(1));
     cantonesePanel.addView(label("六声调单音节 · 音高走势实验", 17, INK));
     toneLabel = label("", 15, INK);
@@ -285,6 +292,8 @@ public final class JourneyImmersionActivity extends Activity {
     button("录 / 停单音节", toneControls, this::togglePractice);
     LinearLayout toneAnalyzeRow = row(cantonesePanel);
     button("分析刚才的音高走势", toneAnalyzeRow, this::analyzeTone);
+    LinearLayout toneListenRow = row(cantonesePanel);
+    button("听所选单音节", toneListenRow, this::speakToneExample);
     toneFeedback = label("尚未录制。只能分析单音节的音高走势，不能作为完整粤语发音评分。", 13, MUTED);
     cantonesePanel.addView(toneFeedback);
     toneTarget = Math.max(1, Math.min(6, prefs.getInt("toneTarget", 1)));
@@ -510,6 +519,33 @@ public final class JourneyImmersionActivity extends Activity {
         + String.format(java.util.Locale.US, "%.1f 秒", Math.abs(subtitleOffsetMs / 1000.0)));
   }
 
+  private void speakToneExample() {
+    String word = TONE_WORDS[toneTarget - 1].substring(0, 1);
+    startGuide(word, "yue", false);
+  }
+
+  private void speakExample(boolean lesson, boolean slow) {
+    String text = lesson ? JourneyCantonese.lesson(cantoneseLessonIndex).hanzi
+        : activeIndex >= 0 && activeIndex < source.size()
+          ? source.get(activeIndex).text : "";
+    if (text.trim().isEmpty()) {
+      if ("yue".equals(language)) text = JourneyCantonese.lesson(cantoneseLessonIndex).hanzi;
+      else { toast("请先选择当前视频的一句字幕"); return; }
+    }
+    startGuide(text, lesson ? "yue" : language, slow);
+  }
+
+  private void startGuide(String words, String lang, boolean slow) {
+    if (player != null && player.isPlaying()) player.pause();
+    if (practice.isRecording()) practice.stop();
+    practice.stopPlayback();
+    if (speechGuide == null) speechGuide = new JourneySpeechGuide(this, message -> {
+      if (speechFeedback != null) speechFeedback.setText(message);
+    });
+    String info = speechGuide.speak(words, lang, slow);
+    if (speechFeedback != null) speechFeedback.setText(info);
+  }
+
   private void updateToneTarget() {
     if (toneLabel != null) toneLabel.setText("目标：" + TONE_WORDS[toneTarget - 1]
         + " · 预期走势：" + JourneyToneContour.expectedTrend(toneTarget));
@@ -579,6 +615,7 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void startPractice() {
     if (player != null && player.isPlaying()) player.pause();
+    if (speechGuide != null) speechGuide.stop();
     try {
       practice.start(getCacheDir());
       if (toneFeedback != null) toneFeedback.setText("开始录制新声音：分析将以新录音为准。");
@@ -626,6 +663,7 @@ public final class JourneyImmersionActivity extends Activity {
     language = target;
     prefs.edit().putString("language", language).apply();
     updateLanguageLabel();
+    if (speechGuide != null) speechGuide.stop();
     if (cantonesePanel != null) {
       cantonesePanel.setVisibility("yue".equals(language) ? View.VISIBLE : View.GONE);
     }
@@ -665,6 +703,7 @@ public final class JourneyImmersionActivity extends Activity {
     }
     if (player != null && player.isPlaying()) player.pause();
     if (practice.isRecording()) practice.stop();
+    if (speechGuide != null) speechGuide.stop();
     Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
@@ -744,6 +783,7 @@ public final class JourneyImmersionActivity extends Activity {
     foreground = false;
     handler.removeCallbacks(progress);
     if (player != null) player.pause();
+    if (speechGuide != null) speechGuide.stop();
     if (practice.isRecording()) {
       boolean result = practice.stop();
       if (speechFeedback != null) speechFeedback.setText(result
@@ -758,6 +798,7 @@ public final class JourneyImmersionActivity extends Activity {
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
     practice.close();
+    if (speechGuide != null) speechGuide.close();
     super.onDestroy();
   }
 }
