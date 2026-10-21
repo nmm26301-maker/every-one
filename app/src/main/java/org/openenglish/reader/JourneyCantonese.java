@@ -76,7 +76,7 @@ public final class JourneyCantonese {
   }
 
   public static Phrase lesson(int index) {
-    return PHRASES[Math.floorMod(index, PHRASES.length)];
+    return PHRASES[((index % PHRASES.length) + PHRASES.length) % PHRASES.length];
   }
 
   /** 返回字幕中找到的少量常见粤语词条；不对陌生词臆造释义。 */
