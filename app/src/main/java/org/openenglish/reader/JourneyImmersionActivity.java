@@ -69,6 +69,10 @@ public final class JourneyImmersionActivity extends Activity {
   private TextView languageLabel, referenceGuideLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private TextView phoneticDetail, contrastDetail;
   private TextView quickPhrase, quickStatus;
+  private Button quickRecordButton;
+  private boolean quickRecordRequested;
+  private boolean currentQuickTake;
+  private long recordingSession;
   private int quickIndex;
   private String quickSpeechLanguage = "yue";
   private LinearLayout cantonesePanel;
@@ -235,7 +239,7 @@ public final class JourneyImmersionActivity extends Activity {
     button("听示范", quickListen, () -> speakQuick(false));
     button("慢速听", quickListen, () -> speakQuick(true));
     LinearLayout quickRecord = row(quickCard);
-    button("● 录音 / 停止", quickRecord, this::togglePractice);
+    quickRecordButton = button("● 开始录音", quickRecord, this::toggleQuickPractice);
     button("▶ 回放", quickRecord, this::playPractice);
     LinearLayout quickRecognize = row(quickCard);
     button("识别我读的句子", quickRecognize, this::recognizeQuickSpeech);
@@ -879,11 +883,34 @@ public final class JourneyImmersionActivity extends Activity {
     }, "everyone-tone-contour").start();
   }
 
+  private void toggleQuickPractice() {
+    quickRecordRequested = true;
+    togglePractice();
+  }
+
+  private void refreshQuickRecordButton() {
+    if (quickRecordButton != null)
+      quickRecordButton.setText(practice.isRecording() ? "■ 停止录音" : "● 开始录音");
+  }
+
+  private void clearQuickTake() {
+    if (speechGuide != null) speechGuide.stop();
+    practice.discard();
+    currentQuickTake = false;
+    quickRecordRequested = false;
+    recordingSession++;
+    refreshQuickRecordButton();
+    if (quickStatus != null)
+      quickStatus.setText("这是新的一句，先听示范，再录音和回放。");
+  }
+
   private void togglePractice() {
     if (yueAsrBusy) { toast("粤语转写进行中，请勿覆盖录音"); return; }
     if (toneBusy) { toast("请等待本机音高分析完成"); return; }
     if (practice.isRecording()) {
       boolean okay = practice.stop();
+      recordingSession++;
+      refreshQuickRecordButton();
       String info = okay ? "录音完成。现在点「回放」，对比示范。"
           : "录音太短或麦克风失败，请重新录一遍。";
       speechFeedback.setText(info);
@@ -892,6 +919,7 @@ public final class JourneyImmersionActivity extends Activity {
     }
     if (android.os.Build.VERSION.SDK_INT >= 23
         && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+      refreshQuickRecordButton();
       requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_PERMISSION);
       return;
     }
@@ -903,26 +931,45 @@ public final class JourneyImmersionActivity extends Activity {
     if (speechGuide != null) speechGuide.stop();
     try {
       practice.start(getCacheDir());
+      currentQuickTake = quickRecordRequested;
+      quickRecordRequested = false;
+      recordingSession++;
+      refreshQuickRecordButton();
       if (toneFeedback != null) toneFeedback.setText("开始录制新声音：分析将以新录音为准。");
       if (tonePlot != null) tonePlot.show(null);
       recordingStartedAt = android.os.SystemClock.elapsedRealtime();
+      final long session = recordingSession;
+      final long limit = currentQuickTake ? 10000L : 30000L;
       speechFeedback.setText("● 正在录你的跟读……再次点击“录我的声音 / 停止”结束。");
       if (quickStatus != null) quickStatus.setText("● 正在录音……再点一次「录音 / 停止」结束。");
       handler.postDelayed(() -> {
-        if (!practice.isRecording()) return;
-        if (android.os.SystemClock.elapsedRealtime() - recordingStartedAt < 30000L) return;
+        if (session != recordingSession || !practice.isRecording()) return;
+        if (android.os.SystemClock.elapsedRealtime() - recordingStartedAt < limit) return;
         boolean ok = practice.stop();
-        if (speechFeedback != null) speechFeedback.setText(ok
-            ? "已录满 30 秒并自动停止。现在可以回放。"
-            : "录音未完成，请重试。");
-      }, 30050);
+        recordingSession++;
+        refreshQuickRecordButton();
+        String info = ok ? "录音已自动停止，可点「回放」听刚才的声音。"
+            : "录音未完成，请重新录制。";
+        if (speechFeedback != null) speechFeedback.setText(info);
+        if (quickStatus != null) quickStatus.setText(info);
+      }, limit + 60L);
     } catch (Exception e) {
+      quickRecordRequested = false;
+      currentQuickTake = false;
+      refreshQuickRecordButton();
       speechFeedback.setText("录音启动失败：" + e.getMessage());
       if (quickStatus != null) quickStatus.setText("录音启动失败，请检查麦克风权限或其他录音应用。");
     }
   }
 
   private void playPractice() {
+    if (practice.isRecording()) {
+      if (quickStatus != null) quickStatus.setText("正在录音，请先点「停止录音」，再回放。");
+      toast("请先停止录音");
+      return;
+    }
+    if (speechGuide != null) speechGuide.stop();
+    if (player != null && player.isPlaying()) player.pause();
     try {
       if (!practice.play()) {
         speechFeedback.setText("没有可回放的录音。请先录制一遍。");
@@ -932,15 +979,23 @@ public final class JourneyImmersionActivity extends Activity {
       }
     } catch (Exception e) {
       speechFeedback.setText("回放失败：" + e.getMessage());
+      if (quickStatus != null) quickStatus.setText("回放失败，请重新录一遍。");
     }
   }
 
   @Override public void onRequestPermissionsResult(int request, String[] permissions, int[] results) {
     super.onRequestPermissionsResult(request, permissions, results);
     if (request != RECORD_PERMISSION) return;
-    if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) startPractice();
-    else if (speechFeedback != null) speechFeedback.setText(
-        "没有录音权限，可继续看字幕、听原声及使用外部系统语音识别。");
+    if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
+      startPractice();
+    } else {
+      quickRecordRequested = false;
+      refreshQuickRecordButton();
+      if (speechFeedback != null) speechFeedback.setText(
+          "没有录音权限，可继续阅读字幕和听示范。");
+      if (quickStatus != null) quickStatus.setText(
+          "未获得麦克风权限。可在系统应用设置中允许录音后重试。");
+    }
   }
 
   private JourneyQuickStart.Phrase currentQuick() {
@@ -958,6 +1013,8 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void changeQuick(int offset) {
+    if (toneBusy || yueAsrBusy) { toast("请等待当前分析完成再换句"); return; }
+    clearQuickTake();
     int total = JourneyQuickStart.size(language);
     quickIndex = ((quickIndex + offset) % total + total) % total;
     prefs.edit().putInt("quickIndex_" + language, quickIndex).apply();
@@ -996,6 +1053,8 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void selectLanguage(String target) {
+    if (toneBusy || yueAsrBusy) { toast("请等待当前分析完成再切换语言"); return; }
+    clearQuickTake();
     language = JourneyQuickStart.normalizeLanguage(target);
     quickIndex = Math.max(0, prefs.getInt("quickIndex_" + language, 0))
         % JourneyQuickStart.size(language);
@@ -1174,6 +1233,11 @@ public final class JourneyImmersionActivity extends Activity {
     if (speechGuide != null) speechGuide.stop();
     if (practice.isRecording()) {
       boolean result = practice.stop();
+      recordingSession++;
+      refreshQuickRecordButton();
+      if (quickStatus != null) quickStatus.setText(result
+          ? "已在离开页面时安全停止录音，可返回本页回放。"
+          : "录音中断，请重新录一遍。");
       if (speechFeedback != null) speechFeedback.setText(result
           ? "已暂停麦克风录音，可继续回放。"
           : "录音中断，请重新录制。");
@@ -1186,6 +1250,7 @@ public final class JourneyImmersionActivity extends Activity {
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
     practice.close();
+    recordingSession++;
     if (toneReference != null) toneReference.delete();
     if (speechGuide != null) speechGuide.close();
     super.onDestroy();
