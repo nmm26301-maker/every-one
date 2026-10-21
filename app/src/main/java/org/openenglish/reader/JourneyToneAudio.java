@@ -132,10 +132,10 @@ public final class JourneyToneAudio {
     if (channels < 1 || channels > 8) throw new IOException("不支持的音频通道数量");
     int frameBytes = channels * 2;
     if (size % frameBytes != 0) throw new IOException("PCM 样本边界异常");
-    // Maximum 30 sec of decoded mono recording at the actual sample rate.
-    int maxBytes = rate * 30 * 2;
+    // Tone analysis is intentionally bounded to a single short syllable.
+    int maxBytes = rate * 3 * 2;
     if (mono.size() + size / channels > maxBytes)
-      throw new IOException("声调样本超过 30 秒限制");
+      throw new IOException("声调分析只接受 3 秒内的单音节录音，请缩短录制时间");
     for (int i = offset; i < offset + size; i += frameBytes) {
       mono.write(buf.get(i) & 255);
       mono.write(buf.get(i + 1) & 255);
