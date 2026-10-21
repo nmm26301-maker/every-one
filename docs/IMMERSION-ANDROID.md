@@ -1,6 +1,6 @@
-# Everyone · 原生影视精听（Undertone 风格学习体验）
+# Everyone · 多语言原生影视精听（粤语 / 日语 / 英语）
 
-本分支新增 **Android 原生影视精听**，入口位于 Everyone 5.0 首页的“影视精听 · 双语字幕 / 逐句复读”。它不依赖浏览器扩展，和 Undertone 弦外没有商业、技术或授权关联。
+本分支新增 **Android 原生影视精听**，入口位于 Everyone 5.0 首页的“影视精听 · 双语字幕 / 逐句复读”。当前核心功能不依赖浏览器扩展，和下列外部项目没有商业、技术或授权关联。
 
 ## 已实现的能力（源码）
 
@@ -12,6 +12,19 @@
 - 少量**规则式**日语口语缩略提示：`ちゃった`、`じゃん`、`っす`、`ちょっと`、`考えておきます`。
 - 播放与字幕无需网络，未集成付费 API，不上传用户视频。
 
+
+## 已明确的分语言参考项目（2026-10-21 用户更正）
+
+**粤语（广东话）采用两套互补参考，而不是 Undertone：**
+
+1. [DualSub Replay](https://github.com/hoangkien1703/dual-sub-replay)：开源 Android 应用，侧重带字幕的 YouTube 视频、双语字幕、点句重播、查词/收藏。它是通用语言学习工具，**不是专门的粤语语音识别模型**；某个粤语视频的原字幕是否存在取决于 YouTube 资源。上游项目 MIT 许可。Everyone 目前仅有本地视频+SRT/VTT，不宣称已经接入它的 YouTube 播放能力。
+2. [Cantonese Learner V2](https://github.com/lyhjeremy/cantonese-learner-v2) / [可直接试用的网页](https://lyhjeremy.github.io/cantonese-learner-v2/)：专门的香港粤语学习项目，提供港式口语对话、新闻书面语/口语并排、按字粤拼、示范发音、跟读及文字识别式反馈。可在安卓浏览器打开，部分朗读/识别依赖浏览器与设备环境。它展示的字符识别评分不等于自动评估声母韵母及全部六调。上游仓库 MIT 许可；内容来源、音频和第三方服务须另核实授权，不自动纳入 Everyone。
+   
+**日语采用单独参考：**
+
+3. [Undertone 弦外](https://undertone.day/) / [Chrome 插件商店](https://chromewebstore.google.com/detail/baeckicjpfmgblnpnkdpfgbejobaeebe)：明确**目前主要支持日语**，主打 Netflix/YouTube 日语字幕的假名注音、口语缩约、礼貌程度/语气/言外之意及逐句复读。官方声明需**电脑 Chrome**，不是 Android 原生插件。Everyone 内部的少量规则式日语解析不是 Undertone 本身，亦未获得其闭源功能实现。
+
+**产品目标分工**：粤语优先学习「YouTube 视频双字幕/逐句回放 + 港式对话/粤拼/跟读」，日语优先学习「日语影视口语注音/缩约/语气/言外之意」，英语继续保留既有课程及精听。这是后续独立开发时的对标清单，不意味着上述软件已直接集成或已有合作授权。
 
 ## 粤语 · Jyutping + 影视台词学习（2026-10-21）
 
