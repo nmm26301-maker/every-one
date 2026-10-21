@@ -26,7 +26,7 @@ public final class JourneyCantoneseAsr {
       URL parsed = new URL(address.trim());
       return "https".equalsIgnoreCase(parsed.getProtocol())
           && parsed.getHost() != null && !parsed.getHost().isEmpty()
-          && parsed.getUserInfo() == null && parsed.getRef() == null
+          && new java.net.URI(address.trim()).getUserInfo() == null && parsed.getRef() == null
           && parsed.getQuery() == null
           && "/v1/yue/transcribe".equals(parsed.getPath());
     } catch (Exception e) {
