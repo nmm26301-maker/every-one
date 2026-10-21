@@ -66,7 +66,7 @@ public final class JourneyImmersionActivity extends Activity {
   private SharedPreferences prefs;
   private VideoView player;
   private TextView status, sourceLabel, translationLabel, tipsLabel, counter;
-  private TextView languageLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
+  private TextView languageLabel, referenceGuideLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private TextView phoneticDetail, contrastDetail;
   private LinearLayout cantonesePanel;
   private JourneyTonePlotView tonePlot;
@@ -200,6 +200,8 @@ public final class JourneyImmersionActivity extends Activity {
     button("粤语", languages, () -> selectLanguage("yue"));
     button("日语", languages, () -> selectLanguage("ja"));
     button("英语", languages, () -> selectLanguage("en"));
+    referenceGuideLabel = label("", 13, MUTED);
+    page.addView(referenceGuideLabel);
     updateLanguageLabel();
 
     player = new VideoView(this);
@@ -898,6 +900,18 @@ public final class JourneyImmersionActivity extends Activity {
     String name = "yue".equals(language) ? "粤语 · 粤拼 / 港式口语"
         : "ja".equals(language) ? "日语 · 口语缩略" : "英语 · 字幕精听";
     languageLabel.setText("当前学习语言：" + name + "（原文字幕需自行导入）");
+    if (referenceGuideLabel != null) {
+      String guide = "yue".equals(language)
+          ? "粤语学习参考：DualSub Replay（安卓 YouTube 双语字幕、逐句回放）"
+              + " + Cantonese Learner V2（港式生活对话、粤拼注音、听后跟读）。"
+              + "本页现有本地视频/字幕学习与录音分析，并未直接集成这两个外部产品。"
+          : "ja".equals(language)
+          ? "日语学习参考：Undertone 弦外（日语影视台词的口语缩约、语气、话外含义）。"
+              + "它需要电脑 Chrome；此安卓页只实现了少量独立日语提示，不是 Undertone 插件。"
+          : "英语使用 Everyone 原有课程及本地影视精听，不把日语 Undertone"
+              + " 或粤语 Cantonese Learner V2 标作英语功能。";
+      referenceGuideLabel.setText(guide);
+    }
   }
 
   private void selectLanguage(String target) {
