@@ -1,4 +1,4 @@
-"""Verify unsigned Everyone 5.0.1 immersion APK without exposing private keys."""
+"""Verify unsigned Everyone 5.0.2 immersion APK without exposing private keys."""
 import json
 import pathlib
 import sys
@@ -14,7 +14,7 @@ new = {str(p.relative_to(new_dir)): p.read_bytes() for p in new_dir.rglob("*.sma
 def in_scope(name):
     prefix = "org/openenglish/reader/"
     targets = ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles",
-               "JourneyCantonese", "JourneyPracticeAudio")
+               "JourneyCantonese", "JourneyPracticeAudio", "JourneyToneContour", "JourneyToneAudio")
     return name.startswith(tuple(prefix + target for target in targets))
 
 unchanged = [name for name in old if not in_scope(name)]
@@ -27,6 +27,8 @@ assert any(name.endswith("/JourneyImmersionActivity.smali") for name in added)
 assert any(name.endswith("/JourneySubtitles.smali") for name in added)
 assert any(name.endswith("/JourneyCantonese.smali") for name in added)
 assert any(name.endswith("/JourneyPracticeAudio.smali") for name in added)
+assert any(name.endswith("/JourneyToneContour.smali") for name in added)
+assert any(name.endswith("/JourneyToneAudio.smali") for name in added)
 assert any(name.endswith("/JourneyActivity.smali") for name in old)
 assert any(name.endswith("/JourneyActivity.smali") for name in new)
 
@@ -41,8 +43,8 @@ with zipfile.ZipFile(base) as old_apk, zipfile.ZipFile(output) as new_apk:
     assert old_apk.read("AndroidManifest.xml") != new_apk.read("AndroidManifest.xml")
 
 report = {
-    "version_name": "5.0.1",
-    "version_code": 60,
+    "version_name": "5.0.2",
+    "version_code": 61,
     "previous_other_classes_unchanged": len(unchanged),
     "added_immersion_classes": len(added),
     "preserved_archive_entries": len(preserved),
