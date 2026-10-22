@@ -100,6 +100,8 @@ public final class JourneyImmersionActivity extends Activity {
   private Button pauseButton, loopButton;
   private Uri videoUri;
   private boolean videoReady;
+  private android.media.MediaPlayer videoDecoder;
+  private int resumeVideoPosition;
   private long lastPositionSavedAt;
   private int activeIndex = -1;
   private int pausedAt = -1;
@@ -121,7 +123,7 @@ public final class JourneyImmersionActivity extends Activity {
         int actualEnd = cue.endMs + subtitleOffsetMs;
         if (ms >= actualEnd - 120 && ms < actualEnd + 550) {
           if (loopOne) {
-            player.seekTo(Math.max(0, cue.startMs + subtitleOffsetMs + 35));
+            seekVideo(Math.max(0, cue.startMs + subtitleOffsetMs + 35));
           } else if (pauseEach && pausedAt != next) {
             pausedAt = next;
             player.pause();
@@ -600,7 +602,7 @@ public final class JourneyImmersionActivity extends Activity {
       return;
     }
     pausedAt = -1;
-    player.seekTo(Math.max(0, source.get(n).startMs + subtitleOffsetMs + 35));
+    seekVideo(Math.max(0, source.get(n).startMs + subtitleOffsetMs + 35));
     player.start();
     showCue(n);
   }
@@ -1027,17 +1029,31 @@ public final class JourneyImmersionActivity extends Activity {
     player.stopPlayback();
     videoUri = uri;
     videoReady = false;
+    videoDecoder = null;
+    resumeVideoPosition = Math.max(0, position);
     player.setOnPreparedListener(mp -> {
+      videoDecoder = mp;
       videoReady = true;
       lastPositionSavedAt = android.os.SystemClock.elapsedRealtime();
       status.setText(position > 0 ? "已恢复上次视频位置，点击画面继续播放。" : "视频准备好了，点击画面开始播放。");
+      handler.post(() -> { if (videoDecoder == mp && !isDestroyed()) seekVideo(resumeVideoPosition); });
     });
     player.setVideoURI(uri);
-    if (position > 0) player.seekTo(position);
+  }
+
+  private void seekVideo(int position) {
+    resumeVideoPosition = Math.max(0, position);
+    if (!videoReady || videoDecoder == null || player.getDuration() <= 0) return;
+    int target = Math.min(resumeVideoPosition, Math.max(0, player.getDuration() - 1));
+    try {
+      if (android.os.Build.VERSION.SDK_INT >= 26)
+        videoDecoder.seekTo((long) target, android.media.MediaPlayer.SEEK_CLOSEST);
+      else player.seekTo(target);
+    } catch (IllegalStateException released) { videoReady = false; }
   }
 
   private void saveVideoPosition() {
-    if (videoUri != null && videoReady && player != null)
+    if (videoUri != null && videoReady && player != null && player.getDuration() > 0)
       prefs.edit().putInt("videoPosition", Math.max(0, player.getCurrentPosition())).apply();
   }
 
@@ -1047,6 +1063,8 @@ public final class JourneyImmersionActivity extends Activity {
     player.setVideoURI(null);
     videoUri = null;
     videoReady = false;
+    videoDecoder = null;
+    resumeVideoPosition = 0;
     source.clear();
     translated.clear();
     subtitleFile("source").delete();
@@ -1439,9 +1457,15 @@ public final class JourneyImmersionActivity extends Activity {
   @Override protected void onStart() {
     super.onStart();
     foreground = true;
-    if (videoUri != null) player.seekTo(Math.max(0, prefs.getInt("videoPosition", 0)));
+    if (videoUri != null) seekVideo(Math.max(0, prefs.getInt("videoPosition", 0)));
     handler.removeCallbacks(progress);
     handler.post(progress);
+  }
+
+  @Override protected void onPause() {
+    saveVideoPosition();
+    if (player != null) player.pause();
+    super.onPause();
   }
 
   @Override protected void onStop() {
@@ -1474,6 +1498,8 @@ public final class JourneyImmersionActivity extends Activity {
   @Override protected void onDestroy() {
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
+    videoDecoder = null;
+    videoReady = false;
     practice.close();
     recordingSession++;
     if (toneReference != null) toneReference.delete();

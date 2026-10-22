@@ -105,8 +105,13 @@ public final class ImmersionValidation extends Instrumentation {
       check((Boolean)main(() -> ((VideoView)field("player")).isPlaying()),"real MP4 playback advances");
       check((Boolean)main(() -> ((TextView)field("sourceLabel")).getText().toString().equals("Test original line.")),"Android subtitle markup stripped");
       check((Boolean)main(() -> ((TextView)field("translationLabel")).getText().toString().contains("测试译文")),"subtitles follow actual video");
-      main(() -> { ((VideoView)field("player")).seekTo(3500);return null; });
+      main(() -> {
+        ((VideoView)field("player")).pause();
+        Method seek=activity.getClass().getDeclaredMethod("seekVideo",int.class);
+        seek.setAccessible(true);seek.invoke(activity,3500);return null;
+      });
       waitVideo(3000);
+      check(position() <= 4000,"paused exact seek avoids previous keyframe");
       main(() -> { ((VideoView)field("player")).pause(); call("saveVideoPosition");activity.finish();return null; });
       waitForIdleSync();SystemClock.sleep(500);open();
       check((Integer)main(() -> ((List<?>)field("source")).size())==2,"source restored after Activity destruction");
