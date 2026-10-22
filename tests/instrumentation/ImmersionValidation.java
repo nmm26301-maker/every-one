@@ -56,6 +56,12 @@ public final class ImmersionValidation extends Instrumentation {
         .putExtra("quickLanguage","en").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     activity = startActivitySync(i); waitForIdleSync();
   }
+  private void back() {
+    if (!getUiAutomation().performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK))
+      throw new AssertionError("System Back unavailable in test automation");
+    SystemClock.sleep(700);
+    waitForIdleSync();
+  }
   private int count() throws Exception {
     return (Integer)main(() -> {
       SharedPreferences p=(SharedPreferences)field("prefs");
@@ -120,17 +126,17 @@ public final class ImmersionValidation extends Instrumentation {
       main(() -> {activity.startActivity(new Intent().setClassName("org.openenglish.reader","org.openenglish.reader.JourneyActivity"));return null;});
       waitForIdleSync();SystemClock.sleep(500);
       check(count()==before+2,"background stop records successful take");
-      sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK);waitForIdleSync();SystemClock.sleep(300);
+      back();SystemClock.sleep(300);
       File recorded=(File)main(() -> field("practice").getClass().getMethod("recordingFile").invoke(field("practice")));
       byte[] original=bytes(recorded);
-      main(() -> call("exportPractice"));waitForIdleSync();
+      main(() -> call("exportPractice"));waitForIdleSync();SystemClock.sleep(500);
       File exported=new File(getTargetContext().getFilesDir(),"saved-recording.m4a");
       deliver(68,Activity.RESULT_OK,exported);
       check(original.length>256 && Arrays.equals(original,bytes(exported)),"exported M4A exactly matches recording");
-      sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK);waitForIdleSync();
-      main(() -> call("exportPractice"));waitForIdleSync();deliver(68,Activity.RESULT_CANCELED,null);
+      back();
+      main(() -> call("exportPractice"));waitForIdleSync();SystemClock.sleep(500);deliver(68,Activity.RESULT_CANCELED,null);
       check(Arrays.equals(original,bytes(exported)),"canceled export leaves previous file unchanged");
-      sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK);waitForIdleSync();
+      back();
       main(() -> {
         SharedPreferences p=(SharedPreferences)field("prefs");
         p.edit().putStringSet("saved-phrases",new HashSet<>(Arrays.asList("keep bookmark"))).commit();
