@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.openenglish.reader">
+  <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="33" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <queries><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>
+  <application android:label="Isolated media validation" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false">
+    <activity android:name=".JourneyActivity" android:exported="false" />
+    <activity android:name=".JourneyImmersionActivity" android:exported="true" />
+  </application>
+</manifest>
