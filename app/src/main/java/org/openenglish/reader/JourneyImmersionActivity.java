@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.util.AtomicFile;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -52,6 +53,7 @@ public final class JourneyImmersionActivity extends Activity {
   private static final int SPEECH_COMPARE = 65;
   private static final int RECORD_PERMISSION = 66;
   private static final int PICK_TONE_REFERENCE = 67;
+  private static final int EXPORT_AUDIO = 68;
   private static final int INK = 0xff19263b;
   private static final int MUTED = 0xff5f6e83;
   private static final int ACCENT = 0xff5948cf;
@@ -97,6 +99,8 @@ public final class JourneyImmersionActivity extends Activity {
   private LinearLayout playlist;
   private Button pauseButton, loopButton;
   private Uri videoUri;
+  private boolean videoReady;
+  private long lastPositionSavedAt;
   private int activeIndex = -1;
   private int pausedAt = -1;
   private boolean pauseEach = true;
@@ -106,7 +110,10 @@ public final class JourneyImmersionActivity extends Activity {
   private final Runnable progress = new Runnable() {
     @Override public void run() {
       if (!foreground || player == null) return;
+      if (!videoReady) { handler.postDelayed(this, 250); return; }
       int ms = player.getCurrentPosition();
+      long now = android.os.SystemClock.elapsedRealtime();
+      if (now - lastPositionSavedAt >= 5000) { saveVideoPosition(); lastPositionSavedAt = now; }
       int next = JourneySubtitles.at(source, ms - subtitleOffsetMs);
       if (next != activeIndex) showCue(next);
       if (next >= 0 && player.isPlaying()) {
@@ -128,11 +135,12 @@ public final class JourneyImmersionActivity extends Activity {
   @Override public void onCreate(Bundle state) {
     super.onCreate(state);
     prefs = getSharedPreferences("everyone-immersion", MODE_PRIVATE);
-    language = JourneyQuickStart.normalizeLanguage(
-        getIntent().getStringExtra("quickLanguage") != null
-        ? getIntent().getStringExtra("quickLanguage")
-        : prefs.getString("language", "yue"));
-    quickSpeechLanguage = language;
+    language = JourneyQuickStart.normalizeLanguage(state != null
+        ? state.getString("language", prefs.getString("language", "yue"))
+        : getIntent().getStringExtra("quickLanguage") != null
+          ? getIntent().getStringExtra("quickLanguage") : prefs.getString("language", "yue"));
+    quickSpeechLanguage = state == null ? language : state.getString("speechLanguage", language);
+    speechReference = state == null ? "" : state.getString("speechReference", "");
     quickIndex = Math.max(0, prefs.getInt("quickIndex_" + language, 0))
         % JourneyQuickStart.size(language);
     saved.addAll(prefs.getStringSet("saved-phrases", Collections.emptySet()));
@@ -143,6 +151,7 @@ public final class JourneyImmersionActivity extends Activity {
     getWindow().setStatusBarColor(BG);
     getWindow().setNavigationBarColor(BG);
     draw();
+    restoreMedia();
   }
 
   private int dp(int n) {
@@ -245,6 +254,7 @@ public final class JourneyImmersionActivity extends Activity {
     quickStatus = label("开始：听一句 → 自己录音 → 停止 → 回放；不依赖服务器。", 12, MUTED);
     quickCard.addView(quickStatus);
     showQuick();
+    button("保存录音到手机", row(quickCard), this::exportPractice);
 
     LinearLayout advancedControls = row(page);
     advancedToggleButton = button("展开影视精听与高级工具", advancedControls,
@@ -269,11 +279,17 @@ public final class JourneyImmersionActivity extends Activity {
     controller.setAnchorView(player);
     player.setMediaController(controller);
     player.setOnErrorListener((mp, what, extra) -> {
+      videoReady = false;
       status.setText("视频无法播放：请尝试系统支持的 MP4/H.264 文件。");
       return true;
     });
     status = label("先选择本地视频，再导入原文字幕。", 13, MUTED);
     advancedArea.addView(status);
+    button("清空当前视频和字幕", row(advancedArea), () -> new AlertDialog.Builder(this)
+        .setTitle("清空当前素材？")
+        .setMessage("清除本页的视频选择、字幕副本和播放位置。手机原文件、收藏及练习记录保留。")
+        .setPositiveButton("清空", (d, w) -> clearMedia())
+        .setNegativeButton("取消", null).show());
     timingLabel = label("", 12, MUTED);
     advancedArea.addView(timingLabel);
     LinearLayout syncRow = row(advancedArea);
@@ -465,6 +481,22 @@ public final class JourneyImmersionActivity extends Activity {
 
   @Override protected void onActivityResult(int request, int result, Intent data) {
     super.onActivityResult(request, result, data);
+    if (request == EXPORT_AUDIO) {
+      File pending = new File(getCacheDir(), "everyone-export.m4a");
+      try {
+        if (result == RESULT_OK && data != null && data.getData() != null) {
+          if (!pending.isFile()) throw new IOException("录音副本已失效，请重新保存");
+          try (InputStream in = new FileInputStream(pending);
+               OutputStream out = getContentResolver().openOutputStream(data.getData(), "w")) {
+            if (out == null) throw new IOException("目标文件不可写");
+            copyAudio(in, out);
+          }
+          quickStatus.setText("录音已保存到你选择的位置，换句或退出后仍可使用。");
+        }
+      } catch (Exception e) { toast("保存录音失败，请重新选择位置"); }
+      finally { pending.delete(); }
+      return;
+    }
     if (request == SPEECH_COMPARE) {
       if (result == RESULT_OK && data != null) showSpeechComparison(data);
       else if (speechFeedback != null) speechFeedback.setText("未取得识别结果；原视频与字幕不受影响。");
@@ -481,18 +513,19 @@ public final class JourneyImmersionActivity extends Activity {
       // SAF 文件本次仍可读取；某些文件提供方不支持持久权限。
     }
     if (request == PICK_VIDEO) {
-      videoUri = uri;
+      prefs.edit().putString("videoUri", uri.toString()).putInt("videoPosition", 0).apply();
       activeIndex = -1;
       pausedAt = -1;
-      player.setVideoURI(uri);
-      player.setOnPreparedListener(mp -> status.setText("视频准备好了，点击画面开始播放。"));
+      openVideo(uri, 0);
       showCue(-1);
       if (foreground) { handler.removeCallbacks(progress); handler.post(progress); }
       return;
     }
     try {
-      List<JourneySubtitles.Cue> parsed = JourneySubtitles.parse(readText(uri));
+      String contents = readText(uri);
+      List<JourneySubtitles.Cue> parsed = JourneySubtitles.parse(contents);
       if (parsed.isEmpty()) throw new IllegalArgumentException("未找到有效字幕时间轴，请使用 SRT/VTT 文件");
+      cacheSubtitle(request == PICK_SOURCE ? "source" : "translation", contents);
       if (request == PICK_SOURCE) {
         source.clear();
         source.addAll(parsed);
@@ -654,9 +687,7 @@ public final class JourneyImmersionActivity extends Activity {
   private void startGuide(String words, String lang, boolean slow) {
     if (player != null && player.isPlaying()) player.pause();
     if (practice.isRecording()) {
-      practice.stop();
-      recordingSession++;
-      refreshQuickRecordButton();
+      finishPractice();
     }
     practice.stopPlayback();
     if (speechGuide == null) speechGuide = new JourneySpeechGuide(this, message -> {
@@ -900,6 +931,132 @@ public final class JourneyImmersionActivity extends Activity {
     }, "everyone-tone-contour").start();
   }
 
+  private boolean finishPractice() {
+    if (!practice.isRecording()) return false;
+    boolean valid = practice.stop();
+    recordingSession++;
+    markQuickRecorded(valid);
+    refreshQuickRecordButton();
+    return valid;
+  }
+
+  private static void copyAudio(InputStream in, OutputStream out) throws IOException {
+    byte[] bytes = new byte[8192];
+    int count;
+    while ((count = in.read(bytes)) != -1) out.write(bytes, 0, count);
+  }
+
+  private void exportPractice() {
+    if (practice.isRecording()) { toast("请先停止录音，再保存"); return; }
+    File take = practice.recordingFile();
+    if (take == null) { toast("先录制一句，再保存到手机"); return; }
+    AtomicFile snapshot = new AtomicFile(new File(getCacheDir(), "everyone-export.m4a"));
+    FileOutputStream output = null;
+    try {
+      output = snapshot.startWrite();
+      try (InputStream in = new FileInputStream(take)) { copyAudio(in, output); }
+      snapshot.finishWrite(output);
+      output = null;
+      Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+      intent.addCategory(Intent.CATEGORY_OPENABLE);
+      intent.setType("audio/mp4");
+      intent.putExtra(Intent.EXTRA_TITLE, "Everyone-" + language + "-" + System.currentTimeMillis() + ".m4a");
+      startActivityForResult(intent, EXPORT_AUDIO);
+    } catch (Exception e) {
+      if (output != null) snapshot.failWrite(output);
+      snapshot.delete();
+      toast("无法保存录音，请检查可用空间和文件选择器");
+    }
+  }
+
+  private AtomicFile subtitleFile(String kind) {
+    return new AtomicFile(new File(getFilesDir(), "immersion-" + kind + ".txt"));
+  }
+
+  private void cacheSubtitle(String kind, String contents) throws IOException {
+    AtomicFile file = subtitleFile(kind);
+    FileOutputStream out = null;
+    try {
+      out = file.startWrite();
+      out.write(contents.getBytes(StandardCharsets.UTF_8));
+      file.finishWrite(out);
+    } catch (IOException e) {
+      if (out != null) file.failWrite(out);
+      throw e;
+    }
+  }
+
+  private void restoreSubtitle(String kind, List<JourneySubtitles.Cue> into) {
+    try (InputStream in = subtitleFile(kind).openRead()) {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      byte[] data = new byte[8192];
+      int count;
+      while ((count = in.read(data)) != -1) {
+        if (out.size() + count > 10 * 1024 * 1024) throw new IOException("Subtitle cache too large");
+        out.write(data, 0, count);
+      }
+      into.addAll(JourneySubtitles.parse(new String(out.toByteArray(), StandardCharsets.UTF_8)));
+    } catch (java.io.FileNotFoundException absent) {
+      // First use has no subtitle cache.
+    } catch (IOException e) { toast("上次字幕无法恢复，请重新导入"); }
+  }
+
+  private void restoreMedia() {
+    restoreSubtitle("source", source);
+    restoreSubtitle("translation", translated);
+    counter.setText("原文 " + source.size() + " 句  /  译文 " + translated.size() + " 句");
+    renderTranscript(0);
+    String uri = prefs.getString("videoUri", "");
+    if (uri.isEmpty()) return;
+    try {
+      Uri previous = Uri.parse(uri);
+      try (android.os.ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(previous, "r")) {
+        if (descriptor == null) throw new IOException("Video unavailable");
+      }
+      openVideo(previous, Math.max(0, prefs.getInt("videoPosition", 0)));
+    } catch (Exception e) {
+      prefs.edit().remove("videoUri").remove("videoPosition").apply();
+      status.setText("上次视频已移动或授权失效，请重新选择；字幕副本仍保留。");
+    }
+  }
+
+  private void openVideo(Uri uri, int position) {
+    player.stopPlayback();
+    videoUri = uri;
+    videoReady = false;
+    player.setOnPreparedListener(mp -> {
+      videoReady = true;
+      lastPositionSavedAt = android.os.SystemClock.elapsedRealtime();
+      status.setText(position > 0 ? "已恢复上次视频位置，点击画面继续播放。" : "视频准备好了，点击画面开始播放。");
+    });
+    player.setVideoURI(uri);
+    if (position > 0) player.seekTo(position);
+  }
+
+  private void saveVideoPosition() {
+    if (videoUri != null && videoReady && player != null)
+      prefs.edit().putInt("videoPosition", Math.max(0, player.getCurrentPosition())).apply();
+  }
+
+  private void clearMedia() {
+    player.stopPlayback();
+    player.setOnPreparedListener(null);
+    player.setVideoURI(null);
+    videoUri = null;
+    videoReady = false;
+    source.clear();
+    translated.clear();
+    subtitleFile("source").delete();
+    subtitleFile("translation").delete();
+    prefs.edit().remove("videoUri").remove("videoPosition").apply();
+    activeIndex = -1;
+    pausedAt = -1;
+    showCue(-1);
+    renderTranscript(0);
+    counter.setText("0 句字幕");
+    status.setText("当前素材已清空，可以选择新视频和字幕。");
+  }
+
   private void toggleQuickPractice() {
     quickRecordRequested = true;
     togglePractice();
@@ -944,10 +1101,7 @@ public final class JourneyImmersionActivity extends Activity {
     }
     if (practice.isRecording()) {
       quickRecordRequested = false;
-      boolean okay = practice.stop();
-      recordingSession++;
-      markQuickRecorded(okay);
-      refreshQuickRecordButton();
+      boolean okay = finishPractice();
       String info = okay ? "录音完成。现在点「回放」，对比示范。"
           : "录音太短或麦克风失败，请重新录一遍。";
       speechFeedback.setText(info);
@@ -982,10 +1136,7 @@ public final class JourneyImmersionActivity extends Activity {
       handler.postDelayed(() -> {
         if (session != recordingSession || !practice.isRecording()) return;
         if (android.os.SystemClock.elapsedRealtime() - recordingStartedAt < limit) return;
-        boolean ok = practice.stop();
-        recordingSession++;
-        markQuickRecorded(ok);
-        refreshQuickRecordButton();
+        boolean ok = finishPractice();
         String info = ok ? "录音已自动停止，可点「回放」听刚才的声音。"
             : "录音未完成，请重新录制。";
         if (speechFeedback != null) speechFeedback.setText(info);
@@ -1207,11 +1358,10 @@ public final class JourneyImmersionActivity extends Activity {
   private void launchSpeechRecognition() {
     if (player != null && player.isPlaying()) player.pause();
     if (practice.isRecording()) {
-      practice.stop();
-      recordingSession++;
-      refreshQuickRecordButton();
+      finishPractice();
     }
     if (speechGuide != null) speechGuide.stop();
+    practice.stopPlayback();
     Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     i.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
@@ -1286,6 +1436,7 @@ public final class JourneyImmersionActivity extends Activity {
   @Override protected void onStart() {
     super.onStart();
     foreground = true;
+    if (videoUri != null) player.seekTo(Math.max(0, prefs.getInt("videoPosition", 0)));
     handler.removeCallbacks(progress);
     handler.post(progress);
   }
@@ -1293,12 +1444,11 @@ public final class JourneyImmersionActivity extends Activity {
   @Override protected void onStop() {
     foreground = false;
     handler.removeCallbacks(progress);
+    saveVideoPosition();
     if (player != null) player.pause();
     if (speechGuide != null) speechGuide.stop();
     if (practice.isRecording()) {
-      boolean result = practice.stop();
-      recordingSession++;
-      refreshQuickRecordButton();
+      boolean result = finishPractice();
       if (quickStatus != null) quickStatus.setText(result
           ? "已在离开页面时安全停止录音，可返回本页回放。"
           : "录音中断，请重新录一遍。");
@@ -1308,6 +1458,14 @@ public final class JourneyImmersionActivity extends Activity {
     }
     practice.stopPlayback();
     super.onStop();
+  }
+
+  @Override protected void onSaveInstanceState(Bundle state) {
+    state.putString("language", language);
+    state.putString("speechLanguage", quickSpeechLanguage);
+    state.putString("speechReference", speechReference);
+    saveVideoPosition();
+    super.onSaveInstanceState(state);
   }
 
   @Override protected void onDestroy() {
