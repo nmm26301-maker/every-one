@@ -83,7 +83,7 @@ public final class ImmersionValidation extends Instrumentation {
       main(() -> { if (((View)field("advancedArea")).getVisibility()!=View.VISIBLE)call("toggleAdvanced");return null; });
       deliver(62,Activity.RESULT_OK,fixture("source.srt"));
       deliver(63,Activity.RESULT_OK,fixture("translation.srt"));
-      check((Integer)main(() -> ((List<?>)field("source")).size())==2,"source imported");
+      check((Integer)main(() -> ((List<?>)field("source")).size())==2,"source imported: " + main(() -> ((TextView)field("status")).getText().toString()));
       check((Integer)main(() -> ((List<?>)field("translated")).size())==2,"translation imported");
       File invalid=new File(getTargetContext().getFilesDir(),"invalid.srt");
       try(FileOutputStream out=new FileOutputStream(invalid)){out.write("not subtitles".getBytes("UTF-8"));}

@@ -543,6 +543,7 @@ public final class JourneyImmersionActivity extends Activity {
       }
       counter.setText("原文 " + source.size() + " 句  /  译文 " + translated.size() + " 句");
     } catch (Exception e) {
+      status.setText("字幕导入失败：" + e.getMessage());
       toast("字幕导入失败：" + e.getMessage());
     }
   }
