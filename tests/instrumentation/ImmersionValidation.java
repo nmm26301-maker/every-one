@@ -83,6 +83,9 @@ public final class ImmersionValidation extends Instrumentation {
       main(() -> { if (((View)field("advancedArea")).getVisibility()!=View.VISIBLE)call("toggleAdvanced");return null; });
       deliver(62,Activity.RESULT_OK,fixture("source.srt"));
       deliver(63,Activity.RESULT_OK,fixture("translation.srt"));
+      check((Integer)main(() -> ((List<?>)field("source")).size())==2,"Android SRT parser accepts ASS tags");
+      deliver(62,Activity.RESULT_OK,fixture("source.vtt"));
+      check((Integer)main(() -> ((List<?>)field("source")).size())==2,"Android WebVTT parser accepts ASS tags");
       check((Integer)main(() -> ((List<?>)field("source")).size())==2,"source imported: " + main(() -> ((TextView)field("status")).getText().toString()));
       check((Integer)main(() -> ((List<?>)field("translated")).size())==2,"translation imported");
       File invalid=new File(getTargetContext().getFilesDir(),"invalid.srt");
@@ -94,6 +97,7 @@ public final class ImmersionValidation extends Instrumentation {
       main(() -> { ((VideoView)field("player")).start();return null; });
       waitVideo(500);
       check((Boolean)main(() -> ((VideoView)field("player")).isPlaying()),"real MP4 playback advances");
+      check((Boolean)main(() -> ((TextView)field("sourceLabel")).getText().toString().equals("Test original line.")),"Android subtitle markup stripped");
       check((Boolean)main(() -> ((TextView)field("translationLabel")).getText().toString().contains("测试译文")),"subtitles follow actual video");
       main(() -> { ((VideoView)field("player")).seekTo(3500);return null; });
       waitVideo(3000);

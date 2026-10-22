@@ -74,7 +74,7 @@ public final class JourneySubtitles {
 
   private static String clean(String line) {
     return line.replaceAll("<[^>]*>", "")
-        .replaceAll("\\{\\\\[^}]+}", "")
+        .replaceAll("\\{\\\\[^}]+\\}", "")
         .replace("&amp;", "&").replace("&lt;", "<")
         .replace("&gt;", ">").replace("&nbsp;", " ").trim();
   }
