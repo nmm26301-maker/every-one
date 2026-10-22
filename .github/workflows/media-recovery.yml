@@ -17,6 +17,8 @@ jobs:
           java-version: '17'
       - name: Host module checks
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
           bash tests/test-journey-subtitles.sh
           python3 -m unittest discover -s tests -p 'test_sensevoice_yue.py' -v
           python3 tests/journey-content.py

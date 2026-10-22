@@ -974,11 +974,13 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void cacheSubtitle(String kind, String contents) throws IOException {
+    byte[] data = contents.getBytes(StandardCharsets.UTF_8);
+    if (data.length > 10 * 1024 * 1024) throw new IOException("字幕副本过大，请换用 UTF-8 文本");
     AtomicFile file = subtitleFile(kind);
     FileOutputStream out = null;
     try {
       out = file.startWrite();
-      out.write(contents.getBytes(StandardCharsets.UTF_8));
+      out.write(data);
       file.finishWrite(out);
     } catch (IOException e) {
       if (out != null) file.failWrite(out);
