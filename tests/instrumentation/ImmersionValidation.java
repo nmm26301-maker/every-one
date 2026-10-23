@@ -175,8 +175,17 @@ public final class ImmersionValidation extends Instrumentation {
     int delayedRate=delayedHeader.getInt(24);long quiet=0,loud=0;
     for(int i=0;i<delayedRate/2;i++)quiet+=Math.abs((int)delayedHeader.getShort(44+i*2));
     for(int i=delayedRate+delayedRate/4;i<delayedRate*7/4;i++)loud+=Math.abs((int)delayedHeader.getShort(44+i*2));
+    android.media.MediaExtractor timing=new android.media.MediaExtractor();
+    timing.setDataSource(fixture("delayed-audio.mp4").getAbsolutePath());
+    long firstPts=-1,seekPts=-1;
+    for(int i=0;i<timing.getTrackCount();i++)if(timing.getTrackFormat(i).getString("mime").startsWith("audio/")) {
+      timing.selectTrack(i);firstPts=timing.getSampleTime();timing.seekTo(1000000,android.media.MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
+      seekPts=timing.getSampleTime();break;
+    }
+    timing.release();
     check(delayedHeader.getInt(40)/2==delayedRate*2 && quiet<delayedRate*5L && loud>delayedRate*500L,
-        "delayed video audio retains leading silence so generated timestamps stay aligned");
+        "delayed video audio retains leading silence so generated timestamps stay aligned: rate="+delayedRate
+            +" samples="+delayedHeader.getInt(40)/2+" quiet="+quiet+" loud="+loud+" firstPts="+firstPts+" seekPts="+seekPts);
     Object canceled=jobType.getConstructor().newInstance();jobType.getMethod("cancel").invoke(canceled);
     try {extract.invoke(null,getTargetContext(),Uri.fromFile(video),0,1000,getTargetContext().getCacheDir(),canceled);
       throw new AssertionError("Canceled extraction started");}
