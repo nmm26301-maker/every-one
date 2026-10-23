@@ -25,6 +25,7 @@ public final class DexImmersionMerge {
   private static final String JYUTPING = OWNER + "JourneyJyutping";
   private static final String ASR = OWNER + "JourneyCantoneseAsr";
   private static final String COMPARE = OWNER + "JourneyToneCompare";
+  private static final String TIMELINE = OWNER + "JourneyMp4Timeline";
   private static final String DRAFT = OWNER + "JourneyCaptionDraft";
   private static final String CAPTIONS = OWNER + "JourneyCaptionService";
   private static final String CLIP = OWNER + "JourneyVideoClip";
@@ -36,7 +37,7 @@ public final class DexImmersionMerge {
   }
 
   private static boolean selected(String type) {
-    return within(type, ENTRY) || within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO) || within(type, TONE) || within(type, DECODE) || within(type, TTS) || within(type, PLOT) || within(type, JYUTPING) || within(type, ASR) || within(type, COMPARE) || within(type, QUICK) || within(type, COACH) || within(type, DRAFT) || within(type, CAPTIONS) || within(type, CLIP);
+    return within(type, ENTRY) || within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO) || within(type, TONE) || within(type, DECODE) || within(type, TTS) || within(type, PLOT) || within(type, JYUTPING) || within(type, ASR) || within(type, COMPARE) || within(type, QUICK) || within(type, COACH) || within(type, DRAFT) || within(type, CAPTIONS) || within(type, CLIP) || within(type, TIMELINE);
   }
 
   public static void main(String[] args) throws Exception {
@@ -48,12 +49,12 @@ public final class DexImmersionMerge {
     Set<String> originalTypes = new HashSet<>();
     Set<String> newTypes = new HashSet<>();
     List<ClassDef> output = new ArrayList<>();
-    int removed = 0, added = 0, activityRoot = 0, viewRoot = 0, subtitleRoot = 0, cantoneseRoot = 0, audioRoot = 0, toneRoot = 0, decodeRoot = 0, ttsRoot = 0, plotRoot = 0, jyutpingRoot = 0, asrRoot = 0, compareRoot = 0, quickRoot = 0, coachRoot = 0, draftRoot = 0, captionsRoot = 0, clipRoot = 0;
+    int removed = 0, added = 0, activityRoot = 0, viewRoot = 0, subtitleRoot = 0, cantoneseRoot = 0, audioRoot = 0, toneRoot = 0, decodeRoot = 0, ttsRoot = 0, plotRoot = 0, jyutpingRoot = 0, asrRoot = 0, compareRoot = 0, quickRoot = 0, coachRoot = 0, draftRoot = 0, captionsRoot = 0, clipRoot = 0, timelineRoot = 0;
 
     for (ClassDef c : original.getClasses()) {
       String type = c.getType();
       if (!originalTypes.add(type)) throw new IllegalStateException("Duplicate source " + type);
-      if (within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO) || within(type, TONE) || within(type, DECODE) || within(type, TTS) || within(type, PLOT) || within(type, JYUTPING) || within(type, ASR) || within(type, COMPARE) || within(type, QUICK) || within(type, COACH) || within(type, DRAFT) || within(type, CAPTIONS) || within(type, CLIP)) {
+      if (within(type, VIEW) || within(type, SUBTITLES) || within(type, CANTONESE) || within(type, AUDIO) || within(type, TONE) || within(type, DECODE) || within(type, TTS) || within(type, PLOT) || within(type, JYUTPING) || within(type, ASR) || within(type, COMPARE) || within(type, QUICK) || within(type, COACH) || within(type, DRAFT) || within(type, CAPTIONS) || within(type, CLIP) || within(type, TIMELINE)) {
         throw new IllegalStateException("New immersion type already installed " + type);
       }
       if (within(type, ENTRY)) {
@@ -87,13 +88,14 @@ public final class DexImmersionMerge {
       if (type.equals(DRAFT + ";")) draftRoot++;
       if (type.equals(CAPTIONS + ";")) captionsRoot++;
       if (type.equals(CLIP + ";")) clipRoot++;
+      if (type.equals(TIMELINE + ";")) timelineRoot++;
       if (originalTypes.contains(type) && !within(type, ENTRY)) {
         throw new IllegalStateException("Collision " + type);
       }
       output.add(c);
       added++;
     }
-    if (activityRoot != 1 || viewRoot != 1 || subtitleRoot != 1 || cantoneseRoot != 1 || audioRoot != 1 || toneRoot != 1 || decodeRoot != 1 || ttsRoot != 1 || plotRoot != 1 || jyutpingRoot != 1 || asrRoot != 1 || compareRoot != 1 || quickRoot != 1 || coachRoot != 1 || draftRoot != 1 || captionsRoot != 1 || clipRoot != 1) {
+    if (activityRoot != 1 || viewRoot != 1 || subtitleRoot != 1 || cantoneseRoot != 1 || audioRoot != 1 || toneRoot != 1 || decodeRoot != 1 || ttsRoot != 1 || plotRoot != 1 || jyutpingRoot != 1 || asrRoot != 1 || compareRoot != 1 || quickRoot != 1 || coachRoot != 1 || draftRoot != 1 || captionsRoot != 1 || clipRoot != 1 || timelineRoot != 1) {
       throw new IllegalStateException("Patch is missing an Activity or parser root class");
     }
     if (added < removed + 12) {

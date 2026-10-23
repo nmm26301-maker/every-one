@@ -28,12 +28,21 @@ public final class JourneyVideoClip {
         if (mime!=null && mime.startsWith("audio/")) { format=candidate;extractor.selectTrack(i);break; }
       }
       if(format==null)throw new IOException("所选视频没有可解码音轨");
-      extractor.seekTo(startMs*1000L,MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
+      long offset;
+      try(android.content.res.AssetFileDescriptor asset=context.getContentResolver().openAssetFileDescriptor(uri,"r")) {
+        if(asset==null)throw new IOException("无法读取视频时间轴");
+        try(FileInputStream stream=asset.createInputStream()) {
+          long length=asset.getLength()>=0?asset.getLength():stream.getChannel().size()-asset.getStartOffset();
+          offset=JourneyMp4Timeline.correction(JourneyMp4Timeline.audioOffset(stream.getChannel(),
+              asset.getStartOffset(),length),extractor.getSampleTime());
+        }
+      }
+      extractor.seekTo(Math.max(0,startMs*1000L-offset),MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
       codec=MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME));
       codec.configure(format,null,null,0);codec.start();started=true;
       try(RandomAccessFile wav=new RandomAccessFile(target,"rw")) {
         wav.write(new byte[44]);
-        decode(codec,extractor,format,startMs*1000L,(startMs+(long)durationMs)*1000,wav,job);
+        decode(codec,extractor,format,startMs*1000L,(startMs+(long)durationMs)*1000,offset,wav,job);
       }
       job.check();complete=true;return target;
     } finally {
@@ -46,7 +55,7 @@ public final class JourneyVideoClip {
   }
 
   private static void decode(MediaCodec codec,MediaExtractor extractor,MediaFormat original,
-      long start,long end,RandomAccessFile wav,CloudClient.Job job) throws Exception {
+      long start,long end,long offset,RandomAccessFile wav,CloudClient.Job job) throws Exception {
     int rate=original.getInteger(MediaFormat.KEY_SAMPLE_RATE);
     int channels=original.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
     int writtenRate=0;
@@ -60,8 +69,8 @@ public final class JourneyVideoClip {
         if(index>=0) {
           ByteBuffer input=codec.getInputBuffer(index);
           if(input==null)throw new IOException("音轨解码输入缓存为空");
-          input.clear();long time=extractor.getSampleTime();
-          int count=time<0 || time>=end?-1:extractor.readSampleData(input,0);
+          input.clear();long sampleTime=extractor.getSampleTime();long time=sampleTime<0?-1:sampleTime+offset;
+          int count=sampleTime<0 || time>=end?-1:extractor.readSampleData(input,0);
           if(count<0) {
             codec.queueInputBuffer(index,0,0,0,MediaCodec.BUFFER_FLAG_END_OF_STREAM);inputDone=true;
           } else {codec.queueInputBuffer(index,0,count,time,0);extractor.advance();}
