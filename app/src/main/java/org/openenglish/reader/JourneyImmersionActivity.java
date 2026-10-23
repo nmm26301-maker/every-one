@@ -415,6 +415,10 @@ public final class JourneyImmersionActivity extends Activity {
     button("将当前录音存为参考", referenceRow, this::saveRecordedReference);
     LinearLayout comparisonRow = row(cantonesePanel);
     button("对比两段音高", comparisonRow, this::compareToneReference);
+    LinearLayout referenceListenRow = row(cantonesePanel);
+    button("听参考音", referenceListenRow, this::playToneReference);
+    button("听我的跟读", referenceListenRow, this::playPractice);
+    button("停止回放", referenceListenRow, this::stopTonePlayback);
     cantonesePanel.addView(label("仅接受本地 AAC/M4A 单音节，参考与跟读各 0.25–3 秒。"
         + "参考可以是真人示范音或自己之前的练习音。音频只暂存本机并在退出页面后删除。"
         + "这里按各自中位音高归一化，因此不能判断高平/中平/低平的绝对音区。", 12, MUTED));
@@ -838,8 +842,30 @@ public final class JourneyImmersionActivity extends Activity {
     } finally {
       if (!saved) candidate.delete();
     }
+    practice.stopPlayback();
     if (toneReference != null) toneReference.delete();
     toneReference = candidate;
+  }
+
+  private void playToneReference() {
+    if (practice.isRecording()) { toast("请先停止录音"); return; }
+    if (speechGuide != null) speechGuide.stop();
+    if (player != null && player.isPlaying()) player.pause();
+    try {
+      boolean playing = practice.playFile(toneReference, () -> {
+        if (!isFinishing() && !isDestroyed())
+          toneFeedback.setText("参考音播放完毕。现在听自己的跟读，再对照音高曲线。");
+      });
+      toneFeedback.setText(playing ? "▶ 正在播放导入或保存的参考音。"
+          : "请先导入或保存一段单音节参考音。");
+    } catch (IOException e) {
+      toneFeedback.setText("参考音回放失败：" + e.getMessage());
+    }
+  }
+
+  private void stopTonePlayback() {
+    practice.stopPlayback();
+    toneFeedback.setText("已停止回放。可以继续对照参考音和自己的跟读。");
   }
 
   private void compareToneReference() {
@@ -876,166 +902,7 @@ public final class JourneyImmersionActivity extends Activity {
           if (toneFeedback != null) toneFeedback.setText(message);
         }
       });
-    }, "everyone-yue-tone-reference").start();
-  }
-
-  private void updateToneTarget() {
-    if (toneLabel != null) toneLabel.setText("目标：" + TONE_WORDS[toneTarget - 1]
-        + " · 预期走势：" + JourneyToneContour.expectedTrend(toneTarget));
-  }
-
-  private void pickTone() {
-    new AlertDialog.Builder(this).setTitle("选择六声调单音节")
-        .setSingleChoiceItems(TONE_WORDS, toneTarget - 1, (dialog, n) -> {
-          toneTarget = n + 1;
-          prefs.edit().putInt("toneTarget", toneTarget).apply();
-          updateToneTarget();
-          if (toneFeedback != null)
-            toneFeedback.setText("目标已更换。请只录读“" + TONE_WORDS[n] + "”中的那个单音节。");
-          dialog.dismiss();
-        }).setNegativeButton("取消", null).show();
-  }
-
-  private void analyzeTone() {
-    if (toneBusy) { toast("正在计算音高走势"); return; }
-    if (practice.isRecording()) {
-      if (toneFeedback != null) toneFeedback.setText("请先停止录音，再分析。");
-      return;
-    }
-    java.io.File audio = practice.recordingFile();
-    if (audio == null) {
-      if (toneFeedback != null) toneFeedback.setText("请先在本页录制一段清晰的单音节声音。");
-      return;
-    }
-    toneBusy = true;
-    final int tone = toneTarget;
-    toneFeedback.setText("正在本机解析录音并计算基频轮廓，不会上传音频……");
-    new Thread(() -> {
-      String result;
-      try {
-        JourneyToneAudio.Samples decoded = JourneyToneAudio.decode(audio);
-        JourneyToneContour.Result contour =
-            JourneyToneContour.analyze(decoded.monoPcm, decoded.sampleRate);
-        result = contour.feedback(tone);
-        final JourneyToneContour.Result plotted = contour;
-        runOnUiThread(() -> {
-          if (!isFinishing() && !isDestroyed() && tonePlot != null) tonePlot.show(plotted);
-        });
-      } catch (Exception e) {
-        result = "音高分析失败：" + (e.getMessage() == null ? "请录制更清晰的单音节再试" : e.getMessage());
-      }
-      final String message = result;
-      runOnUiThread(() -> {
-        toneBusy = false;
-        if (!isFinishing() && !isDestroyed() && toneFeedback != null) {
-          toneFeedback.setText("目标：" + TONE_WORDS[tone - 1] + "\n" + message);
-        }
-      });
-    }, "everyone-tone-contour").start();
-  }
-
-  private boolean finishPractice() {
-    if (!practice.isRecording()) return false;
-    boolean valid = practice.stop();
-    recordingSession++;
-    markQuickRecorded(valid);
-    refreshQuickRecordButton();
-    return valid;
-  }
-
-  private static void copyAudio(InputStream in, OutputStream out) throws IOException {
-    byte[] bytes = new byte[8192];
-    int count;
-    while ((count = in.read(bytes)) != -1) out.write(bytes, 0, count);
-  }
-
-  private void exportPractice() {
-    if (practice.isRecording()) { toast("请先停止录音，再保存"); return; }
-    File take = practice.recordingFile();
-    if (take == null) { toast("先录制一句，再保存到手机"); return; }
-    AtomicFile snapshot = new AtomicFile(new File(getCacheDir(), "everyone-export.m4a"));
-    FileOutputStream output = null;
-    try {
-      output = snapshot.startWrite();
-      try (InputStream in = new FileInputStream(take)) { copyAudio(in, output); }
-      snapshot.finishWrite(output);
-      output = null;
-      Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-      intent.addCategory(Intent.CATEGORY_OPENABLE);
-      intent.setType("audio/mp4");
-      intent.putExtra(Intent.EXTRA_TITLE, "Everyone-" + language + "-" + System.currentTimeMillis() + ".m4a");
-      startActivityForResult(intent, EXPORT_AUDIO);
-    } catch (Exception e) {
-      if (output != null) snapshot.failWrite(output);
-      snapshot.delete();
-      toast("无法保存录音，请检查可用空间和文件选择器");
-    }
-  }
-
-  private AtomicFile subtitleFile(String kind) {
-    return new AtomicFile(new File(getFilesDir(), "immersion-" + kind + ".txt"));
-  }
-
-  private void cacheSubtitle(String kind, String contents) throws IOException {
-    byte[] data = contents.getBytes(StandardCharsets.UTF_8);
-    if (data.length > 10 * 1024 * 1024) throw new IOException("字幕副本过大，请换用 UTF-8 文本");
-    AtomicFile file = subtitleFile(kind);
-    FileOutputStream out = null;
-    try {
-      out = file.startWrite();
-      out.write(data);
-      file.finishWrite(out);
-    } catch (IOException e) {
-      if (out != null) file.failWrite(out);
-      throw e;
-    }
-  }
-
-  private void restoreSubtitle(String kind, List<JourneySubtitles.Cue> into) {
-    try (InputStream in = subtitleFile(kind).openRead()) {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      byte[] data = new byte[8192];
-      int count;
-      while ((count = in.read(data)) != -1) {
-        if (out.size() + count > 10 * 1024 * 1024) throw new IOException("Subtitle cache too large");
-        out.write(data, 0, count);
-      }
-      into.addAll(JourneySubtitles.parse(new String(out.toByteArray(), StandardCharsets.UTF_8)));
-    } catch (java.io.FileNotFoundException absent) {
-      // First use has no subtitle cache.
-    } catch (IOException e) { toast("上次字幕无法恢复，请重新导入"); }
-  }
-
-  private void restoreMedia() {
-    restoreSubtitle("source", source);
-    restoreSubtitle("translation", translated);
-    counter.setText("原文 " + source.size() + " 句  /  译文 " + translated.size() + " 句");
-    renderTranscript(0);
-    String uri = prefs.getString("videoUri", "");
-    if (uri.isEmpty()) return;
-    try {
-      Uri previous = Uri.parse(uri);
-      try (android.os.ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(previous, "r")) {
-        if (descriptor == null) throw new IOException("Video unavailable");
-      }
-      openVideo(previous, Math.max(0, prefs.getInt("videoPosition", 0)));
-    } catch (Exception e) {
-      prefs.edit().remove("videoUri").remove("videoPosition").apply();
-      status.setText("上次视频已移动或授权失效，请重新选择；字幕副本仍保留。");
-    }
-  }
-
-  private void openVideo(Uri uri, int position) {
-    player.stopPlayback();
-    videoUri = uri;
-    videoReady = false;
-    videoDecoder = null;
-    resumeVideoPosition = Math.max(0, position);
-    player.setOnPreparedListener(mp -> {
-      videoDecoder = mp;
-      videoReady = true;
-      lastPositionSavedAt = android.os.SystemClock.elapsedRealtime();
-      status.setText(position > 0 ? "已恢复上次视频位置，点击画面继续播放。" : "视频准备好了，点击画面开始播放。");
+    }, "everyone-yue-tone-…1878 tokens truncated…e。" : "视频准备好了，点击画面开始播放。");
       handler.post(() -> { if (videoDecoder == mp && !isDestroyed()) seekVideo(resumeVideoPosition); });
     });
     player.setVideoURI(uri);

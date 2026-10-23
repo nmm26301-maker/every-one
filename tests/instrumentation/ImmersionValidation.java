@@ -62,6 +62,13 @@ public final class ImmersionValidation extends Instrumentation {
     SystemClock.sleep(700);
     waitForIdleSync();
   }
+  private Object audioPlayer() throws Exception {
+    return main(() -> {
+      Object audio = field("practice");
+      Field f = audio.getClass().getDeclaredField("player");
+      f.setAccessible(true);return f.get(audio);
+    });
+  }
   private int count() throws Exception {
     return (Integer)main(() -> {
       SharedPreferences p=(SharedPreferences)field("prefs");
@@ -145,6 +152,22 @@ public final class ImmersionValidation extends Instrumentation {
       back();SystemClock.sleep(300);
       File recorded=(File)main(() -> field("practice").getClass().getMethod("recordingFile").invoke(field("practice")));
       byte[] original=bytes(recorded);
+      deliver(67,Activity.RESULT_OK,stereo);
+      main(() -> call("playToneReference"));
+      check(audioPlayer()!=null && (Boolean)main(() -> {
+        Object audio=field("practice");Field f=audio.getClass().getDeclaredField("player");
+        f.setAccessible(true);return ((android.media.MediaPlayer)f.get(audio)).isPlaying();
+      }),
+          "imported reference audio can be played in learning page");
+      SystemClock.sleep(1400);waitForIdleSync();
+      check(audioPlayer()==null,"reference completion releases shared player");
+      main(() -> call("playToneReference"));
+      Object referencePlayer=audioPlayer();
+      main(() -> call("playPractice"));
+      check(audioPlayer()!=null && audioPlayer()!=referencePlayer && Arrays.equals(original,bytes(recorded)),
+          "A/B playback switches player without replacing learner recording");
+      main(() -> call("stopTonePlayback"));
+      check(audioPlayer()==null,"reference comparison stop releases playback");
       main(() -> call("exportPractice"));waitForIdleSync();SystemClock.sleep(500);
       File exported=new File(getTargetContext().getFilesDir(),"saved-recording.m4a");
       deliver(68,Activity.RESULT_OK,exported);
