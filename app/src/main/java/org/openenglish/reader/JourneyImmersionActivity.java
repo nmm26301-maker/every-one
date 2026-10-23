@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * 安卓原生影视精听：只读取用户主动选取的本地视频和字幕。
@@ -71,6 +73,13 @@ public final class JourneyImmersionActivity extends Activity {
   private TextView languageLabel, referenceGuideLabel, cantoneseLesson, speechFeedback, timingLabel, toneLabel, toneFeedback;
   private TextView phoneticDetail, contrastDetail;
   private TextView quickPhrase, quickStatus;
+  private TextView lineAnalysis;
+  private final JourneyLineCoach lineCoach = new JourneyLineCoach();
+  private CloudClient lineClient = new CloudClient();
+  private CloudClient.Job lineJob;
+  private Runnable lineTimeout;
+  private AlertDialog lineConfirm;
+  private int lineGeneration;
   private Button quickRecordButton, advancedToggleButton;
   private LinearLayout advancedArea;
   private boolean quickRecordRequested;
@@ -317,6 +326,14 @@ public final class JourneyImmersionActivity extends Activity {
     advancedArea.addView(translationLabel);
     tipsLabel = label("粤语口语词条可点选查看；非完整 AI 讲解。", 13, MUTED);
     advancedArea.addView(tipsLabel);
+    LinearLayout analysisControls = row(advancedArea);
+    button("AI 台词解析", analysisControls, this::confirmLineAnalysis);
+    button("停止解析", analysisControls, this::stopLineAnalysis);
+    button("AI 服务设置", analysisControls, this::configureLineService);
+    lineAnalysis = label("选择原文字幕后，可结合前后各两句解析词义、语法、语气和跟读练法。"
+        + "需配置自己的 AI 服务；发送前会显示文本范围，不上传音视频。", 14, MUTED);
+    lineAnalysis.setTextIsSelectable(true);
+    advancedArea.addView(lineAnalysis);
     counter = label("0 句字幕", 12, MUTED);
     advancedArea.addView(counter);
 
@@ -556,7 +573,9 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void showCue(int index) {
     if (activeIndex == index && index >= 0) return;
+    stopLineAnalysis();
     activeIndex = index;
+    refreshLineAnalysis();
     if (index < 0 || index >= source.size()) {
       sourceLabel.setText("字幕导入后，在这里跟随播放");
       translationLabel.setText(translated.isEmpty() ? "可单独导入中文字幕" : "等待对应译文");
@@ -1451,6 +1470,137 @@ public final class JourneyImmersionActivity extends Activity {
     return "逐句精听：观察省略、语气和说话人关系；暂不提供自动逐词解析。";
   }
 
+  private void configureLineService() {
+    SharedPreferences connection = getSharedPreferences("connection", 0);
+    LinearLayout fields = new LinearLayout(this);
+    fields.setOrientation(1);
+    fields.setPadding(dp(18), dp(6), dp(18), dp(6));
+    fields.addView(label("与英语课程共用 AI 服务；保存后需再次点击解析，不会自动发送。", 13, MUTED));
+    EditText base = new EditText(this);
+    base.setHint("HTTPS API 基础地址，例如 https://服务地址/v1");
+    base.setText(connection.getString("base", ""));
+    base.setSingleLine(true);
+    fields.addView(base);
+    EditText model = new EditText(this);
+    model.setHint("模型名称");
+    model.setText(connection.getString("model", ""));
+    model.setSingleLine(true);
+    fields.addView(model);
+    EditText secret = new EditText(this);
+    secret.setHint("API 密钥，留空保留原密钥");
+    secret.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+    fields.addView(secret);
+    AlertDialog dialog = new AlertDialog.Builder(this).setTitle("台词解析 AI 服务")
+        .setView(fields).setPositiveButton("保存", null).setNegativeButton("取消", null).create();
+    dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+      try {
+        String url = base.getText().toString().trim();
+        String name = model.getText().toString().trim();
+        CloudClient.endpoint(url, "chat/completions");
+        if (name.isEmpty() || name.length() > 200) throw new IOException("请填写有效模型名称");
+        String token = secret.getText().toString().trim();
+        if (!token.isEmpty()) KeyVault.save(this, "connection", token);
+        stopLineAnalysis();
+        connection.edit().putString("base", url).putString("model", name).apply();
+        secret.setText("");
+        refreshLineAnalysis();
+        toast("已保存，点击 AI 台词解析开始");
+        dialog.dismiss();
+      } catch (Exception e) { toast("保存失败，请检查 HTTPS 地址、模型名称和密钥存储"); }
+    }));
+    dialog.show();
+  }
+
+  private void refreshLineAnalysis() {
+    if (lineAnalysis == null) return;
+    try {
+      JourneyLineCoach.Request request = JourneyLineCoach.prepare(source, activeIndex, language);
+      SharedPreferences settings = getSharedPreferences("connection", 0);
+      String cached = lineCoach.cached(request, settings.getString("base", "").trim(),
+          settings.getString("model", "").trim());
+      lineAnalysis.setText(cached == null ? "点「AI 台词解析」查看这句的词义、语法与口语练法。"
+          : "本页已缓存的解析：\n" + cached + "\n仅供学习参考，未评测你的发音。");
+    } catch (IOException e) { lineAnalysis.setText("请先选择一条原文字幕，再点 AI 台词解析。"); }
+  }
+
+  private void confirmLineAnalysis() {
+    if (lineJob != null) { toast("正在解析，可点停止或切换句子取消"); return; }
+    if (practice.isRecording()) { toast("请先停止录音，再解析台词"); return; }
+    try {
+      final JourneyLineCoach.Request request = JourneyLineCoach.prepare(source, activeIndex, language);
+      SharedPreferences connection = getSharedPreferences("connection", 0);
+      final String base = connection.getString("base", "").trim();
+      final String model = connection.getString("model", "").trim();
+      if (base.isEmpty() || model.isEmpty()) { configureLineService(); return; }
+      CloudClient.endpoint(base, "chat/completions");
+      if (lineCoach.cached(request, base, model) != null) { refreshLineAnalysis(); return; }
+      final String key = KeyVault.read(this, "connection");
+      if (player != null && player.isPlaying()) player.pause();
+      if (speechGuide != null) speechGuide.stop();
+      practice.stopPlayback();
+      lineConfirm = new AlertDialog.Builder(this).setTitle("发送以下字幕文本并解析？")
+          .setMessage("服务：" + base + "\n模型：" + model + "\n\n" + request.input
+              + "\n只发送以上文本和教学要求，不发送录音或视频。AI 解释可能有误，可对照原声核实。")
+          .setPositiveButton("发送文本并解析", (d, n) -> runLineAnalysis(request, base, model, key))
+          .setNegativeButton("取消", null).create();
+      lineConfirm.show();
+    } catch (Exception e) { lineAnalysis.setText("无法准备解析，请先选择字幕并检查 AI 服务配置。"); }
+  }
+
+  private void runLineAnalysis(JourneyLineCoach.Request request, String base, String model, String key) {
+    stopLineAnalysis();
+    final int generation = lineGeneration;
+    final CloudClient.Job job = new CloudClient.Job();
+    lineJob = job;
+    lineAnalysis.setText("正在解析所选台词……切换句子或离开本页会取消。\n" + request.input);
+    lineTimeout = () -> {
+      if (lineJob == job) {
+        stopLineAnalysis();
+        lineAnalysis.setText("解析超时，已停止。请检查服务配置后重试。");
+      }
+    };
+    handler.postDelayed(lineTimeout, 90000);
+    new Thread(() -> {
+      try {
+        JSONArray history = new JSONArray().put(new JSONObject().put("role", "user").put("content", request.input));
+        String result = lineClient.chat(base, model, key, JourneyLineCoach.SYSTEM, history, job, text -> {
+          if (text.length() > 8000) throw new IllegalStateException("解析过长");
+          handler.post(() -> {
+            if (lineGeneration == generation && lineJob == job)
+              lineAnalysis.setText("正在解析……\n" + text);
+          });
+        });
+        job.check();
+        handler.post(() -> {
+          if (lineGeneration != generation || lineJob != job || isDestroyed()) return;
+          lineJob = null;
+          clearLineTimeout();
+          try { lineCoach.remember(request, base, model, result); refreshLineAnalysis(); }
+          catch (IOException e) { lineAnalysis.setText("解析为空或过长，请重试或更换模型。"); }
+        });
+      } catch (Exception e) {
+        handler.post(() -> {
+          if (lineGeneration != generation || lineJob != job || isDestroyed()) return;
+          lineJob = null;
+          clearLineTimeout();
+          lineAnalysis.setText("解析未完成。请检查网络、服务地址、模型或额度后重试；未保存本次结果。");
+        });
+      }
+    }, "everyone-subtitle-analysis").start();
+  }
+
+  private void stopLineAnalysis() {
+    lineGeneration++;
+    clearLineTimeout();
+    if (lineJob != null) { lineJob.cancel(); lineJob = null; }
+    if (lineConfirm != null) { lineConfirm.dismiss(); lineConfirm = null; }
+    if (lineAnalysis != null) lineAnalysis.setText("已停止解析。可重新选择台词后再试。");
+  }
+
+  private void clearLineTimeout() {
+    if (lineTimeout != null) { handler.removeCallbacks(lineTimeout); lineTimeout = null; }
+  }
+
   private void explain() {
     if (activeIndex < 0) { toast("请先选择一条台词"); return; }
     String line = source.get(activeIndex).text;
@@ -1483,6 +1633,7 @@ public final class JourneyImmersionActivity extends Activity {
   @Override protected void onStart() {
     super.onStart();
     foreground = true;
+    refreshLineAnalysis();
     if (videoUri != null) seekVideo(Math.max(0, prefs.getInt("videoPosition", 0)));
     handler.removeCallbacks(progress);
     handler.post(progress);
@@ -1495,6 +1646,7 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   @Override protected void onStop() {
+    stopLineAnalysis();
     foreground = false;
     handler.removeCallbacks(progress);
     saveVideoPosition();
@@ -1522,6 +1674,7 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   @Override protected void onDestroy() {
+    stopLineAnalysis();
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
     videoDecoder = null;

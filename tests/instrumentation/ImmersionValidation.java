@@ -89,6 +89,106 @@ public final class ImmersionValidation extends Instrumentation {
       byte[] data=new byte[8192]; int n; while((n=in.read(data))!=-1)out.write(data,0,n); return out.toByteArray();
     }
   }
+  private void selectLine(int index) throws Exception {
+    main(() -> {
+      Method m=activity.getClass().getDeclaredMethod("showCue",int.class);
+      m.setAccessible(true);m.invoke(activity,index);return null;
+    });
+  }
+  private void consentLine(boolean yes) throws Exception {
+    main(() -> {
+      android.app.AlertDialog dialog=(android.app.AlertDialog)field("lineConfirm");
+      dialog.getButton(yes?android.content.DialogInterface.BUTTON_POSITIVE:
+          android.content.DialogInterface.BUTTON_NEGATIVE).performClick();return null;
+    });
+  }
+  private String analysisText() throws Exception {
+    return (String)main(() -> ((TextView)field("lineAnalysis")).getText().toString());
+  }
+  private void waitAnalysis(String text) throws Exception {
+    long until=SystemClock.elapsedRealtime()+6000;
+    while(SystemClock.elapsedRealtime()<until) {
+      if(main(() -> field("lineJob"))==null && analysisText().contains(text))return;
+      SystemClock.sleep(50);
+    }
+    throw new AssertionError("Analysis state: "+analysisText());
+  }
+  private static final class ReplyConnection extends java.net.HttpURLConnection {
+    final ByteArrayOutputStream sent=new ByteArrayOutputStream();
+    final int status;final String answer;
+    final java.util.concurrent.CountDownLatch gate;
+    ReplyConnection(java.net.URL url,int status,String answer,java.util.concurrent.CountDownLatch gate) {
+      super(url);this.status=status;this.answer=answer;this.gate=gate;
+    }
+    public void connect() {}
+    public boolean usingProxy() {return false;}
+    public void disconnect() {}
+    public OutputStream getOutputStream() {return sent;}
+    public int getResponseCode() throws IOException {
+      if(gate!=null)try{gate.await(6,java.util.concurrent.TimeUnit.SECONDS);}
+      catch(InterruptedException e){Thread.currentThread().interrupt();throw new IOException("interrupted");}
+      return status;
+    }
+    public String getContentType() {return "application/json";}
+    public InputStream getInputStream() {
+      String json="{\"choices\":[{\"message\":{\"content\":\""+answer+"\"}}]}";
+      return new ByteArrayInputStream(json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+  }
+  private void lineChecks() throws Exception {
+    java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();
+    java.util.concurrent.atomic.AtomicInteger statusCode=new java.util.concurrent.atomic.AtomicInteger(200);
+    AtomicReference<java.util.concurrent.CountDownLatch> gate=new AtomicReference<>();
+    AtomicReference<ReplyConnection> last=new AtomicReference<>();
+    ClassLoader loader=getTargetContext().getClassLoader();
+    Class<?> client=loader.loadClass("org.openenglish.reader.CloudClient");
+    Class<?> factory=loader.loadClass("org.openenglish.reader.CloudClient$ConnectionFactory");
+    Object proxy=Proxy.newProxyInstance(loader,new Class<?>[]{factory},(p,m,args)->{
+      int n=calls.incrementAndGet();
+      ReplyConnection connection=new ReplyConnection((java.net.URL)args[0],statusCode.get(),
+          n==1?"测试解析：自然译文和分块练习。":"LATE_STALE_REPLY",gate.get());
+      last.set(connection);return connection;
+    });
+    Object instance=client.getConstructor(factory).newInstance(proxy);
+    main(()->{
+      Field f=activity.getClass().getDeclaredField("lineClient");f.setAccessible(true);f.set(activity,instance);
+      activity.getSharedPreferences("connection",0).edit().clear().putString("base","https://example.invalid/v1")
+          .putString("model","fixture-model").commit();return null;
+    });
+    selectLine(0);main(()->call("confirmLineAnalysis"));
+    check(calls.get()==0 && (Boolean)main(()->((android.app.AlertDialog)field("lineConfirm")).isShowing()),
+        "AI explanation requires explicit consent before text leaves page");
+    consentLine(true);waitAnalysis("本页已缓存");
+    check(analysisText().contains("自然译文"),"AI result appears in selected subtitle page");
+    org.json.JSONObject sent=new org.json.JSONObject(last.get().sent.toString("UTF-8"));
+    org.json.JSONArray messages=sent.getJSONArray("messages");
+    check(sent.getString("model").equals("fixture-model") && messages.length()==2
+        && messages.getJSONObject(1).getString("content").contains("Test original line.")
+        && messages.getJSONObject(1).getString("content").contains("后文："),
+        "existing cloud protocol sends bounded selected line and subtitle context only");
+    main(()->call("confirmLineAnalysis"));
+    check(calls.get()==1,"cached explanation does not issue duplicate requests");
+    selectLine(1);main(()->call("confirmLineAnalysis"));consentLine(false);
+    check(calls.get()==1,"canceling text consent does not call AI service");
+    java.util.concurrent.CountDownLatch delayed=new java.util.concurrent.CountDownLatch(1);gate.set(delayed);
+    main(()->call("confirmLineAnalysis"));consentLine(true);
+    long until=SystemClock.elapsedRealtime()+3000;
+    while(calls.get()<2 && SystemClock.elapsedRealtime()<until)SystemClock.sleep(20);
+    selectLine(0);delayed.countDown();SystemClock.sleep(250);waitForIdleSync();
+    check(main(()->field("lineJob"))==null && analysisText().contains("自然译文")
+        && !analysisText().contains("LATE_STALE_REPLY"),"switching subtitle cancels request and rejects late reply");
+    gate.set(null);statusCode.set(429);selectLine(1);main(()->call("confirmLineAnalysis"));consentLine(true);
+    waitAnalysis("未完成");
+    check(!analysisText().contains("本页已缓存"),"AI service errors remain retryable and are not cached");
+    main(()->call("confirmLineAnalysis"));consentLine(false);
+    java.util.concurrent.CountDownLatch background=new java.util.concurrent.CountDownLatch(1);gate.set(background);
+    statusCode.set(200);main(()->call("confirmLineAnalysis"));consentLine(true);
+    main(()->{activity.startActivity(new Intent().setClassName("org.openenglish.reader","org.openenglish.reader.JourneyActivity"));return null;});
+    waitForIdleSync();SystemClock.sleep(300);background.countDown();
+    check(main(()->field("lineJob"))==null,"leaving learning page cancels AI explanation");
+    back();SystemClock.sleep(250);
+    check(!analysisText().contains("LATE_STALE_REPLY"),"returning from background does not show canceled AI reply");
+  }
   @Override public void onStart() {
     Bundle result=new Bundle();
     try {
@@ -112,6 +212,7 @@ public final class ImmersionValidation extends Instrumentation {
       check((Integer)main(() -> ((List<?>)field("source")).size())==2,"Android WebVTT parser accepts ASS tags");
       check((Integer)main(() -> ((List<?>)field("source")).size())==2,"source imported: " + main(() -> ((TextView)field("status")).getText().toString()));
       check((Integer)main(() -> ((List<?>)field("translated")).size())==2,"translation imported");
+      lineChecks();
       File invalid=new File(getTargetContext().getFilesDir(),"invalid.srt");
       try(FileOutputStream out=new FileOutputStream(invalid)){out.write("not subtitles".getBytes("UTF-8"));}
       deliver(62,Activity.RESULT_OK,invalid);

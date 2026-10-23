@@ -8,10 +8,12 @@ javac -encoding UTF-8 -d "$tmp" app/src/main/java/org/openenglish/reader/Journey
   app/src/main/java/org/openenglish/reader/JourneyToneContour.java tests/JourneyToneContourTest.java \
   app/src/main/java/org/openenglish/reader/JourneyToneCompare.java tests/JourneyToneCompareTest.java \
   app/src/main/java/org/openenglish/reader/JourneyJyutping.java tests/JourneyJyutpingTest.java \
-  app/src/main/java/org/openenglish/reader/JourneyQuickStart.java tests/JourneyQuickStartTest.java
+  app/src/main/java/org/openenglish/reader/JourneyQuickStart.java tests/JourneyQuickStartTest.java \
+  app/src/main/java/org/openenglish/reader/JourneyLineCoach.java tests/JourneyLineCoachTest.java
 java -cp "$tmp" org.openenglish.reader.JourneySubtitlesTest
 java -cp "$tmp" org.openenglish.reader.JourneyCantoneseTest
 java -cp "$tmp" org.openenglish.reader.JourneyToneContourTest
 java -cp "$tmp" org.openenglish.reader.JourneyToneCompareTest
 java -cp "$tmp" org.openenglish.reader.JourneyJyutpingTest
 java -cp "$tmp" org.openenglish.reader.JourneyQuickStartTest
+java -cp "$tmp" org.openenglish.reader.JourneyLineCoachTest

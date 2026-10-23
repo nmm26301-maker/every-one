@@ -4,6 +4,7 @@ import android.content.Context;import org.json.*;import java.io.File;
 public final class CloudClient {
  public interface Delta{void text(String complete);}
  public static class Job{public Job(){} public void cancel(){}public void check(){}}
+ public CloudClient(){}
  public CloudClient(Context c){}
  public static String endpoint(String base,String path)throws Exception{return null;}
  public String chat(String base,String model,String key,String system,JSONArray history,Job job,Delta delta)throws Exception{return null;}

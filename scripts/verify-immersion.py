@@ -15,7 +15,7 @@ new = {str(p.relative_to(new_dir)): p.read_bytes() for p in new_dir.rglob("*.sma
 def in_scope(name):
     prefix = "org/openenglish/reader/"
     targets = ("JourneyActivity", "JourneyImmersionActivity", "JourneySubtitles",
-               "JourneyCantonese", "JourneyPracticeAudio", "JourneyToneContour", "JourneyToneAudio", "JourneySpeechGuide", "JourneyTonePlotView", "JourneyJyutping", "JourneyCantoneseAsr", "JourneyToneCompare", "JourneyQuickStart")
+               "JourneyCantonese", "JourneyPracticeAudio", "JourneyToneContour", "JourneyToneAudio", "JourneySpeechGuide", "JourneyTonePlotView", "JourneyJyutping", "JourneyCantoneseAsr", "JourneyToneCompare", "JourneyQuickStart", "JourneyLineCoach")
     return name.startswith(tuple(prefix + target for target in targets))
 
 unchanged = [name for name in old if not in_scope(name)]
@@ -36,6 +36,7 @@ assert any(name.endswith("/JourneyJyutping.smali") for name in added)
 assert any(name.endswith("/JourneyCantoneseAsr.smali") for name in added)
 assert any(name.endswith("/JourneyToneCompare.smali") for name in added)
 assert any(name.endswith("/JourneyQuickStart.smali") for name in added)
+assert any(name.endswith("/JourneyLineCoach.smali") for name in added)
 assert any(name.endswith("/JourneyActivity.smali") for name in old)
 assert any(name.endswith("/JourneyActivity.smali") for name in new)
 
