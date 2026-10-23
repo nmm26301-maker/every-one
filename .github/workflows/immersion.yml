@@ -1,0 +1,200 @@
+name: Everyone Android immersion checks
+on:
+  push:
+    branches:
+      - feature/android-video-immersion-20261021
+    paths:
+      - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyQuickStart.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyToneAudio.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyToneContour.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyToneCompare.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
+      - 'app/src/main/AndroidManifest.xml'
+      - 'preview/AndroidManifest.xml'
+      - 'tests/JourneySubtitlesTest.java'
+      - 'tests/JourneyCantoneseTest.java'
+      - 'tests/JourneyQuickStartTest.java'
+      - 'tests/JourneyJyutpingTest.java'
+      - 'tests/test_sensevoice_yue.py'
+      - 'server/sensevoice_yue.py'
+      - 'tests/JourneyToneContourTest.java'
+      - 'tests/JourneyToneCompareTest.java'
+      - 'tests/test-journey-subtitles.sh'
+      - '.github/workflows/immersion.yml'
+  pull_request:
+    paths:
+      - 'app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneySubtitles.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCantonese.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyQuickStart.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyJyutping.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyToneAudio.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyToneContour.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyToneCompare.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
+      - 'app/src/main/AndroidManifest.xml'
+      - 'preview/AndroidManifest.xml'
+      - 'tests/JourneySubtitlesTest.java'
+      - 'tests/JourneyCantoneseTest.java'
+      - 'tests/JourneyQuickStartTest.java'
+      - 'tests/JourneyJyutpingTest.java'
+      - 'tests/test_sensevoice_yue.py'
+      - 'server/sensevoice_yue.py'
+      - 'tests/JourneyToneContourTest.java'
+      - 'tests/JourneyToneCompareTest.java'
+      - 'tests/test-journey-subtitles.sh'
+      - '.github/workflows/immersion.yml'
+permissions:
+  contents: read
+jobs:
+  immersion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Parse real subtitles without Android dependencies
+        run: bash tests/test-journey-subtitles.sh
+      - name: Test optional self-hosted Cantonese ASR protocol with mocked model
+        run: python3 -m unittest discover -s tests -p 'test_sensevoice_yue.py' -v
+      - name: Check existing manifest and home entry
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = ET.parse('app/src/main/AndroidManifest.xml').getroot()
+          android = '{http://schemas.android.com/apk/res/android}'
+          activities = root.findall('.//activity')
+          assert any(x.get(android+'name') == '.JourneyImmersionActivity' and x.get(android+'exported') == 'false' for x in activities)
+          home = Path('app/src/main/java/org/openenglish/reader/JourneyActivity.java').read_text()
+          assert 'JourneyImmersionActivity.class' in home
+          preview = ET.parse('preview/AndroidManifest.xml').getroot()
+          queries = preview.find('queries')
+          assert queries is not None
+          assert any(a.get(android + 'name') == 'android.intent.action.TTS_SERVICE'
+                     for a in queries.findall('.//action')), 'TTS service must be visible on Android 11+'
+          assert any(p.get(android + 'name') == 'android.permission.INTERNET'
+                         for p in preview.findall('uses-permission')), 'Opt-in HTTPS client needs permission'
+          print('Native immersion Activity and offline TTS package visibility wired')
+          PY
+      - name: Compile native Android module with Android 35 API
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          jar="$sdk/platforms/android-35/android.jar"
+          if [[ ! -f "$jar" ]]; then
+            echo "Android platform android-35 is not installed at $sdk"
+            exit 1
+          fi
+          mkdir -p build/immersion-classes
+          javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
+            app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
+            app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyQuickStart.java \
+            app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
+            app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
+            app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
+            app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
+            app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
+            app/src/main/java/org/openenglish/reader/JourneyToneCompare.java \
+            app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java \
+            app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java \
+            app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
+
+      - name: Validate all compiled Journey sources and overlay scripts
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          jar="$sdk/platforms/android-35/android.jar"
+          mkdir -p vendor/onnxruntime build/integrated-classes
+          curl --fail --silent --show-error --location --retry 3 \
+            https://repo.maven.apache.org/maven2/com/microsoft/onnxruntime/onnxruntime/1.22.0/onnxruntime-1.22.0.jar \
+            -o vendor/onnxruntime/classes.jar
+          javac -encoding UTF-8 -source 8 -target 8 \
+            -cp "$jar:vendor/onnxruntime/classes.jar" \
+            -d build/integrated-classes \
+            scripts/journey-stubs/org/openenglish/reader/*.java \
+            app/src/main/java/org/openenglish/reader/Journey*.java
+          test -f build/integrated-classes/org/openenglish/reader/JourneyActivity.class
+          test -f build/integrated-classes/org/openenglish/reader/JourneyImmersionActivity.class
+          bash -n scripts/build-5.0.1-immersion-snapshot.sh
+          python3 -m py_compile scripts/verify-immersion.py
+  preview-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build independently installable Android preview
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          jar="$sdk/platforms/android-35/android.jar"
+          buildtools="$sdk/build-tools/35.0.0"
+          for tool in aapt2 d8 zipalign apksigner; do
+            test -x "$buildtools/$tool"
+          done
+          mkdir -p build/immersion-preview/classes build/immersion-preview/dex
+          javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" \
+            -d build/immersion-preview/classes \
+            app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
+            app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
+            app/src/main/java/org/openenglish/reader/JourneyQuickStart.java \
+            app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
+            app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
+            app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
+            app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
+            app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
+            app/src/main/java/org/openenglish/reader/JourneyToneCompare.java \
+            app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java \
+            app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java \
+            app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
+          mapfile -t classes < <(find build/immersion-preview/classes -name '*.class' -print)
+          "$buildtools/d8" --min-api 23 --lib "$jar" --output build/immersion-preview/dex "${classes[@]}"
+          "$buildtools/aapt2" link \
+            -o build/immersion-preview/app-shell.apk \
+            -I "$jar" --manifest preview/AndroidManifest.xml \
+            --min-sdk-version 23 --target-sdk-version 33
+          cp build/immersion-preview/app-shell.apk build/immersion-preview/unsigned.apk
+          (cd build/immersion-preview/dex && zip -q ../unsigned.apk classes.dex)
+          "$buildtools/zipalign" -f -P 16 4 \
+            build/immersion-preview/unsigned.apk build/immersion-preview/aligned.apk
+          keytool -genkeypair -noprompt -alias preview \
+            -keystore build/immersion-preview/ephemeral.keystore \
+            -storepass android -keypass android -keyalg RSA -keysize 2048 \
+            -validity 3650 -dname "CN=Everyone Immersion Preview, O=Ephemeral Test Build"
+          "$buildtools/apksigner" sign \
+            --ks build/immersion-preview/ephemeral.keystore \
+            --ks-key-alias preview --ks-pass pass:android --key-pass pass:android \
+            --out build/immersion-preview/Everyone-Immersion-Preview-5.0.12.apk \
+            build/immersion-preview/aligned.apk
+          "$buildtools/apksigner" verify --verbose \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.12.apk
+          "$buildtools/aapt2" dump badging \
+            build/immersion-preview/Everyone-Immersion-Preview-5.0.12.apk \
+            | head -n 8
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Everyone-Immersion-Preview-5.0.12
+          path: build/immersion-preview/Everyone-Immersion-Preview-5.0.12.apk
+          if-no-files-found: error
+          retention-days: 14

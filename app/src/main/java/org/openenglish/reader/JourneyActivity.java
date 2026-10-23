@@ -63,6 +63,11 @@ public final class JourneyActivity extends Activity {
   if(state==null)return;view("home","每天开口，逐步说自在");
   JSONObject level=levels.optJSONObject(state.level());line(level.optString("name")+" · 已练习完成 "+state.completed()+" / 48 单元");
   int due=state.due(System.currentTimeMillis()).size();
+  LinearLayout quick=card("马上开口 · 不用找视频或配置 API",
+      "点击语言，直接进入内置短句练习：听示范、慢速跟读、录音、回听。未安装对应系统语音包时仍能看句子和练习录音。");
+  button(quick,"粤语 · 立即跟读",()->openFastPractice("yue"),true);
+  button(quick,"日语 · 影视口语速练",()->openFastPractice("ja"),false);
+  button(quick,"英语 · 日常表达速练",()->openFastPractice("en"),false);
   LinearLayout c=card("今天的练习 · 约 20 分钟","先复习，再学新内容，最后脱稿交流。进度记录练习表现，不等于英语等级认证。");
   button(c,due>0?"先复习 · "+due+" 句待练":"开始今日课程",()->{if(due>0)reviewList();else openNext();},true);
   button(c,"我的学习路线",this::route,false);
@@ -70,7 +75,12 @@ public final class JourneyActivity extends Activity {
   button("场景交流 · AI 对话",()->{if(lesson==null)lesson=nextLesson();conversation();});
   button("纠音训练室",this::lab);button("间隔复习 · "+due+" 句",this::reviewList);
   button("进步与阶段挑战",this::progress);button("设置、模型与备份",this::settings);
+  button("影视精听 · 双语字幕 / 逐句复读",()->startActivity(new Intent(this,JourneyImmersionActivity.class)));
   button("原有工作室 · 阅读 / 听写 / 素材 / 多语言",()->startActivity(new Intent(this,StudioActivity.class)));
+ }
+ private void openFastPractice(String language){
+  startActivity(new Intent(this,JourneyImmersionActivity.class)
+      .putExtra("quickLanguage",language));
  }
  private JSONObject nextLesson(){for(int i=state.level()*8;i<(state.level()+1)*8;i++){JSONObject u=lessons.optJSONObject(i);if(!state.complete(u.optString("id")))return u;}return lessons.optJSONObject(state.level()*8);}
  private void openNext(){lesson=nextLesson();unit();}

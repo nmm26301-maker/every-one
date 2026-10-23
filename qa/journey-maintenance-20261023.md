@@ -17,4 +17,4 @@ Executed locally:
 - All Journey Java sources compiled against Android API and ONNX Runtime 1.22.0 with the existing compile-only legacy contracts.
 - The existing voice-recovery CI command set also passed locally: voice buffer, conversation boundary, microphone capture, speech deadlines/streaming, exact APK restoration and cloud job cancellation/commit tests.
 
-Not executed: new signed APK packaging, physical installation/upgrade, real Android provider cancellation, microphone/TTS interaction and on-device acoustic inference/performance. The existing 5.0.0 release predates this maintenance patch.
+Packaged subsequently as original-signed 5.0.16 using the full 5.0.15 release; see `release-5.0.16.json`. Physical installation/upgrade, real Android provider cancellation, microphone/TTS interaction and on-device acoustic inference/performance remain unexecuted.

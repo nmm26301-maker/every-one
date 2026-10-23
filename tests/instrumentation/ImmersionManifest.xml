@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.openenglish.reader.tests">
+  <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="33" />
+  <application android:label="Everyone integration validation" />
+  <instrumentation android:name=".ImmersionValidation" android:targetPackage="org.openenglish.reader" android:functionalTest="true" />
+</manifest>

@@ -1,0 +1,29 @@
+{
+  "base_sha256": "7039d0b41cd4b5bc5245bf25dc6011d4793365d9a61ced075ed31d629ef30d01",
+  "versionName": "5.0.16",
+  "versionCode": 75,
+  "preserved_classes": 1144,
+  "replaced_class_families": [
+    "JourneyActivity",
+    "JourneyPhoneEngine",
+    "JourneyState"
+  ],
+  "retained_zip_entries": 353,
+  "bundled_models_and_media_unchanged": true,
+  "physical_device_tested": false,
+  "apk_bytes": 428014525,
+  "apk_sha256": "1dd2a0bb0599707bdd352885f11b9405c5f02640f2fee23b0b30d53a8320b7b2",
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "original_signer_preserved": true,
+  "apk_signed": true,
+  "zip_alignment_16k_verified": true,
+  "exact_signed_restore_verified": true,
+  "runtime_method_contracts_verified": 781,
+  "host_checks": {
+    "journey": 56,
+    "phone_installation": 25,
+    "phone_compatibility": 31
+  },
+  "curriculum_units": 48,
+  "curriculum_utterances": 144
+}
