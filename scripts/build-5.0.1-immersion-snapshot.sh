@@ -25,7 +25,10 @@ for binary in "$tools/d8" "$tools/aapt2" "$tools/zipalign"; do
   [[ -x "$binary" ]] || { echo "missing $binary" >&2; exit 1; }
 done
 [[ -f "$android_jar" ]] || { echo "missing $android_jar" >&2; exit 1; }
-smali_cp="$(dpkg -L libsmali-java libguava-java libjcommander-java libantlr3-runtime-java | sed -n '/\.jar$/p' | paste -sd:)"
+smali_cp="${SMALI_CLASSPATH:-}"
+if [[ -z "$smali_cp" ]]; then
+  smali_cp="$(dpkg -L libsmali-java libguava-java libjcommander-java libantlr3-runtime-java | sed -n '/\.jar$/p' | paste -sd:)"
+fi
 [[ -n "$smali_cp" ]] || { echo "Install libsmali-java and its dependencies" >&2; exit 1; }
 dir="$(mktemp -d)"
 trap 'rm -rf "$dir"' EXIT
