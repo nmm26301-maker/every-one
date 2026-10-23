@@ -131,9 +131,113 @@ public final class ImmersionValidation extends Instrumentation {
     }
     public String getContentType() {return "application/json";}
     public InputStream getInputStream() {
-      String json="{\"choices\":[{\"message\":{\"content\":\""+answer+"\"}}]}";
+      String json=answer.startsWith("{")?answer:"{\"choices\":[{\"message\":{\"content\":\""+answer+"\"}}]}";
       return new ByteArrayInputStream(json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
+  }
+  private void captionConsent(boolean yes) throws Exception {
+    main(()->{
+      android.app.AlertDialog dialog=(android.app.AlertDialog)field("captionDialog");
+      dialog.getButton(yes?android.content.DialogInterface.BUTTON_POSITIVE:
+          android.content.DialogInterface.BUTTON_NEGATIVE).performClick();return null;
+    });
+  }
+  private String captionText() throws Exception {
+    return (String)main(()->((TextView)field("captionStatus")).getText().toString());
+  }
+  private void waitCaption(String text) throws Exception {
+    long until=SystemClock.elapsedRealtime()+12000;
+    while(SystemClock.elapsedRealtime()<until) {
+      if(main(()->field("captionJob"))==null && captionText().contains(text))return;
+      SystemClock.sleep(50);
+    }
+    throw new AssertionError("Caption state: "+captionText());
+  }
+  private void captionChecks(File video) throws Exception {
+    ClassLoader loader=getTargetContext().getClassLoader();
+    Class<?> jobType=loader.loadClass("org.openenglish.reader.CloudClient$Job");
+    Class<?> clipType=loader.loadClass("org.openenglish.reader.JourneyVideoClip");
+    Method extract=clipType.getMethod("extract",Context.class,Uri.class,int.class,int.class,File.class,jobType);
+    File clip=(File)extract.invoke(null,getTargetContext(),Uri.fromFile(video),3000,1000,
+        getTargetContext().getCacheDir(),jobType.getConstructor().newInstance());
+    byte[] wav=bytes(clip);clip.delete();
+    java.nio.ByteBuffer header=java.nio.ByteBuffer.wrap(wav).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+    int rate=header.getInt(24),channels=header.getShort(22),count=header.getInt(40)/2;
+    check(new String(wav,0,4,"UTF-8").equals("RIFF") && channels==1 && Math.abs(count-rate)<10,
+        "real MP4 audio becomes a bounded one-second mono PCM WAV");
+    int crossings=0;short previous=0;
+    for(int i=44;i+1<wav.length;i+=2) {short sample=header.getShort(i);if(previous<0 && sample>=0)crossings++;previous=sample;}
+    check(crossings>425 && crossings<455,"video audio seek trims to 440Hz region after two-second 220Hz lead-in");
+    File delayedClip=(File)extract.invoke(null,getTargetContext(),Uri.fromFile(fixture("delayed-audio.mp4")),
+        1000,2000,getTargetContext().getCacheDir(),jobType.getConstructor().newInstance());
+    byte[] delayedWav=bytes(delayedClip);delayedClip.delete();
+    java.nio.ByteBuffer delayedHeader=java.nio.ByteBuffer.wrap(delayedWav).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+    int delayedRate=delayedHeader.getInt(24);long quiet=0,loud=0;
+    for(int i=0;i<delayedRate/2;i++)quiet+=Math.abs((int)delayedHeader.getShort(44+i*2));
+    for(int i=delayedRate+delayedRate/4;i<delayedRate*7/4;i++)loud+=Math.abs((int)delayedHeader.getShort(44+i*2));
+    check(delayedHeader.getInt(40)/2==delayedRate*2 && quiet<delayedRate*5L && loud>delayedRate*500L,
+        "delayed video audio retains leading silence so generated timestamps stay aligned");
+    Object canceled=jobType.getConstructor().newInstance();jobType.getMethod("cancel").invoke(canceled);
+    try {extract.invoke(null,getTargetContext(),Uri.fromFile(video),0,1000,getTargetContext().getCacheDir(),canceled);
+      throw new AssertionError("Canceled extraction started");}
+    catch(InvocationTargetException e){check(e.getCause() instanceof java.util.concurrent.CancellationException,
+        "canceled extraction does not create an upload");}
+    try {extract.invoke(null,getTargetContext(),Uri.fromFile(fixture("no-audio.mp4")),0,1000,
+        getTargetContext().getCacheDir(),jobType.getConstructor().newInstance());throw new AssertionError("No audio accepted");}
+    catch(InvocationTargetException e){check(e.getCause() instanceof IOException,"video without audio fails before upload");}
+    java.util.concurrent.atomic.AtomicInteger requests=new java.util.concurrent.atomic.AtomicInteger();
+    AtomicReference<String> response=new AtomicReference<>("{\"segments\":[{\"start\":0.1,\"end\":0.5,\"text\":\"Draft caption\"}]}");
+    AtomicReference<ReplyConnection> last=new AtomicReference<>();
+    AtomicReference<java.util.concurrent.CountDownLatch> gate=new AtomicReference<>();
+    Class<?> factory=loader.loadClass("org.openenglish.reader.CloudClient$ConnectionFactory");
+    Object proxy=Proxy.newProxyInstance(loader,new Class<?>[]{factory},(p,m,args)->{
+      requests.incrementAndGet();ReplyConnection c=new ReplyConnection((java.net.URL)args[0],200,response.get(),gate.get());
+      last.set(c);return c;
+    });
+    Object service=loader.loadClass("org.openenglish.reader.JourneyCaptionService").getConstructor(factory).newInstance(proxy);
+    String oldLanguage=(String)main(()->field("language"));
+    main(()->{
+      Field f=activity.getClass().getDeclaredField("captionService");f.setAccessible(true);f.set(activity,service);
+      f=activity.getClass().getDeclaredField("captionLengthMs");f.setAccessible(true);f.setInt(activity,1000);
+      f=activity.getClass().getDeclaredField("language");f.setAccessible(true);f.set(activity,"yue");
+      activity.getSharedPreferences("speech",0).edit().clear().putString("base","https://example.invalid/v1")
+          .putString("model","fixture-asr").commit();return null;
+    });
+    int oldCount=(Integer)main(()->((List<?>)field("source")).size());
+    main(()->call("confirmCaptionClip"));
+    check(requests.get()==0,"video audio is not uploaded before range and service consent");
+    captionConsent(true);waitCaption("草稿");
+    check((Integer)main(()->((List<?>)field("source")).size())==oldCount,
+        "generated caption draft does not modify subtitles before preview approval");
+    String sent=last.get().sent.toString("UTF-8");
+    check(sent.contains("verbose_json") && sent.contains("timestamp_granularities[]") && sent.contains("RIFF")
+        && !sent.contains("name=\"language\"") && last.get().sent.size()<64000,
+        "caption protocol uploads only bounded WAV and does not force English for Cantonese");
+    captionConsent(false);
+    main(()->call("confirmCaptionClip"));captionConsent(true);waitCaption("草稿");captionConsent(true);
+    check((Integer)main(()->((List<?>)field("source")).size())>oldCount
+        && (Integer)main(()->((List<?>)field("translated")).size())==2,
+        "approved draft replaces selected interval while retaining outside captions and translation");
+    File cache=new File(getTargetContext().getFilesDir(),"immersion-source.txt");byte[] applied=bytes(cache);
+    check(new String(applied,"UTF-8").contains("Draft caption"),"approved generated subtitles persist atomically");
+    java.util.concurrent.CountDownLatch delayed=new java.util.concurrent.CountDownLatch(1);gate.set(delayed);
+    main(()->call("confirmCaptionClip"));captionConsent(true);
+    long until=SystemClock.elapsedRealtime()+8000;
+    while(requests.get()<3 && SystemClock.elapsedRealtime()<until)SystemClock.sleep(30);
+    main(()->call("stopCaptionWork"));delayed.countDown();SystemClock.sleep(300);waitForIdleSync();
+    check(main(()->field("captionJob"))==null && main(()->field("captionDialog"))==null
+        && Arrays.equals(applied,bytes(cache)),"canceling subtitle generation rejects late results and preserves source cache");
+    gate.set(null);response.set("{\"text\":\"No timestamp response\"}");
+    main(()->call("confirmCaptionClip"));captionConsent(true);waitCaption("未完成");
+    check(Arrays.equals(applied,bytes(cache)),"timestamp-free ASR response cannot replace existing subtitles");
+    main(()->call("exportSubtitles"));waitForIdleSync();SystemClock.sleep(500);
+    File exported=new File(getTargetContext().getFilesDir(),"captions-export.srt");deliver(69,Activity.RESULT_OK,exported);
+    check(Arrays.equals(applied,bytes(exported)),"exported SRT matches applied caption snapshot byte for byte");back();
+    main(()->call("exportSubtitles"));waitForIdleSync();SystemClock.sleep(500);deliver(69,Activity.RESULT_CANCELED,null);
+    check(Arrays.equals(applied,bytes(exported)),"canceling SRT export leaves previous file unchanged");back();
+    main(()->{Field f=activity.getClass().getDeclaredField("language");f.setAccessible(true);f.set(activity,oldLanguage);return null;});
+    File[] leftovers=getTargetContext().getCacheDir().listFiles((dir,name)->name.startsWith("everyone-caption-") && name.endsWith(".wav"));
+    check(leftovers!=null && leftovers.length==0,"success, error and canceled generation remove temporary audio clips");
   }
   private void lineChecks() throws Exception {
     java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();
@@ -277,6 +381,7 @@ public final class ImmersionValidation extends Instrumentation {
       main(() -> call("exportPractice"));waitForIdleSync();SystemClock.sleep(500);deliver(68,Activity.RESULT_CANCELED,null);
       check(Arrays.equals(original,bytes(exported)),"canceled export leaves previous file unchanged");
       back();
+      captionChecks(fixture("video.mp4"));
       main(() -> {
         SharedPreferences p=(SharedPreferences)field("prefs");
         p.edit().putStringSet("saved-phrases",new HashSet<>(Arrays.asList("keep bookmark"))).commit();

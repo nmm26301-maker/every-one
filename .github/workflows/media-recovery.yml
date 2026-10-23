@@ -1,7 +1,7 @@
 name: Android media recovery and export checks
 on:
   push:
-    branches: [release/everyone-5.0.13-media-20261022, release/everyone-5.0.14-analysis-20261023]
+    branches: [release/everyone-5.0.13-media-20261022, release/everyone-5.0.14-analysis-20261023, release/everyone-5.0.15-captions-20261023]
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
           jar="$ANDROID_HOME/platforms/android-35/android.jar"
           mkdir -p build/media/classes build/media/dex build/test/classes build/test/dex build/test/assets output
           sources=()
-          for name in Subtitles Cantonese QuickStart Jyutping CantoneseAsr PracticeAudio ToneAudio ToneContour ToneCompare TonePlotView SpeechGuide LineCoach ImmersionActivity; do
+          for name in Subtitles Cantonese QuickStart Jyutping CantoneseAsr PracticeAudio ToneAudio ToneContour ToneCompare TonePlotView SpeechGuide LineCoach CaptionDraft CaptionService VideoClip ImmersionActivity; do
             sources+=("app/src/main/java/org/openenglish/reader/Journey${name}.java")
           done
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/media/classes "${sources[@]}" tests/instrumentation/JourneyActivity.java tests/instrumentation/LocalAI.java app/src/main/java/org/openenglish/reader/{CloudClient,AiClient,KeyVault}.java

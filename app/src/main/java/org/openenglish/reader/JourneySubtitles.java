@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /** 本地 SRT/WebVTT 字幕解析器；不下载视频，不访问网络。 */
 public final class JourneySubtitles {
-  private static final Pattern TIME = Pattern.compile("(?:(\\d{1,2}):)?(\\d{1,2}):(\\d{2})[.,](\\d{1,3})");
+  private static final Pattern TIME = Pattern.compile("(?:(\\d{1,3}):)?(\\d{1,2}):(\\d{2})[.,](\\d{1,3})");
   private static final int MAX_CUES = 30000;
 
   /** 一个字幕区间（毫秒），不可变。 */

@@ -2,8 +2,9 @@ package org.openenglish.reader;
 import android.content.Context;import org.json.*;import java.io.File;
 /** Compile-only binary contracts. Never included in the APK. */
 public final class CloudClient {
+ public interface ConnectionFactory{java.net.HttpURLConnection open(java.net.URL url)throws Exception;}
  public interface Delta{void text(String complete);}
- public static class Job{public Job(){} public void cancel(){}public void check(){}}
+ public static class Job{public Job(){} public void cancel(){}public void check(){}void attach(java.net.HttpURLConnection connection){}}
  public CloudClient(){}
  public CloudClient(Context c){}
  public static String endpoint(String base,String path)throws Exception{return null;}

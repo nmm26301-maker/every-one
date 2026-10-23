@@ -56,6 +56,7 @@ public final class JourneyImmersionActivity extends Activity {
   private static final int RECORD_PERMISSION = 66;
   private static final int PICK_TONE_REFERENCE = 67;
   private static final int EXPORT_AUDIO = 68;
+  private static final int EXPORT_SRT = 69;
   private static final int INK = 0xff19263b;
   private static final int MUTED = 0xff5f6e83;
   private static final int ACCENT = 0xff5948cf;
@@ -80,6 +81,12 @@ public final class JourneyImmersionActivity extends Activity {
   private Runnable lineTimeout;
   private AlertDialog lineConfirm;
   private int lineGeneration;
+  private TextView captionStatus;
+  private JourneyCaptionService captionService = new JourneyCaptionService();
+  private CloudClient.Job captionJob;
+  private AlertDialog captionDialog;
+  private Runnable captionTimeout;
+  private int captionGeneration, captionLengthMs = 30000;
   private Button quickRecordButton, advancedToggleButton;
   private LinearLayout advancedArea;
   private boolean quickRecordRequested;
@@ -315,6 +322,20 @@ public final class JourneyImmersionActivity extends Activity {
     LinearLayout files2 = row(advancedArea);
     button("中文字幕", files2, () -> pick(PICK_TRANSLATION, "*/*"));
     button("导出 Anki", files2, this::exportBookmarks);
+    LinearLayout captions = row(advancedArea);
+    button("生成片段字幕", captions, this::confirmCaptionClip);
+    button("停止生成", captions, this::stopCaptionWork);
+    button("导出 SRT", captions, this::exportSubtitles);
+    LinearLayout captionSettings = row(advancedArea);
+    button("字幕服务设置", captionSettings, () -> configureService(true));
+    button("片段时长", captionSettings, () -> new AlertDialog.Builder(this).setTitle("从当前位置生成多长的字幕？")
+        .setItems(new String[]{"30 秒", "60 秒", "120 秒"}, (d,n) -> {
+          captionLengthMs = new int[]{30000,60000,120000}[n];
+          captionStatus.setText("已选 " + captionLengthMs/1000 + " 秒。生成前将确认范围和服务。");
+        }).setNegativeButton("取消", null).show());
+    captionStatus = label("可用自己的语音转写服务生成当前位置的字幕草稿；预览确认后应用。"
+        + "服务需支持带分段时间轴的转写，粤语识别能力由模型决定。", 12, MUTED);
+    advancedArea.addView(captionStatus);
 
     TextView segment = label("当前台词", 13, ACCENT);
     segment.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
@@ -504,6 +525,21 @@ public final class JourneyImmersionActivity extends Activity {
 
   @Override protected void onActivityResult(int request, int result, Intent data) {
     super.onActivityResult(request, result, data);
+    if (request == EXPORT_SRT) {
+      File pending = new File(getCacheDir(), "everyone-caption-export.srt");
+      try {
+        if (result == RESULT_OK && data != null && data.getData() != null) {
+          try (InputStream in = new FileInputStream(pending);
+               OutputStream out = getContentResolver().openOutputStream(data.getData(), "w")) {
+            if (out == null) throw new IOException("目标文件不可写");
+            copyAudio(in, out);
+          }
+          captionStatus.setText("SRT 已保存到所选位置。");
+        }
+      } catch (Exception e) { toast("字幕保存失败，请重新导出"); }
+      finally { pending.delete(); }
+      return;
+    }
     if (request == EXPORT_AUDIO) {
       File pending = new File(getCacheDir(), "everyone-export.m4a");
       try {
@@ -536,6 +572,7 @@ public final class JourneyImmersionActivity extends Activity {
       // SAF 文件本次仍可读取；某些文件提供方不支持持久权限。
     }
     if (request == PICK_VIDEO) {
+      stopCaptionWork();
       prefs.edit().putString("videoUri", uri.toString()).putInt("videoPosition", 0).apply();
       activeIndex = -1;
       pausedAt = -1;
@@ -550,6 +587,7 @@ public final class JourneyImmersionActivity extends Activity {
       if (parsed.isEmpty()) throw new IllegalArgumentException("未找到有效字幕时间轴，请使用 SRT/VTT 文件");
       cacheSubtitle(request == PICK_SOURCE ? "source" : "translation", contents);
       if (request == PICK_SOURCE) {
+        stopCaptionWork();
         source.clear();
         source.addAll(parsed);
         activeIndex = -1;
@@ -1103,6 +1141,7 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   private void clearMedia() {
+    stopCaptionWork();
     player.stopPlayback();
     player.setOnPreparedListener(null);
     player.setVideoURI(null);
@@ -1332,6 +1371,7 @@ public final class JourneyImmersionActivity extends Activity {
   private void selectLanguage(String target) {
     if (toneBusy || yueAsrBusy) { toast("请等待当前分析完成再切换语言"); return; }
     clearQuickTake();
+    stopCaptionWork();
     language = JourneyQuickStart.normalizeLanguage(target);
     quickIndex = Math.max(0, prefs.getInt("quickIndex_" + language, 0))
         % JourneyQuickStart.size(language);
@@ -1470,12 +1510,129 @@ public final class JourneyImmersionActivity extends Activity {
     return "逐句精听：观察省略、语气和说话人关系；暂不提供自动逐词解析。";
   }
 
+  private void confirmCaptionClip() {
+    if (captionJob != null) { toast("正在生成字幕，可先停止"); return; }
+    if (videoUri == null || !videoReady || player.getDuration() <= 0) { toast("请先选择可播放的视频"); return; }
+    if (practice.isRecording()) { toast("请先停止跟读录音"); return; }
+    if (subtitleOffsetMs != 0) { toast("自动字幕使用视频时间轴，请先点「同步重置」"); return; }
+    try {
+      SharedPreferences service = getSharedPreferences("speech", 0);
+      String base = service.getString("base", "").trim(), model = service.getString("model", "").trim();
+      if (base.isEmpty() || model.isEmpty()) { configureService(true); return; }
+      CloudClient.endpoint(base, "audio/transcriptions");
+      String key = KeyVault.read(this, "speech");
+      int start = Math.max(0, player.getCurrentPosition());
+      int length = Math.min(captionLengthMs, player.getDuration() - start);
+      if (length < 100) { toast("请定位到视频结束前再生成字幕"); return; }
+      Uri selected = videoUri;
+      player.pause(); practice.stopPlayback();
+      if (speechGuide != null) speechGuide.stop();
+      captionDialog = new AlertDialog.Builder(this).setTitle("发送该片段音轨生成字幕？")
+          .setMessage(JourneyCaptionDraft.time(start) + " → " + JourneyCaptionDraft.time(start + length)
+              + "\n服务：" + base + "\n模型：" + model
+              + "\n仅提取并发送这段音轨，不发送视频。服务须支持分段时间轴；粤语由所选模型自动检测，"
+              + "不强制按英语识别。生成后先预览，确认应用才替换该区间字幕。")
+          .setPositiveButton("发送音轨并生成", (d,n) -> runCaptionClip(selected,start,length,base,model,key,language))
+          .setNegativeButton("取消", null).create();
+      captionDialog.show();
+    } catch (Exception e) { captionStatus.setText("无法准备生成，请检查视频和语音服务配置。"); }
+  }
+
+  private void runCaptionClip(Uri selected,int start,int length,String base,String model,String key,String lang) {
+    stopCaptionWork();
+    final int generation = captionGeneration;
+    final CloudClient.Job job = new CloudClient.Job();
+    captionJob = job;
+    captionStatus.setText("正在提取所选音轨并生成字幕草稿……离开页面或更换素材会取消。");
+    captionTimeout = () -> {
+      if (captionJob == job) { stopCaptionWork(); captionStatus.setText("生成超时，已停止，原字幕保留。"); }
+    };
+    handler.postDelayed(captionTimeout, 180000);
+    new Thread(() -> {
+      File audio = null;
+      try {
+        audio = JourneyVideoClip.extract(this,selected,start,length,getCacheDir(),job);
+        JourneyCaptionDraft draft = captionService.transcribe(base,model,key,lang,audio,start,length,job);
+        job.check();
+        handler.post(() -> {
+          if (captionGeneration != generation || captionJob != job || isDestroyed()) return;
+          captionJob = null; clearCaptionTimeout();
+          String preview = JourneyCaptionDraft.srt(draft.cues);
+          if (preview.length() > 6000) preview = preview.substring(0,6000) + "\n（预览截断，应用包含全部分段）";
+          captionStatus.setText("已生成 " + draft.cues.size() + " 条草稿，确认后才应用。");
+          captionDialog = new AlertDialog.Builder(this).setTitle("预览字幕草稿 · " + draft.cues.size() + " 条")
+              .setMessage("应用后替换 " + JourneyCaptionDraft.time(draft.startMs) + " → "
+                  + JourneyCaptionDraft.time(draft.endMs) + " 区间；保留区间外字幕和中文字幕。\n\n" + preview)
+              .setPositiveButton("应用这段字幕", (d,n) -> {
+                if (captionGeneration == generation) applyCaptionDraft(draft);
+              }).setNegativeButton("放弃草稿", null).create();
+          captionDialog.show();
+        });
+      } catch (Exception e) {
+        handler.post(() -> {
+          if (captionGeneration != generation || captionJob != job || isDestroyed()) return;
+          captionJob = null; clearCaptionTimeout();
+          captionStatus.setText("生成未完成，原字幕保留。请检查音轨、网络及模型的分段时间轴支持后重试。");
+        });
+      } finally { if (audio != null) audio.delete(); }
+    }, "everyone-video-captions").start();
+  }
+
+  private void applyCaptionDraft(JourneyCaptionDraft draft) {
+    try {
+      List<JourneySubtitles.Cue> merged = draft.merge(source);
+      String text = JourneyCaptionDraft.srt(merged);
+      List<JourneySubtitles.Cue> parsed = JourneySubtitles.parse(text);
+      if (parsed.size() != merged.size()) throw new IOException("字幕草稿无法完整解析");
+      cacheSubtitle("source", text);
+      stopCaptionWork();
+      source.clear(); source.addAll(parsed); activeIndex = -1; pausedAt = -1;
+      showCue(JourneySubtitles.at(source, draft.startMs)); renderTranscript(Math.max(0,activeIndex));
+      captionStatus.setText("已应用该片段的 " + draft.cues.size() + " 条字幕，可精听、解析或导出 SRT。");
+    } catch (Exception e) { captionStatus.setText("应用失败，原字幕保留，请重试。"); }
+  }
+
+  private void clearCaptionTimeout() {
+    if (captionTimeout != null) { handler.removeCallbacks(captionTimeout); captionTimeout = null; }
+  }
+
+  private void stopCaptionWork() {
+    captionGeneration++; clearCaptionTimeout();
+    if (captionJob != null) { captionJob.cancel(); captionJob = null; }
+    if (captionDialog != null) { captionDialog.dismiss(); captionDialog = null; }
+    if (captionStatus != null) captionStatus.setText("已停止生成，已应用的字幕保留。");
+  }
+
+  private void exportSubtitles() {
+    if (source.isEmpty()) { toast("请先导入或生成原文字幕"); return; }
+    AtomicFile snapshot = new AtomicFile(new File(getCacheDir(), "everyone-caption-export.srt"));
+    FileOutputStream out = null;
+    try {
+      byte[] text = JourneyCaptionDraft.srt(JourneyCaptionDraft.shift(source,subtitleOffsetMs))
+          .getBytes(StandardCharsets.UTF_8);
+      if (text.length > 10*1024*1024) throw new IOException("字幕过大");
+      out = snapshot.startWrite(); out.write(text); snapshot.finishWrite(out); out = null;
+      startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+          .setType("application/x-subrip").putExtra(Intent.EXTRA_TITLE,"Everyone-captions.srt"),EXPORT_SRT);
+    } catch (Exception e) {
+      if (out != null) snapshot.failWrite(out);
+      snapshot.delete(); toast("无法导出字幕，请检查可用空间和文件选择器");
+    }
+  }
+
   private void configureLineService() {
-    SharedPreferences connection = getSharedPreferences("connection", 0);
+    configureService(false);
+  }
+
+  private void configureService(boolean captions) {
+    String namespace = captions ? "speech" : "connection";
+    if (captions) stopCaptionWork();
+    SharedPreferences connection = getSharedPreferences(namespace, 0);
     LinearLayout fields = new LinearLayout(this);
     fields.setOrientation(1);
     fields.setPadding(dp(18), dp(6), dp(18), dp(6));
-    fields.addView(label("与英语课程共用 AI 服务；保存后需再次点击解析，不会自动发送。", 13, MUTED));
+    fields.addView(label(captions ? "复用已有语音转写服务；模型需支持分段时间轴。保存不会发送音频。"
+        : "与英语课程共用 AI 服务；保存后需再次点击解析，不会自动发送。", 13, MUTED));
     EditText base = new EditText(this);
     base.setHint("HTTPS API 基础地址，例如 https://服务地址/v1");
     base.setText(connection.getString("base", ""));
@@ -1490,21 +1647,22 @@ public final class JourneyImmersionActivity extends Activity {
     secret.setHint("API 密钥，留空保留原密钥");
     secret.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     fields.addView(secret);
-    AlertDialog dialog = new AlertDialog.Builder(this).setTitle("台词解析 AI 服务")
+    AlertDialog dialog = new AlertDialog.Builder(this).setTitle(captions ? "自动字幕转写服务" : "台词解析 AI 服务")
         .setView(fields).setPositiveButton("保存", null).setNegativeButton("取消", null).create();
     dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
       try {
         String url = base.getText().toString().trim();
         String name = model.getText().toString().trim();
-        CloudClient.endpoint(url, "chat/completions");
-        if (name.isEmpty() || name.length() > 200) throw new IOException("请填写有效模型名称");
+        CloudClient.endpoint(url, captions ? "audio/transcriptions" : "chat/completions");
+        if (name.isEmpty() || name.length() > 200 || name.contains("\r") || name.contains("\n"))
+          throw new IOException("请填写有效模型名称");
         String token = secret.getText().toString().trim();
-        if (!token.isEmpty()) KeyVault.save(this, "connection", token);
+        if (!token.isEmpty()) KeyVault.save(this, namespace, token);
         stopLineAnalysis();
         connection.edit().putString("base", url).putString("model", name).apply();
         secret.setText("");
         refreshLineAnalysis();
-        toast("已保存，点击 AI 台词解析开始");
+        toast(captions ? "已保存，点击生成片段字幕开始" : "已保存，点击 AI 台词解析开始");
         dialog.dismiss();
       } catch (Exception e) { toast("保存失败，请检查 HTTPS 地址、模型名称和密钥存储"); }
     }));
@@ -1646,6 +1804,7 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   @Override protected void onStop() {
+    stopCaptionWork();
     stopLineAnalysis();
     foreground = false;
     handler.removeCallbacks(progress);
@@ -1674,6 +1833,7 @@ public final class JourneyImmersionActivity extends Activity {
   }
 
   @Override protected void onDestroy() {
+    stopCaptionWork();
     stopLineAnalysis();
     handler.removeCallbacks(progress);
     if (player != null) player.stopPlayback();
