@@ -63,6 +63,15 @@ public final class JourneyToneContour {
       return invalid("采样率不受支持", new double[0]);
     if (samples.length > sampleRate * 3L)
       return invalid("录音超过 3 秒。请只读一个音节，录 0.5–1 秒即可", new double[0]);
+    int clipped = 0;
+    for (short value : samples) if (Math.abs((int) value) >= 32276) clipped++;
+    if (clipped > samples.length * .08)
+      return invalid("录音爆音较多，请离麦克风稍远一些再录", new double[0]);
+    // 与项目现有 YIN 纠音路径保持一致；高采样率先做区间平均，限制计算量。
+    if (sampleRate > 16000) {
+      samples = downsample(samples, sampleRate);
+      sampleRate = 16000;
+    }
     int frame = sampleRate * FRAME_MS / 1000;
     int hop = sampleRate * HOP_MS / 1000;
     if (samples.length < sampleRate / 4 || hop <= 0)
@@ -151,18 +160,44 @@ public final class JourneyToneContour {
       diff[lag] = squared;
     }
     double cumulative = 0;
-    int best = -1;
-    double bestScore = 0.18;
     for (int lag = 1; lag <= maxLag; lag++) {
       cumulative += diff[lag];
-      if (lag < minLag || cumulative <= 0) continue;
-      double normalized = diff[lag] * lag / cumulative;
-      if (normalized < bestScore) {
-        best = lag;
-        bestScore = normalized;
-        if (normalized < 0.09) break;
-      }
+      diff[lag] = cumulative <= 0 ? 1 : diff[lag] * lag / cumulative;
     }
-    return best < 0 ? -1 : (double) rate / best;
+    // 首次越过阈值后寻找同一谷底，不能把阈值交点直接当作周期。
+    int best = -1;
+    for (int lag = minLag; lag < maxLag; lag++) {
+      if (diff[lag] >= .18) continue;
+      while (lag + 1 <= maxLag && diff[lag + 1] < diff[lag]) lag++;
+      best = lag;
+      break;
+    }
+    if (best < 0) return -1;
+    double period = best;
+    if (best > 1 && best < maxLag) {
+      double left = diff[best - 1], middle = diff[best], right = diff[best + 1];
+      double denominator = left - 2 * middle + right;
+      if (Math.abs(denominator) > 1e-12)
+        period += Math.max(-.5, Math.min(.5, .5 * (left - right) / denominator));
+    }
+    double hz = rate / period;
+    // 周期插值在检测边界允许 1% 的离散采样误差。
+    return hz >= 75 * .99 && hz <= 480 * 1.01 ? hz : -1;
+  }
+
+  /** 以输入采样区间的加权平均降至 16kHz，保留录音时长和实际采样率。 */
+  private static short[] downsample(short[] input, int rate) {
+    short[] output = new short[(int) (input.length * 16000L / rate)];
+    double scale = rate / 16000.0;
+    for (int i = 0; i < output.length; i++) {
+      double start = i * scale, end = Math.min(input.length, (i + 1) * scale);
+      double sum = 0;
+      for (int j = (int) start; j < end; j++) {
+        double weight = Math.min(j + 1, end) - Math.max(j, start);
+        sum += input[j] * weight;
+      }
+      output[i] = (short) Math.round(sum / (end - start));
+    }
+    return output;
   }
 }

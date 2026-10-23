@@ -60,7 +60,42 @@ public final class JourneyToneCompare {
         + "模型不检测声母、韵母、嗓音品质或所有六个粤语声调，结果不能用作准确率评分。";
     return new Result(true,
         "参考：" + r.trend + "；你的跟读：" + a.trend + "。\n"
-            + comparison + " " + details + next + disclaimer, rms, r, a);
+            + comparison + " " + details + next + localAdvice(rTrack, aTrack, rms)
+            + durationAdvice(r.pitchHz, a.pitchHz) + disclaimer, rms, r, a);
+  }
+
+  private static String localAdvice(double[] reference, double[] attempt, double rms) {
+    if (rms < 1.5) return "";
+    int region = 0;
+    double largest = 0;
+    for (int part = 0; part < 4; part++) {
+      double difference = 0;
+      for (int i = part * 6; i < (part + 1) * 6; i++)
+        difference += attempt[i] - reference[i];
+      difference /= 6;
+      if (Math.abs(difference) > Math.abs(largest)) {
+        largest = difference;
+        region = part;
+      }
+    }
+    if (Math.abs(largest) < 1.5) return "";
+    return "\n分段对照：" + new String[]{"开头", "前半段", "后半段", "结尾"}[region]
+        + (largest > 0 ? "相对参考偏高，可轻轻放低这一段。" : "相对参考偏低，可轻轻抬高这一段。")
+        + "这是归一化曲线的位置差异，请同时回听两段声音。";
+  }
+
+  private static String durationAdvice(double[] reference, double[] attempt) {
+    double ratio = voicedSpan(attempt) / voicedSpan(reference);
+    if (ratio < .65) return "\n跟读有声段明显较短，检查是否过早收音，再完整模仿一次。";
+    if (ratio > 1.55) return "\n跟读有声段明显较长，听清示范的收音位置，避免拖长。";
+    return "\n两段有声段时长接近。";
+  }
+
+  private static double voicedSpan(double[] pitches) {
+    int first = 0, last = pitches.length - 1;
+    while (first < pitches.length && pitches[first] <= 0) first++;
+    while (last >= first && pitches[last] <= 0) last--;
+    return (last - first) * .02 + .045;
   }
 
   /** 把有效有声帧按音节相对时间插值到 24 个点，单位为相对半音。 */

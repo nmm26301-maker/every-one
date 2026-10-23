@@ -85,6 +85,17 @@ public final class ImmersionValidation extends Instrumentation {
   @Override public void onStart() {
     Bundle result=new Bundle();
     try {
+      File stereo = fixture("right-channel.m4a");
+      Class<?> decoder = getTargetContext().getClassLoader().loadClass("org.openenglish.reader.JourneyToneAudio");
+      Object samples = decoder.getMethod("decode",File.class).invoke(null,stereo);
+      short[] pcm = (short[]) samples.getClass().getField("monoPcm").get(samples);
+      int rate = samples.getClass().getField("sampleRate").getInt(samples);
+      Class<?> contour = getTargetContext().getClassLoader().loadClass("org.openenglish.reader.JourneyToneContour");
+      Object measured = contour.getMethod("analyze",short[].class,int.class).invoke(null,pcm,rate);
+      check(measured.getClass().getField("valid").getBoolean(measured),
+          "AAC stereo reference uses audible right channel when left is silent");
+      double hz = measured.getClass().getField("medianHz").getDouble(measured);
+      check(Math.abs(hz - 170) < 3,"decoded AAC reference retains pitch precision");
       open();
       main(() -> { if (((View)field("advancedArea")).getVisibility()!=View.VISIBLE)call("toggleAdvanced");return null; });
       deliver(62,Activity.RESULT_OK,fixture("source.srt"));

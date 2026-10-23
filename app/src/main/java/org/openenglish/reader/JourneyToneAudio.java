@@ -137,8 +137,14 @@ public final class JourneyToneAudio {
     if (mono.size() + size / channels > maxBytes)
       throw new IOException("声调分析只接受 3 秒内的单音节录音，请缩短录制时间");
     for (int i = offset; i < offset + size; i += frameBytes) {
-      mono.write(buf.get(i) & 255);
-      mono.write(buf.get(i + 1) & 255);
+      int sum = 0;
+      for (int channel = 0; channel < channels; channel++) {
+        int at = i + channel * 2;
+        sum += (short) ((buf.get(at) & 255) | (buf.get(at + 1) << 8));
+      }
+      int value = sum / channels;
+      mono.write(value & 255);
+      mono.write((value >> 8) & 255);
     }
   }
 }

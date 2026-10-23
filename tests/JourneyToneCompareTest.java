@@ -39,6 +39,20 @@ public final class JourneyToneCompareTest {
         sine(rate, 4000, 140, 200), rate, sine(rate, 700, 140, 200), rate);
     yes(!overlong.comparable && overlong.feedback.contains("超过 3 秒"),
         "overlong reference rejected");
+    yes(opposite.feedback.contains("分段对照："), "different contours identify practice region");
+    JourneyToneCompare.Result longTake = JourneyToneCompare.compare(
+        sine(rate, 500, 170, 170), rate, sine(rate, 1100, 170, 170), rate);
+    yes(longTake.comparable && longTake.feedback.contains("明显较长"), "overlong voicing feedback");
+    JourneyToneCompare.Result shortTake = JourneyToneCompare.compare(
+        sine(rate, 1100, 170, 170), rate, sine(rate, 500, 170, 170), rate);
+    yes(shortTake.comparable && shortTake.feedback.contains("明显较短"), "early cutoff feedback");
+    short[] padded = new short[rate * 2];
+    short[] voice = sine(rate, 500, 170, 170);
+    System.arraycopy(voice, 0, padded, rate, voice.length);
+    JourneyToneCompare.Result silencePadding = JourneyToneCompare.compare(
+        voice, rate, padded, rate);
+    yes(silencePadding.comparable && silencePadding.feedback.contains("时长接近"),
+        "leading and trailing silence do not distort duration feedback");
     System.out.println("JourneyToneCompare: OK");
   }
 }

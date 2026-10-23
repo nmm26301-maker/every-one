@@ -43,6 +43,29 @@ public final class JourneyToneContourTest {
     yes(up.pitchHz.length > 20 && up.pitchHz.length < 60, "fixed-time Hz curve");
     yes(up.medianHz > 100 && up.medianHz < 260, "Hz curve scale");
     yes(up.feedback(2).contains("平调 1、3、6"), "flat tone ambiguity is explicit");
+    for (int sampleRate : new int[]{8000, 16000, 44100, 48000, 96000}) {
+      for (double hz : new double[]{75, 80, 125, 220, 420, 480}) {
+        JourneyToneContour.Result measured = JourneyToneContour.analyze(
+            generated(sampleRate, hz, hz), sampleRate);
+        double error = 12 * Math.abs(Math.log(measured.medianHz / hz) / Math.log(2));
+        yes(measured.valid && error < .25, "pitch precision at " + sampleRate + "/" + hz
+            + ": " + measured.medianHz + " Hz, error " + error + " semitones");
+      }
+    }
+    short[] harmonic = generated(rate, 145, 145);
+    for (int i = 0; i < harmonic.length; i++)
+      harmonic[i] = (short) (harmonic[i] + 3000 * Math.sin(2 * Math.PI * 290 * i / rate) + 4000);
+    JourneyToneContour.Result voiced = JourneyToneContour.analyze(harmonic, rate);
+    yes(voiced.valid && Math.abs(voiced.medianHz - 145) < 2, "harmonics and DC offset retain fundamental");
+    short[] clipped = generated(rate, 170, 170);
+    for (int i = 0; i < clipped.length; i++)
+      clipped[i] = (short) Math.max(-32768, Math.min(32767, clipped[i] * 5));
+    JourneyToneContour.Result overloaded = JourneyToneContour.analyze(clipped, rate);
+    yes(!overloaded.valid && overloaded.reason.contains("爆音"), "clipped recording needs retake");
+    java.util.Random random = new java.util.Random(7);
+    short[] noise = new short[rate];
+    for (int i = 0; i < noise.length; i++) noise[i] = (short) (random.nextInt(20000) - 10000);
+    yes(!JourneyToneContour.analyze(noise, rate).valid, "noise cannot become pronunciation advice");
     System.out.println("JourneyToneContour: OK");
   }
 }

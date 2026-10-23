@@ -40,8 +40,7 @@ jobs:
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/test/classes tests/instrumentation/ImmersionValidation.java
           mapfile -t classes < <(find build/test/classes -name '*.class')
           "$tools/d8" --min-api 23 --lib "$jar" --output build/test/dex "${classes[@]}"
-          cp tests/media/* build/test/assets/
-          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=navy:s=320x180:r=15 -f lavfi -i sine=frequency=440:sample_rate=16000 -t 20 -c:v libx264 -pix_fmt yuv420p -c:a aac -movflags +faststart build/test/assets/video.mp4
+          bash tests/create-media-fixtures.sh build/test/assets
           "$tools/aapt2" link -o build/test/unsigned.apk -I "$jar" --manifest tests/instrumentation/ImmersionManifest.xml -A build/test/assets
           (cd build/test/dex && zip -q ../unsigned.apk classes.dex)
           keytool -genkeypair -keystore build/test.jks -storepass android -keypass android -alias test -dname CN=DisposableModuleTest -keyalg RSA -validity 2
