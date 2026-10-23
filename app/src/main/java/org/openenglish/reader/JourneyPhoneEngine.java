@@ -24,12 +24,15 @@ public final class JourneyPhoneEngine {
   }
   // Provider close/disconnect and native termination must never block the UI thread.
   private static void release(OrtSession.RunOptions r,HttpURLConnection h,InputStream in){
-   if(r==null&&h==null&&in==null)return;
-   Thread cleanup=new Thread(()->{
-    if(r!=null)try{r.setTerminate(true);}catch(Exception ignored){}
-    if(h!=null)try{h.disconnect();}catch(Exception ignored){}
-    if(in!=null)try{in.close();}catch(Exception ignored){}
-   },"journey-phone-cancel");cleanup.setDaemon(true);cleanup.start();
+   // Close the stream independently: disconnect can itself wait for a pending read.
+   if(in!=null)cleanup(in::close);
+   if(h!=null)cleanup(h::disconnect);
+   if(r!=null)cleanup(()->r.setTerminate(true));
+  }
+  private interface Cleanup{void run()throws Exception;}
+  private static void cleanup(Cleanup action){
+   Thread worker=new Thread(()->{try{action.run();}catch(Exception ignored){}},"journey-phone-cleanup");
+   worker.setDaemon(true);worker.start();
   }
   public void check(){if(cancelled||Thread.currentThread().isInterrupted())throw new CancellationException("已停止开源纠音");}
   synchronized void attach(OrtSession.RunOptions r){check();run=r;}
@@ -45,19 +48,22 @@ public final class JourneyPhoneEngine {
  private static String digest(File file,Control c)throws Exception{MessageDigest d=MessageDigest.getInstance("SHA-256");try(InputStream in=new BufferedInputStream(new FileInputStream(file))){byte[] b=new byte[131072];int n;while((n=in.read(b))!=-1){c.check();d.update(b,0,n);}}return hex(d.digest());}
  /** Only fixed package metadata may choose the URL or checksum. No remote manifest execution. */
  public static void download(Context ctx,Control c,Progress progress)throws Exception{
-  supported();if(!RUNNING.compareAndSet(false,true))throw new IOException("上一次纠音任务正在释放，请稍后重试");
-  File target=modelFile(ctx),partial=new File(target.getPath()+".part");HttpURLConnection connection=null;
-  try{JSONObject meta=asset(ctx,"phone-model.json");long size=meta.getLong("bytes");if(target.getParentFile().getUsableSpace()<size+64*1024*1024)throw new IOException("空间不足，请至少腾出模型大小加 64 MB 的空间");
+  supported();c.check();if(!RUNNING.compareAndSet(false,true))throw new IOException("上一次纠音任务正在释放，请稍后重试");
+  File partial=null;HttpURLConnection connection=null;
+  try{File target=modelFile(ctx);partial=new File(target.getPath()+".part");JSONObject meta=asset(ctx,"phone-model.json");long size=meta.getLong("bytes");if(target.getParentFile().getUsableSpace()<size+64*1024*1024)throw new IOException("空间不足，请至少腾出模型大小加 64 MB 的空间");
    URL url=new URL(meta.getString("url"));
    for(int redirects=0;;redirects++){
     if(!url.getProtocol().equals("https"))throw new IOException("模型地址必须使用 HTTPS");
     c.check();connection=(HttpURLConnection)url.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(20000);connection.setReadTimeout(20000);c.attach(connection);int code=connection.getResponseCode();
-    if(code>=300&&code<400){if(redirects>=5)throw new IOException("模型下载重定向过多");String next=connection.getHeaderField("Location");if(next==null)throw new IOException("模型下载地址无效");url=new URL(url,next);connection.disconnect();continue;}
+    if(code>=300&&code<400){if(redirects>=5)throw new IOException("模型下载重定向过多");String next=connection.getHeaderField("Location");if(next==null)throw new IOException("模型下载地址无效");url=new URL(url,next);Control.release(null,connection,null);connection=null;continue;}
     if(code!=200)throw new IOException("模型下载失败（"+code+"），可稍后重试或从文件导入");break;
    }
    try(InputStream in=connection.getInputStream()){c.attach(in);copyChecked(in,partial,meta,c,progress);}
    c.check();if(!partial.renameTo(target))throw new IOException("模型安装失败，请检查存储空间");
-  }finally{if(connection!=null)connection.disconnect();c.clear();partial.delete();RUNNING.set(false);}
+  }finally{
+   // Network cleanup must neither reject a verified model nor retain the task lock.
+   try{Control.release(null,connection,null);}finally{c.clear();try{if(partial!=null)partial.delete();}finally{RUNNING.set(false);}}
+  }
  }
  public static void importModel(Context ctx,InputStream input,Control c,Progress progress)throws Exception{
   try(InputStream in=input){
@@ -69,8 +75,8 @@ public final class JourneyPhoneEngine {
  }
  private static void copyChecked(InputStream in,File partial,JSONObject meta,Control c,Progress progress)throws Exception{
   long total=meta.getLong("bytes"),count=0,last=0;MessageDigest hash=MessageDigest.getInstance("SHA-256");
-  try(OutputStream out=new BufferedOutputStream(new FileOutputStream(partial))){byte[] b=new byte[131072];int n;while((n=in.read(b))!=-1){c.check();count+=n;if(count>total)throw new IOException("模型大小不匹配，已停止安装");hash.update(b,0,n);out.write(b,0,n);if(count-last>1048576){progress.update(count,total);last=count;}}}
-  if(count!=total||!hex(hash.digest()).equals(meta.getString("sha256")))throw new IOException("模型校验不通过，未安装此文件；请重新下载");progress.update(total,total);
+  try(OutputStream out=new BufferedOutputStream(new FileOutputStream(partial))){byte[] b=new byte[131072];while(true){c.check();int n=in.read(b);c.check();if(n==-1)break;count+=n;if(count>total)throw new IOException("模型大小不匹配，已停止安装");hash.update(b,0,n);out.write(b,0,n);if(count-last>1048576){progress.update(count,total);last=count;}}}
+  c.check();if(count!=total||!hex(hash.digest()).equals(meta.getString("sha256")))throw new IOException("模型校验不通过，未安装此文件；请重新下载");progress.update(total,total);
  }
  public static JSONObject assess(Context c,float[] pcm,String text,Control control)throws Exception{
   supported();if(!RUNNING.compareAndSet(false,true))throw new IOException("上一次纠音任务正在释放，请稍后重试");

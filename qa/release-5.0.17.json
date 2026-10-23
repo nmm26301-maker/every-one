@@ -1,0 +1,28 @@
+{
+  "base_sha256": "1dd2a0bb0599707bdd352885f11b9405c5f02640f2fee23b0b30d53a8320b7b2",
+  "versionName": "5.0.17",
+  "versionCode": 76,
+  "preserved_classes": 1144,
+  "replaced_class_families": [
+    "JourneyActivity",
+    "JourneyPhoneEngine",
+    "JourneyState"
+  ],
+  "retained_zip_entries": 353,
+  "bundled_models_and_media_unchanged": true,
+  "physical_device_tested": false,
+  "apk_signed": true,
+  "apk_sha256": "3da2ca02b303a1448b27bfc538b0c3b071e1c9045c9e44a8f7164c6253c7b60a",
+  "apk_bytes": 428014525,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "original_signer_preserved": true,
+  "zip_alignment_16k_verified": true,
+  "runtime_method_contracts_verified": 798,
+  "host_checks": {
+    "download_recovery": 24,
+    "import_and_cancellation": 25,
+    "journey": 56,
+    "phone_compatibility": 31
+  },
+  "source_base": "8a75814d46de088bfe753a550f7c3b16dd3672af"
+}

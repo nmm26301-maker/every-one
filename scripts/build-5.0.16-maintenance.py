@@ -2,6 +2,9 @@
 import argparse, glob, hashlib, json, pathlib, re, subprocess, zipfile
 
 BASE_SHA = '7039d0b41cd4b5bc5245bf25dc6011d4793365d9a61ced075ed31d629ef30d01'
+VERSION_NAME = '5.0.16'
+VERSION_CODE = 75
+BUILD_DIR = 'maintenance516'
 ROOTS = ('JourneyActivity', 'JourneyPhoneEngine', 'JourneyState')
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
@@ -20,7 +23,7 @@ def main():
     p = argparse.ArgumentParser(__doc__)
     for flag in ('base', 'output', 'tools', 'android-jar', 'onnx-jar', 'dex-classpath'):
         p.add_argument('--' + flag, required=True)
-    p.add_argument('--build-dir', default=str(ROOT / 'build/maintenance516'))
+    p.add_argument('--build-dir', default=str(ROOT / 'build' / BUILD_DIR))
     a = p.parse_args()
     a.dex_classpath = ':'.join(str(pathlib.Path(p).resolve()) for pattern in a.dex_classpath.split(':')
                               for p in (sorted(glob.glob(pattern)) if '*' in pattern else [pattern])
@@ -86,8 +89,8 @@ def main():
         assert all(old.read(n) == new.read(n) for n in retained), 'Bundled content changed'
         assert set(new.namelist()) == {n for n in old.namelist() if not n.startswith('META-INF/')}, 'Unexpected ZIP entry'
     badging = run(tools / 'aapt2', 'dump', 'badging', output, capture=True)
-    assert "name='org.openenglish.reader' versionCode='75' versionName='5.0.16'" in badging
-    report = dict(base_sha256=BASE_SHA, versionName='5.0.16', versionCode=75,
+    assert f"name='org.openenglish.reader' versionCode='{VERSION_CODE}' versionName='{VERSION_NAME}'" in badging
+    report = dict(base_sha256=BASE_SHA, versionName=VERSION_NAME, versionCode=VERSION_CODE,
                   preserved_classes=len(preserved), replaced_class_families=list(ROOTS),
                   retained_zip_entries=len(retained), bundled_models_and_media_unchanged=True,
                   physical_device_tested=False)
