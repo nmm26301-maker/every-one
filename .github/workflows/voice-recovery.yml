@@ -25,3 +25,4 @@ jobs:
           python3 tests/test-cloud-job-recovery.py
           bash tests/test-journey.sh
           bash tests/test-phones.sh
+          bash tests/test-phone-install.sh

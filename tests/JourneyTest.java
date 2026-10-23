@@ -2,6 +2,14 @@ import org.openenglish.reader.*;import org.json.*;import android.content.*;impor
 public final class JourneyTest {
  static int checks=0;static void check(boolean b,String reason){checks++;if(!b)throw new AssertionError(reason);}
  static class Memory extends Context implements SharedPreferences,SharedPreferences.Editor{Map<String,String> data=new HashMap<>();String k,v;public SharedPreferences getSharedPreferences(String n,int m){return this;}public String getString(String key,String fallback){return data.getOrDefault(key,fallback);}public Editor edit(){return this;}public Editor putString(String key,String value){k=key;v=value;return this;}public boolean commit(){data.put(k,v);return true;}}
+ static class FailingMemory extends Memory{boolean fail,throwsError;public boolean commit(){if(fail)return false;if(throwsError)throw new IllegalStateException("storage failure");return super.commit();}}
+ interface Change{void run()throws Exception;}
+ static void rejectedSave(FailingMemory memory,JourneyState state,Change change)throws Exception{
+  String before=state.export();boolean rejected=false;memory.fail=true;
+  try{change.run();}catch(Exception e){rejected=true;}finally{memory.fail=false;}
+  check(rejected&&state.export().equals(before),"failed save rolls back memory");
+  check(new JourneyState(memory).export().equals(before),"failed fixture write preserves stored record");
+ }
  static JSONObject assessment(String body)throws Exception{return new JSONObject("{\"RecognitionStatus\":\"Success\",\"NBest\":["+body+"]}");}
  public static void main(String[] args)throws Exception{
   check(JourneyCore.nextStage(0,true,true)==1,"new recall moves to tomorrow");check(JourneyCore.nextStage(4,true,false)==4,"early repeat cannot advance");check(JourneyCore.nextStage(5,true,true)==5,"interval capped");check(JourneyCore.nextStage(4,false,true)==0,"failed recall resets");check(JourneyCore.nextDue(100,0)==600100,"failed recall ten minutes");check(JourneyCore.nextDue(100,5)==100+30*JourneyCore.DAY,"30 day due");
@@ -20,6 +28,20 @@ public final class JourneyTest {
   JSONObject largest=new JSONObject(s.export());JSONObject allChats=new JSONObject();String chinese=String.join("",Collections.nCopies(1500,"字"));
   for(int u=1;u<=48;u++){JSONArray a=new JSONArray();for(int m=0;m<30;m++)a.put(new JSONObject().put("role","user").put("content",chinese));allChats.put(String.format(Locale.US,"u%02d",u),a);}largest.put("chats",allChats);
   JourneyState.validate(largest);check(largest.toString().getBytes("UTF-8").length<10000000,"all 48 full Chinese conversations fit the import byte ceiling");
+  FailingMemory memory=new FailingMemory();JourneyState stable=new JourneyState(memory);stable.practice("u01",0,"saved",false);stable.message("u01","user","saved chat");
+  rejectedSave(memory,stable,()->stable.level(4));
+  rejectedSave(memory,stable,()->stable.mark("u01","heard",7));
+  rejectedSave(memory,stable,()->stable.practice("u01",0,"failed attempt",true));
+  rejectedSave(memory,stable,()->stable.practice("u02",1,"new failed attempt",true));
+  rejectedSave(memory,stable,()->stable.recall("u01_0",true,System.currentTimeMillis()));
+  rejectedSave(memory,stable,()->stable.message("u01","assistant","failed reply"));
+  rejectedSave(memory,stable,()->stable.clearChat("u01"));
+  rejectedSave(memory,stable,()->stable.restore(exported));
+  String beforeException=stable.export();memory.throwsError=true;boolean threw=false;
+  try{stable.level(3);}catch(IllegalStateException e){threw=true;}memory.throwsError=false;
+  check(threw&&stable.export().equals(beforeException),"throwing storage rolls back memory");
+  stable.level(2);check(new JourneyState(memory).level()==2,"retry persists after failed writes");
+  stable.restore(exported);rejectedSave(memory,stable,()->stable.level(5));
   System.out.println("Journey checks: "+checks);
  }
 }

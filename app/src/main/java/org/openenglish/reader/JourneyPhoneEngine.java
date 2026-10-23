@@ -16,12 +16,26 @@ public final class JourneyPhoneEngine {
  private static final AtomicBoolean RUNNING=new AtomicBoolean();
  public interface Progress{void update(long bytes,long total);}
  public static final class Control {
-  private volatile boolean cancelled;private OrtSession.RunOptions run;private HttpURLConnection connection;
-  public synchronized void cancel(){cancelled=true;if(run!=null)try{run.setTerminate(true);}catch(OrtException ignored){}if(connection!=null)connection.disconnect();}
+  private volatile boolean cancelled;private OrtSession.RunOptions run;private HttpURLConnection connection;private InputStream input;
+  public void cancel(){
+   OrtSession.RunOptions r;HttpURLConnection h;InputStream in;
+   synchronized(this){if(cancelled)return;cancelled=true;r=run;h=connection;in=input;run=null;connection=null;input=null;}
+   release(r,h,in);
+  }
+  // Provider close/disconnect and native termination must never block the UI thread.
+  private static void release(OrtSession.RunOptions r,HttpURLConnection h,InputStream in){
+   if(r==null&&h==null&&in==null)return;
+   Thread cleanup=new Thread(()->{
+    if(r!=null)try{r.setTerminate(true);}catch(Exception ignored){}
+    if(h!=null)try{h.disconnect();}catch(Exception ignored){}
+    if(in!=null)try{in.close();}catch(Exception ignored){}
+   },"journey-phone-cancel");cleanup.setDaemon(true);cleanup.start();
+  }
   public void check(){if(cancelled||Thread.currentThread().isInterrupted())throw new CancellationException("已停止开源纠音");}
   synchronized void attach(OrtSession.RunOptions r){check();run=r;}
-  synchronized void attach(HttpURLConnection c){check();connection=c;}
-  synchronized void clear(){run=null;connection=null;}
+  synchronized void attach(HttpURLConnection c){if(cancelled||Thread.currentThread().isInterrupted()){release(null,c,null);check();}connection=c;}
+  synchronized void attach(InputStream in){if(cancelled||Thread.currentThread().isInterrupted()){release(null,null,in);check();}input=in;}
+  synchronized void clear(){run=null;connection=null;input=null;}
  }
  public static JSONObject asset(Context c,String name)throws Exception{try(InputStream in=c.getAssets().open("journey/"+name);ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1){if(out.size()+n>2000000)throw new IOException("音素配置过大");out.write(b,0,n);}return new JSONObject(out.toString("UTF-8"));}}
  public static File modelFile(Context c){return new File(c.getNoBackupFilesDir(),"openpronounce-en-int8.onnx");}
@@ -41,14 +55,17 @@ public final class JourneyPhoneEngine {
     if(code>=300&&code<400){if(redirects>=5)throw new IOException("模型下载重定向过多");String next=connection.getHeaderField("Location");if(next==null)throw new IOException("模型下载地址无效");url=new URL(url,next);connection.disconnect();continue;}
     if(code!=200)throw new IOException("模型下载失败（"+code+"），可稍后重试或从文件导入");break;
    }
-   try(InputStream in=connection.getInputStream()){copyChecked(in,partial,meta,c,progress);}
+   try(InputStream in=connection.getInputStream()){c.attach(in);copyChecked(in,partial,meta,c,progress);}
    c.check();if(!partial.renameTo(target))throw new IOException("模型安装失败，请检查存储空间");
   }finally{if(connection!=null)connection.disconnect();c.clear();partial.delete();RUNNING.set(false);}
  }
  public static void importModel(Context ctx,InputStream input,Control c,Progress progress)throws Exception{
-  supported();if(!RUNNING.compareAndSet(false,true)){input.close();throw new IOException("请等待上一次任务结束");}File target=modelFile(ctx),partial=new File(target.getPath()+".part");
-  try(InputStream in=input){JSONObject meta=asset(ctx,"phone-model.json");if(target.getParentFile().getUsableSpace()<meta.getLong("bytes")+64*1024*1024)throw new IOException("空间不足，无法导入模型");copyChecked(in,partial,meta,c,progress);c.check();if(!partial.renameTo(target))throw new IOException("模型保存失败");}
-  finally{partial.delete();RUNNING.set(false);}
+  try(InputStream in=input){
+   supported();c.check();if(!RUNNING.compareAndSet(false,true))throw new IOException("请等待上一次任务结束");
+   File partial=null;
+   try{c.attach(in);File target=modelFile(ctx);partial=new File(target.getPath()+".part");JSONObject meta=asset(ctx,"phone-model.json");if(target.getParentFile().getUsableSpace()<meta.getLong("bytes")+64*1024*1024)throw new IOException("空间不足，无法导入模型");copyChecked(in,partial,meta,c,progress);c.check();if(!partial.renameTo(target))throw new IOException("模型保存失败");}
+   finally{c.clear();if(partial!=null)partial.delete();RUNNING.set(false);}
+  }
  }
  private static void copyChecked(InputStream in,File partial,JSONObject meta,Control c,Progress progress)throws Exception{
   long total=meta.getLong("bytes"),count=0,last=0;MessageDigest hash=MessageDigest.getInstance("SHA-256");

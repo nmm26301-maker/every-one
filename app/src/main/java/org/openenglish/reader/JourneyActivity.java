@@ -25,7 +25,7 @@ public final class JourneyActivity extends Activity {
  private final LessonRecorder recorder=new LessonRecorder();
  private JourneyState state;private JSONObject catalog,lesson;private JSONArray lessons,levels;
  private LinearLayout page;private TextView status;private TextToSpeech tts;private boolean ttsReady,busy,destroyed;
- private MediaPlayer player;private CloudClient.Job job;private int generation,phraseIndex;private String screen="home";
+ private MediaPlayer player;private CloudClient.Job job;private Runnable jobDeadline;private int generation,phraseIndex;private String screen="home";
  private File take;private EditText chatInput;private boolean review;
  private JourneyPhoneEngine.Control phoneControl;private String drillText;private LinearLayout phoneResults;
  private interface Action{void run()throws Exception;}
@@ -137,13 +137,13 @@ public final class JourneyActivity extends Activity {
   if(busy||recorder.busy()){Toast.makeText(this,"当前录音或处理尚未结束",Toast.LENGTH_SHORT).show();return;}
   if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},91);status.setText("允许权限后，请再次点击开始录音。");return;}
   if(!forChat&&getSharedPreferences("journey_settings",0).getString("assessment_mode","openpronounce").equals("openpronounce")){JourneyPhoneEngine.supported();if(!JourneyPhoneEngine.installed(this))throw new IOException("请先在设置中安装开源纠音模型，约 357 MB；安装后可离线使用。");}
-  if(phoneResults!=null)phoneResults.removeAllViews();if(tts!=null)tts.stop();releasePlayer();deleteTake();busy=true;int token=++generation;status.setText("正在启动麦克风，请等开始提示…");
+  if(phoneResults!=null)phoneResults.removeAllViews();if(tts!=null)tts.stop();releasePlayer();deleteTake();busy=true;getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);int token=++generation;status.setText("正在启动麦克风，请等开始提示…");
   boolean started=recorder.start(new LessonRecorder.Listener(){
    public void ready(){post(token,()->status.setText("正在录音，请开始说话。说完点结束，最多 12 秒。"));}
    public void meter(double rms,int ms){post(token,()->status.setText("录音 "+(ms/1000)+" / 12 秒 · "+(rms<.003?"声音较轻，请靠近麦克风":"已收到声音")));}
-   public void done(float[] pcm){post(token,()->{busy=false;if(!LocalWav.hasSignal(pcm)){status.setText("没有收到足够清楚的声音，请检查麦克风后重录。");return;}safely(()->processTake(pcm,forChat));});}
-   public void error(String error){post(token,()->{busy=false;status.setText(error);});}
-  });if(!started){busy=false;status.setText("上次录音正在结束，请稍后再试。");}
+   public void done(float[] pcm){post(token,()->{finishJob();if(!LocalWav.hasSignal(pcm)){status.setText("没有收到足够清楚的声音，请检查麦克风后重录。");return;}safely(()->processTake(pcm,forChat));});}
+   public void error(String error){post(token,()->{finishJob();status.setText(error);});}
+  });if(!started){finishJob();status.setText("上次录音正在结束，请稍后再试。");}
  }
  private void post(int token,Runnable r){main.post(()->{if(!destroyed&&generation==token&&!isFinishing())r.run();});}
  private void processTake(float[] pcm,boolean forChat)throws Exception{
@@ -182,15 +182,16 @@ public final class JourneyActivity extends Activity {
  private void runJob(Work work,Result result,String label){runJob(work,result,label,120000);}
  private void runJob(Work work,Result result,String label,long timeout){
   if(busy)return;busy=true;getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);int token=++generation;CloudClient.Job task=new CloudClient.Job();job=task;status.setText(label);
-  main.postDelayed(()->{if(generation==token&&busy){stopTasks();if(status!=null)status.setText("处理超时，已取消。可重试或检查模型与网络设置。");}},timeout);
-  new Thread(()->{try{String value=work.run(task);task.check();post(token,()->{busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);job=null;safely(()->result.accept(value));});}catch(Exception e){post(token,()->{busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);job=null;status.setText("没有完成："+safeError(e)+"\n可以重试，或前往设置检查服务 / 本地模型。");});}},"journey-work").start();
+  jobDeadline=()->{if(generation==token&&busy){stopTasks();if(status!=null)status.setText("处理超时，已取消。可重试或检查模型与网络设置。");}};main.postDelayed(jobDeadline,timeout);
+  new Thread(()->{try{String value=work.run(task);task.check();post(token,()->{finishJob();safely(()->result.accept(value));});}catch(Exception e){post(token,()->{finishJob();status.setText("没有完成："+safeError(e)+"\n可以重试，或前往设置检查服务 / 本地模型。");});}},"journey-work").start();
  }
+ private void finishJob(){busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);if(jobDeadline!=null){main.removeCallbacks(jobDeadline);jobDeadline=null;}job=null;phoneControl=null;}
  private static void writeWav(File file,float[] pcm)throws Exception{try(DataOutputStream o=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))){int bytes=pcm.length*2;o.writeBytes("RIFF");o.writeInt(Integer.reverseBytes(36+bytes));o.writeBytes("WAVEfmt ");o.writeInt(Integer.reverseBytes(16));o.writeShort(Short.reverseBytes((short)1));o.writeShort(Short.reverseBytes((short)1));o.writeInt(Integer.reverseBytes(16000));o.writeInt(Integer.reverseBytes(32000));o.writeShort(Short.reverseBytes((short)2));o.writeShort(Short.reverseBytes((short)16));o.writeBytes("data");o.writeInt(Integer.reverseBytes(bytes));for(float v:pcm)o.writeShort(Short.reverseBytes((short)Math.max(-32768,Math.min(32767,Math.round(v*32767)))));}}
  private void playTake()throws Exception{if(busy)throw new IOException("请先结束录音和处理再回听");if(take==null||!take.isFile())throw new IOException("本页还没有录音，请先录一句");if(tts!=null)tts.stop();releasePlayer();player=new MediaPlayer();player.setDataSource(take.getAbsolutePath());player.setOnCompletionListener(p->releasePlayer());player.prepare();player.start();}
  private void speak(String text,float speed)throws Exception{if(busy)throw new IOException("请先结束录音或处理再播放");if(!ttsReady)throw new IOException("请在系统文字转语音设置中安装英语语音，再重开应用");releasePlayer();tts.setSpeechRate(speed);int max=TextToSpeech.getMaxSpeechInputLength();if(text.length()>max)text=text.substring(0,max);if(tts.speak(text,TextToSpeech.QUEUE_FLUSH,null,"journey")==TextToSpeech.ERROR)throw new IOException("朗读未能启动，请检查系统英语语音");}
  private void releasePlayer(){if(player!=null){try{player.release();}catch(Exception ignored){}player=null;}}
  private void deleteTake(){if(take!=null){take.delete();take=null;}}
- private void stopTasks(){generation++;busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);if(phoneControl!=null){phoneControl.cancel();phoneControl=null;}if(job!=null){job.cancel();job=null;}recorder.cancel();if(tts!=null)tts.stop();releasePlayer();}
+ private void stopTasks(){generation++;if(phoneControl!=null)phoneControl.cancel();if(job!=null)job.cancel();finishJob();recorder.cancel();if(tts!=null)tts.stop();releasePlayer();}
  private EditText field(LinearLayout box,String label,String value,boolean secret){box.addView(text(label,14,MUTED));EditText e=new EditText(this);e.setTextSize(16);e.setTextColor(INK);e.setSingleLine(true);e.setText(value);e.setHint(secret?"留空保留已保存的密钥":"");if(secret)e.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);box.addView(e,new LinearLayout.LayoutParams(-1,dp(52)));return e;}
  private void settings(){
   view("settings","把练习方式配置好");SharedPreferences prefs=getSharedPreferences("journey_settings",0);
