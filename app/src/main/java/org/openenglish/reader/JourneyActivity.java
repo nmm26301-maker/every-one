@@ -39,7 +39,23 @@ public final class JourneyActivity extends Activity {
   try{catalog=new JSONObject(read(getAssets().open("journey/course.json"),300000));lessons=catalog.getJSONArray("lessons");levels=catalog.getJSONArray("levels");state=new JourneyState(this);}
   catch(Exception e){new AlertDialog.Builder(this).setTitle("学习记录未能打开").setMessage("未覆盖原有记录。你仍可打开原有工作室。\n"+e.getMessage()).setPositiveButton("打开工作室",(d,w)->{startActivity(new Intent(this,StudioActivity.class));finish();}).setNegativeButton("关闭",(d,w)->finish()).show();return;}
   tts=new TextToSpeech(this,result->main.post(()->{if(destroyed)return;if(result==TextToSpeech.SUCCESS){int lang=tts.setLanguage(Locale.US);ttsReady=lang>=TextToSpeech.LANG_AVAILABLE;}if(!ttsReady)Toast.makeText(this,"未找到英文朗读语音，请在系统文字转语音设置中安装英语语音",Toast.LENGTH_LONG).show();}));
-  home();
+  restorePage(saved);
+ }
+ private void restorePage(Bundle saved){
+  JourneyState.Page p=JourneyState.Page.decode(saved==null?null:saved.getString("journey_page"));
+  if(!p.unit.isEmpty())lesson=find(p.unit);phraseIndex=p.phrase;review=p.review;
+  switch(p.screen){
+   case "route":route();break;case "placement":placement();break;case "unit":unit();break;
+   case "listen":listenQuiz(phraseIndex);break;case "practice":practice();break;case "conversation":conversation();break;
+   case "review":reviewList();break;case "lab":lab();break;case "progress":progress();break;
+   case "settings":settings();break;case "drill":drill(p.word);break;default:home();
+  }
+ }
+ @Override protected void onSaveInstanceState(Bundle out){
+  rememberDraft();
+  try{out.putString("journey_page",JourneyState.Page.of(screen,lesson==null?"":id(),phraseIndex,review,drillText==null?"":drillText).encode());}
+  catch(JSONException ignored){ /* Missing transient state falls back to home. */ }
+  super.onSaveInstanceState(out);
  }
  private int dp(int x){return (int)(getResources().getDisplayMetrics().density*x+.5f);}
  private GradientDrawable bg(int color,int radius){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));return d;}
@@ -98,7 +114,7 @@ public final class JourneyActivity extends Activity {
   for(int i=0;i<3;i++){final int n=i;JSONObject s=sentence(i);JSONObject c=state.card(id()+"_"+i);LinearLayout box=card((i+1)+"  "+s.optString("en"),s.optString("zh")+(c==null?"":"\n已开口 "+c.optInt("attempts")+" 次 · "+(c.optBoolean("assessed")?"最近有音频评测":"最近为识别/回听练习")));button(box,"听懂这句话",()->listenQuiz(n),false);button(box,"跟读、纠音和脱稿",()->{phraseIndex=n;review=false;practice();},true);}
   LinearLayout task=card("把句子变成自己的话",lesson.optString("task"));button(task,"进入场景对话",this::conversation,true);button("返回学习路线",this::route);
  }
- private void listenQuiz(int n){view("listen","先听，再选意思");line("第 "+(n+1)+" 句 · 可以重复听。首次练习先正常速度，再用慢速确认。");String en=sentence(n).optString("en");button("播放英语",()->speak(en,1f));button("慢速听",()->speak(en,.78f));List<Integer> options=new ArrayList<>(Arrays.asList(0,1,2));Collections.shuffle(options);TextView feedback=text("选择你听到的意思。",16,MUTED);for(int x:options)button(sentence(x).optString("zh"),()->{if(x==n){state.mark(id(),"heard",1<<n);feedback.setText("听懂了。现在试着不看英文复述，再进入跟读。\n"+en);}else feedback.setText("再听一次，注意关键词。你还可以回到课程看解释。");});page.addView(feedback);button("进入跟读",()->{phraseIndex=n;review=false;practice();});button("返回本单元",this::unit);}
+ private void listenQuiz(int n){view("listen","先听，再选意思");phraseIndex=n;line("第 "+(n+1)+" 句 · 可以重复听。首次练习先正常速度，再用慢速确认。");String en=sentence(n).optString("en");button("播放英语",()->speak(en,1f));button("慢速听",()->speak(en,.78f));List<Integer> options=new ArrayList<>(Arrays.asList(0,1,2));Collections.shuffle(options);TextView feedback=text("选择你听到的意思。",16,MUTED);for(int x:options)button(sentence(x).optString("zh"),()->{if(x==n){state.mark(id(),"heard",1<<n);feedback.setText("听懂了。现在试着不看英文复述，再进入跟读。\n"+en);}else feedback.setText("再听一次，注意关键词。你还可以回到课程看解释。");});page.addView(feedback);button("进入跟读",()->{phraseIndex=n;review=false;practice();});button("返回本单元",this::unit);}
  private void practice(){
   view("practice",review?"到期复习 · 先回忆再看答案":"听示范，开口，再改进");
   JSONObject s=sentence(phraseIndex);String en=s.optString("en"),zh=s.optString("zh");line(lesson.optString("title")+" · 第 "+(phraseIndex+1)+" 句");line(zh);

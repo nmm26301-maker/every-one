@@ -6,6 +6,27 @@ import java.util.*;
 
 /** A bounded, separately versioned learning journal. API keys and audio are never exported. */
 public final class JourneyState {
+ /** Small transient page descriptor, separate from exported learning records. */
+ public static final class Page {
+  public final String screen,unit,word;public final int phrase;public final boolean review;
+  private Page(String screen,String unit,int phrase,boolean review,String word){this.screen=screen;this.unit=unit;this.phrase=phrase;this.review=review;this.word=word;}
+  private static Page home(){return new Page("home","",0,false,"");}
+  public static Page of(String screen,String unit,int phrase,boolean review,String word){
+   if(!Arrays.asList("home","route","placement","unit","listen","practice","review","lab","progress","conversation","settings","drill").contains(screen))return home();
+   if(unit==null||(!unit.isEmpty()&&!unit.matches("u(0[1-9]|[1-3][0-9]|4[0-8])"))||phrase<0||phrase>2||word==null||word.length()>120)return home();
+   if(Arrays.asList("unit","listen","practice","conversation").contains(screen)&&unit.isEmpty())return home();
+   if(screen.equals("drill")&&word.trim().isEmpty())return home();
+   return new Page(screen,unit,phrase,screen.equals("practice")&&review,screen.equals("drill")?word:"");
+  }
+  public String encode()throws JSONException{return new JSONObject().put("schema",1).put("screen",screen).put("unit",unit).put("phrase",phrase).put("review",review).put("word",word).toString();}
+  public static Page decode(String text){
+   if(text==null||text.length()>1024)return home();
+   try{JSONObject d=new JSONObject(text);integer(d,"schema",1,1,true);integer(d,"phrase",0,2,true);
+    if(!(d.opt("screen") instanceof String)||!(d.opt("unit") instanceof String)||!(d.opt("word") instanceof String)||!(d.opt("review") instanceof Boolean))return home();
+    return of(d.getString("screen"),d.getString("unit"),d.getInt("phrase"),d.getBoolean("review"),d.getString("word"));
+   }catch(Exception e){return home();}
+  }
+ }
  private final SharedPreferences prefs;private JSONObject data;private String saved;
  public JourneyState(Context c) throws Exception {
   prefs=c.getSharedPreferences("journey_progress_v1",0);

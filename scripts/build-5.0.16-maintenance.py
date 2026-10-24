@@ -1,5 +1,5 @@
 """Build an unsigned 5.0.16 while preserving the complete 5.0.15 release."""
-import argparse, glob, hashlib, json, pathlib, re, subprocess, zipfile
+import argparse, glob, hashlib, json, os, pathlib, re, subprocess, zipfile
 
 BASE_SHA = '7039d0b41cd4b5bc5245bf25dc6011d4793365d9a61ced075ed31d629ef30d01'
 VERSION_NAME = '5.0.16'
@@ -10,6 +10,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 def run(*args, capture=False):
+    executable = pathlib.Path(str(args[0]))
+    if (executable.is_absolute() and executable.name in ('d8', 'aapt2', 'zipalign')
+            and executable.is_file() and not os.access(executable, os.X_OK)):
+        # SDK ZIP extraction can omit executable bits; repair only the selected owner-run tool.
+        executable.chmod(executable.stat().st_mode | 0o100)
     return subprocess.run([str(x) for x in args], cwd=ROOT, check=True,
                           stdout=subprocess.PIPE if capture else None, text=True).stdout
 
