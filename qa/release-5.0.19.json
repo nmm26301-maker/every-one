@@ -1,0 +1,35 @@
+{
+  "base_sha256": "3081ab95d37decd17cce31f65d131fdf854018a8b25f1d9226c10af21ee19145",
+  "versionName": "5.0.19",
+  "versionCode": 78,
+  "preserved_classes": 1144,
+  "replaced_class_families": [
+    "JourneyActivity",
+    "JourneyPhoneEngine",
+    "JourneyState"
+  ],
+  "retained_zip_entries": 353,
+  "bundled_models_and_media_unchanged": true,
+  "physical_device_tested": false,
+  "apk_signed": true,
+  "apk_sha256": "aab6674874299c1cb772c365f46b142d5d861370574b7d15fd04919c09cbb640",
+  "apk_bytes": 428014525,
+  "original_signer_preserved": true,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "zip_alignment_16k_verified": true,
+  "runtime_method_contracts_verified": 831,
+  "source_base": "55ebf4d90ac0736a88c84c6081425cf41fbb2e97",
+  "host_checks": {
+    "conversation_drafts": 52,
+    "conversation_retry": 30,
+    "journey": 56,
+    "conversation_boundary": 24,
+    "voice_flow": 39,
+    "playback_guard": 15
+  },
+  "exact_signed_restore_verified": true,
+  "recovery_kit_sha256": "6200cbb8a1fbdbff1c6737d07295e3731d6a0335e1836ba6f337c21ed806e6e7",
+  "recovery_kit_bytes": 602033,
+  "recovery_kit_git_blob": "dc7bcf6795e301e92b57206d8a03ada7fae43112",
+  "recovery_backup_ref": "backup/everyone-5.0.19-20261025"
+}

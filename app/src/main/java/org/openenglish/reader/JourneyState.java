@@ -16,6 +16,10 @@ public final class JourneyState {
  public static void validate(JSONObject d)throws Exception{
   if(d.optInt("schema")!=1||d.optInt("level",-1)<0||d.optInt("level")>5)throw new JSONException("学习备份版本或级别不正确");
   for(String name:new String[]{"units","cards","chats"})if(d.optJSONObject(name)==null)throw new JSONException("缺少学习记录："+name);
+  if(d.has("drafts")){
+   JSONObject drafts=d.optJSONObject("drafts");if(drafts==null||drafts.length()>48)throw new JSONException("草稿记录不正确");
+   Iterator<String> it=drafts.keys();while(it.hasNext()){String id=it.next();Object value=drafts.get(id);checkDraft(id,value instanceof String?(String)value:null);}
+  }
   if(d.toString().length()>6000000||d.getJSONObject("units").length()>48||d.getJSONObject("cards").length()>200||d.getJSONObject("chats").length()>48)throw new JSONException("学习备份超出范围");
   Iterator<String> units=d.getJSONObject("units").keys();while(units.hasNext()){String k=units.next();if(!k.matches("u(0[1-9]|[1-3][0-9]|4[0-8])"))throw new JSONException("未知课程");JSONObject u=d.getJSONObject("units").getJSONObject(k);if(u.optInt("heard",0)<0||u.optInt("heard",0)>7||u.optInt("spoken",0)<0||u.optInt("spoken",0)>7)throw new JSONException("无效学习进度");}
   Iterator<String> keys=d.getJSONObject("cards").keys();while(keys.hasNext()){String k=keys.next();if(!k.matches("u(0[1-9]|[1-3][0-9]|4[0-8])_[0-2]"))throw new JSONException("未知复习句");JSONObject c=d.getJSONObject("cards").getJSONObject(k);if(c.optInt("stage",-1)<0||c.optInt("stage")>5||c.optLong("due",-1)<0||c.optInt("attempts",-1)<1)throw new JSONException("无效复习记录");}
@@ -49,14 +53,30 @@ public final class JourneyState {
  public boolean complete(String id){JSONObject u=unit(id);if(u.optInt("heard")!=7||u.optInt("spoken")!=7)return false;for(int i=0;i<3;i++){JSONObject c=card(id+"_"+i);if(c==null||!c.optBoolean("recall"))return false;}return true;}
  public JSONArray chat(String id){JSONArray a=data.optJSONObject("chats").optJSONArray(id);return a==null?new JSONArray():a;}
  public String pendingMessage(String id){JSONArray a=chat(id);JSONObject last=a.optJSONObject(a.length()-1);return last!=null&&"user".equals(last.optString("role"))?last.optString("content"):"";}
+ public String draft(String id){JSONObject drafts=data.optJSONObject("drafts");return drafts==null?"":drafts.optString(id,"");}
+ private static void checkDraft(String id,String value)throws Exception{
+  if(id==null||!id.matches("u(0[1-9]|[1-3][0-9]|4[0-8])")||value==null||value.length()>1500)throw new JSONException("草稿场景或长度不正确（最多 1500 字）");
+ }
+ private void putDraft(String id,String value)throws Exception{
+  JSONObject drafts=data.optJSONObject("drafts");if(drafts==null){if(value.isEmpty())return;drafts=new JSONObject();data.put("drafts",drafts);}
+  if(value.isEmpty())drafts.remove(id);else drafts.put(id,value);
+  if(drafts.length()==0)data.remove("drafts");
+ }
+ public void draft(String id,String value)throws Exception{checkDraft(id,value);if(value.equals(draft(id)))return;putDraft(id,value);save();}
+ /** Commit the outgoing question and its remaining input together. A failed save preserves both. */
+ public void sendMessage(String id,String content,String input)throws Exception{
+  checkDraft(id,input);if(content==null||content.trim().isEmpty()||content.length()>1500)throw new JSONException("请输入 1500 字以内的消息");
+  String question=content.trim();appendMessage(id,"user",question);putDraft(id,input.trim().equals(question)?"":input);save();
+ }
  public void reply(String id,String expected,String content)throws Exception{
   if(expected==null||expected.isEmpty()||!pendingMessage(id).equals(expected))throw new JSONException("待回复的消息已经变化，请重新打开当前场景");
   if(content==null||content.trim().isEmpty())throw new JSONException("AI 没有返回内容，请重试上一条消息");
   message(id,"assistant",content);
  }
  public void message(String id,String role,String content)throws Exception{
-  JSONArray a=chat(id),next=new JSONArray();for(int i=Math.max(0,a.length()-29);i<a.length();i++)next.put(a.getJSONObject(i));next.put(new JSONObject().put("role",role).put("content",bounded(content)));data.getJSONObject("chats").put(id,next);save();
+  appendMessage(id,role,content);save();
  }
+ private void appendMessage(String id,String role,String content)throws Exception{JSONArray a=chat(id),next=new JSONArray();for(int i=Math.max(0,a.length()-29);i<a.length();i++)next.put(a.getJSONObject(i));next.put(new JSONObject().put("role",role).put("content",bounded(content)));data.getJSONObject("chats").put(id,next);}
  public void clearChat(String id)throws Exception{data.getJSONObject("chats").remove(id);save();}
  private static String bounded(String value){if(value.length()<=1500)return value;int end=1470;if(Character.isHighSurrogate(value.charAt(end-1)))end--;return value.substring(0,end)+"\n[历史记录已截短]";}
  public String export(){return data.toString();}

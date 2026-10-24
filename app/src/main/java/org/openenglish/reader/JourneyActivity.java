@@ -26,7 +26,8 @@ public final class JourneyActivity extends Activity {
  private JourneyState state;private JSONObject catalog,lesson;private JSONArray lessons,levels;
  private LinearLayout page;private TextView status;private TextToSpeech tts;private boolean ttsReady,busy,destroyed;
  private MediaPlayer player;private CloudClient.Job job;private Runnable jobDeadline;private int generation,phraseIndex;private String screen="home";
- private File take;private EditText chatInput;private boolean review;
+ private File take;private EditText chatInput;private boolean review;private String chatUnit="";
+ private final Map<String,String> unsavedDrafts=new HashMap<>();
  private JourneyPhoneEngine.Control phoneControl;private String drillText;private LinearLayout phoneResults;
  private interface Action{void run()throws Exception;}
  private interface Work{String run(CloudClient.Job job)throws Exception;}
@@ -51,8 +52,13 @@ public final class JourneyActivity extends Activity {
  private LinearLayout card(String heading,String body){LinearLayout c=new LinearLayout(this);c.setOrientation(1);c.setPadding(dp(17),dp(12),dp(17),dp(14));c.setBackground(bg(Color.WHITE,16));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,dp(8),0,dp(8));page.addView(c,p);TextView h=text(heading,19,INK);h.setTypeface(null,Typeface.BOLD);c.addView(h);if(!body.isEmpty())c.addView(text(body,16,MUTED));return c;}
  private Button button(LinearLayout into,String label,Action a,boolean primary){Button b=new Button(this);b.setText(label);b.setAllCaps(false);b.setTextSize(16);b.setTextColor(primary?Color.WHITE:ACCENT);b.setMinHeight(dp(50));b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setBackground(bg(primary?ACCENT:0xffeeebff,12));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,dp(6),0,dp(3));into.addView(b,p);b.setOnClickListener(v->safely(a));return b;}
  private Button button(String label,Action a){return button(page,label,a,false);}
+ private void rememberDraft(){
+  if("conversation".equals(screen)&&chatInput!=null&&!chatUnit.isEmpty())unsavedDrafts.put(chatUnit,chatInput.getText().toString());
+  Iterator<Map.Entry<String,String>> it=unsavedDrafts.entrySet().iterator();
+  while(it.hasNext()){Map.Entry<String,String> e=it.next();try{state.draft(e.getKey(),e.getValue());it.remove();}catch(Exception error){Toast.makeText(this,"草稿暂未保存，请检查剩余空间；本次打开期间仍可继续编辑。",Toast.LENGTH_LONG).show();break;}}
+ }
  private void view(String key,String heading){
-  stopTasks();deleteTake();screen=key;drillText=null;phoneResults=null;
+  rememberDraft();stopTasks();deleteTake();screen=key;drillText=null;phoneResults=null;chatUnit="";
   LinearLayout root=new LinearLayout(this);root.setOrientation(1);root.setBackgroundColor(PAPER);root.setPadding(dp(18),dp(10),dp(18),0);
   LinearLayout bar=new LinearLayout(this);bar.setGravity(Gravity.CENTER_VERTICAL);
   TextView brand=text("EVERYONE  /  学会交流",13,ACCENT);brand.setTypeface(null,Typeface.BOLD);bar.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
@@ -123,11 +129,11 @@ public final class JourneyActivity extends Activity {
  }
  private void progress(){view("progress","用交流任务检验进步");card("训练记录",state.completed()+" / 48 单元完成听辨、录音与自评回忆\n"+state.due(System.currentTimeMillis()).size()+" 句到期复习\n此记录不推断 CEFR 等级，也不代表发音已正确。");for(int i=0;i<6;i++){final int l=i;JSONObject v=levels.optJSONObject(i);LinearLayout c=card(v.optString("name")+" · 阶段挑战",v.optString("canDo")+"\n练法：不看稿换一个话题，回应至少五轮；检查是否能追问、澄清和总结。让真实交流对象反馈是否容易理解。");button(c,"开始阶段场景",()->{lesson=lessons.optJSONObject(l*8+7);conversation();},true);}line("进阶需要更多词汇、真实语速与不同说话人的输入。可在原有工作室导入自己的音视频，做听写与跟读，再把话题带入交流。应用不提供真人匹配，也不能保证所有场景零障碍。");}
  private void conversation(){
-  String draft="conversation".equals(screen)&&chatInput!=null?chatInput.getText().toString():"";
   view("conversation","把英语用起来");line(levels.optJSONObject(lesson.optInt("level")).optString("name")+" · "+lesson.optString("title"));card("本次任务",lesson.optString("task"));
+  chatUnit=id();String draft=unsavedDrafts.containsKey(chatUnit)?unsavedDrafts.get(chatUnit):state.draft(chatUnit);
   JSONArray messages=state.chat(id());for(int i=0;i<messages.length();i++){JSONObject m=messages.optJSONObject(i);String content=m.optString("content");LinearLayout c=card(m.optString("role").equals("user")?"我":"AI 练习伙伴",content);if(m.optString("role").equals("assistant"))button(c,"听这段回复",()->speak(content,1f),false);}
-  status=text("可打字，也可录一句后确认文字再发送。AI 可能出错；文字反馈不评判发音。",16,MUTED);page.addView(status);chatInput=new EditText(this);chatInput.setTextColor(INK);chatInput.setTextSize(17);chatInput.setHint("说你自己的话，或先点“帮我开场”");chatInput.setMinLines(2);chatInput.setMaxLines(6);chatInput.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);page.addView(chatInput,new LinearLayout.LayoutParams(-1,-2));
-  chatInput.setText(draft);chatInput.setSelection(chatInput.length());
+  status=text("可打字，也可录一句后确认文字再发送。AI 可能出错；文字反馈不评判发音。",16,MUTED);page.addView(status);chatInput=new EditText(this);chatInput.setTextColor(INK);chatInput.setTextSize(17);chatInput.setHint("说你自己的话（草稿最多 1500 字），或点“帮我开场”");chatInput.setMinLines(2);chatInput.setMaxLines(6);chatInput.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);page.addView(chatInput,new LinearLayout.LayoutParams(-1,-2));
+  chatInput.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(1500)});chatInput.setText(draft);chatInput.setSelection(chatInput.length());
   button(page,"发送并继续对话",()->send(chatInput.getText().toString()),true);
   if(!state.pendingMessage(id()).isEmpty())button("重试上一条 · 不重复追加消息",this::requestReply);
   button("● 录一句 · 最多 12 秒",()->record(true));button("■ 结束录音 / 停止生成",()->{if(recorder.busy())recorder.finish();else{stopTasks();status.setText("已停止，已保存的对话仍在。");}});
@@ -141,7 +147,7 @@ public final class JourneyActivity extends Activity {
  private void send(String message)throws Exception{
   if(busy){Toast.makeText(this,"请先结束当前录音或处理",Toast.LENGTH_SHORT).show();return;}
   final String content=message.trim();if(content.isEmpty())return;if(content.length()>1500)throw new IOException("请把内容缩短到 1500 字以内，再分段交流。");
-  state.message(id(),"user",content);if(chatInput!=null&&chatInput.getText().toString().trim().equals(content))chatInput.setText("");conversation();requestReply();
+  state.sendMessage(id(),content,chatInput==null?state.draft(id()):chatInput.getText().toString());unsavedDrafts.remove(id());if(chatInput!=null)chatInput.setText(state.draft(id()));conversation();requestReply();
  }
  private void requestReply()throws Exception{
   if(busy){Toast.makeText(this,"请先停止当前处理",Toast.LENGTH_SHORT).show();return;}
@@ -233,15 +239,15 @@ public final class JourneyActivity extends Activity {
    button(c,"保存此服务",()->{String url=base.getText().toString().trim(),name=model.getText().toString().trim();CloudClient.endpoint(url,speech?"audio/transcriptions":"chat/completions");if(name.isEmpty())throw new IOException("请填写模型名称");String secret=token.getText().toString().trim();if(!secret.isEmpty())KeyVault.save(this,ns,secret);p.edit().putString("base",url).putString("model",name).apply();token.setText("");notice("已保存","服务配置已保存。选择云端模型模式后生效。");},false);
   }
   LinearLayout voice=card("朗读与回放","使用手机已安装的英语文字转语音引擎。若听不到声音，请安装英语语音并检查媒体音量。");Switch auto=new Switch(this);auto.setText("自动朗读完成的 AI 回复");auto.setMinHeight(dp(48));auto.setChecked(prefs.getBoolean("autoplay",false));auto.setOnCheckedChangeListener((b,on)->prefs.edit().putBoolean("autoplay",on).apply());voice.addView(auto);button(voice,"打开系统朗读设置",()->startActivity(new Intent("com.android.settings.TTS_SETTINGS")),false);
-  LinearLayout backup=card("学习记录备份","包含本路线的课程进度、复习计划、反馈和最近对话。录音仅临时回听，离开页面即删除；备份不含录音和密钥。原有工作室数据仍用其原有备份入口。");
+  LinearLayout backup=card("学习记录备份","包含本路线的课程进度、复习计划、反馈和最近对话。录音仅临时回听，离开页面即删除；草稿也会保存并随备份导出；备份不含录音和密钥。原有工作室数据仍用其原有备份入口。");
   button(backup,"导出学习记录",()->{Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Everyone-learning-backup.json");startActivityForResult(i,100);},false);
   button(backup,"导入学习记录",()->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE),101),false);
   button("返回首页",this::home);
  }
- @Override protected void onActivityResult(int request,int result,Intent intent){super.onActivityResult(request,result,intent);if(result!=RESULT_OK||intent==null||intent.getData()==null)return;Uri uri=intent.getData();safely(()->{if(request==102){phoneDownload(uri);}else if(request==100){try(OutputStream out=getContentResolver().openOutputStream(uri,"wt")){if(out==null)throw new IOException("无法写入所选文件");out.write(state.export().getBytes("UTF-8"));}notice("已导出","请妥善保管学习记录，其中包含对话文字。");}else if(request==101){String imported=read(getContentResolver().openInputStream(uri),10000000);JourneyState.validate(new JSONObject(imported));new AlertDialog.Builder(this).setTitle("恢复这份学习记录？").setMessage("将替换本学习路线的当前进度与对话。原有工作室数据和服务密钥不受影响，请先确认已导出需要保留的记录。").setPositiveButton("恢复",(d,w)->safely(()->{state.restore(imported);home();Toast.makeText(this,"学习记录已恢复",Toast.LENGTH_LONG).show();})).setNegativeButton("取消",null).show();}});}
+ @Override protected void onActivityResult(int request,int result,Intent intent){super.onActivityResult(request,result,intent);if(result!=RESULT_OK||intent==null||intent.getData()==null)return;Uri uri=intent.getData();safely(()->{if(request==102){phoneDownload(uri);}else if(request==100){rememberDraft();if(!unsavedDrafts.isEmpty())throw new IOException("有草稿尚未保存，请检查剩余空间后再导出。");try(OutputStream out=getContentResolver().openOutputStream(uri,"wt")){if(out==null)throw new IOException("无法写入所选文件");out.write(state.export().getBytes("UTF-8"));}notice("已导出","请妥善保管学习记录，其中包含对话文字和未发送的草稿。");}else if(request==101){String imported=read(getContentResolver().openInputStream(uri),10000000);JourneyState.validate(new JSONObject(imported));new AlertDialog.Builder(this).setTitle("恢复这份学习记录？").setMessage("将替换本学习路线的当前进度、对话与草稿。原有工作室数据和服务密钥不受影响，请先确认已导出需要保留的记录。").setPositiveButton("恢复",(d,w)->safely(()->{state.restore(imported);unsavedDrafts.clear();home();Toast.makeText(this,"学习记录已恢复",Toast.LENGTH_LONG).show();})).setNegativeButton("取消",null).show();}});}
  private static String read(InputStream input,int max)throws Exception{if(input==null)throw new IOException("无法打开文件");try(InputStream in=input;ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1){if(out.size()+n>max)throw new IOException("文件超过允许大小");out.write(b,0,n);}return out.toString("UTF-8");}}
  @Override public void onRequestPermissionsResult(int request,String[] permissions,int[] results){super.onRequestPermissionsResult(request,permissions,results);if(request==91&&status!=null)status.setText(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED?"麦克风已允许，点击开始录音即可。":"未获得麦克风权限。可以继续听读、打字对话，或到系统设置允许麦克风。");}
- @Override protected void onPause(){super.onPause();boolean wasBusy=busy;stopTasks();deleteTake();if(wasBusy&&status!=null)status.setText("已暂停录音或处理，请重新开始。");}
+ @Override protected void onPause(){super.onPause();rememberDraft();boolean wasBusy=busy;stopTasks();deleteTake();if(wasBusy&&status!=null)status.setText("已暂停录音或处理，请重新开始。");}
  @Override protected void onDestroy(){destroyed=true;stopTasks();main.removeCallbacksAndMessages(null);deleteTake();if(tts!=null)tts.shutdown();super.onDestroy();}
  @Override public void onBackPressed(){if("home".equals(screen)){super.onBackPressed();return;}if(Arrays.asList("practice","listen","conversation").contains(screen)&&lesson!=null)unit();else home();}
 }
