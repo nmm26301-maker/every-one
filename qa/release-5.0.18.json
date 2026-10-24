@@ -1,0 +1,29 @@
+{
+  "base_sha256": "3da2ca02b303a1448b27bfc538b0c3b071e1c9045c9e44a8f7164c6253c7b60a",
+  "versionName": "5.0.18",
+  "versionCode": 77,
+  "preserved_classes": 1144,
+  "replaced_class_families": [
+    "JourneyActivity",
+    "JourneyPhoneEngine",
+    "JourneyState"
+  ],
+  "retained_zip_entries": 353,
+  "bundled_models_and_media_unchanged": true,
+  "physical_device_tested": false,
+  "apk_signed": true,
+  "apk_sha256": "3081ab95d37decd17cce31f65d131fdf854018a8b25f1d9226c10af21ee19145",
+  "apk_bytes": 428014525,
+  "original_signer_preserved": true,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "zip_alignment_16k_verified": true,
+  "runtime_method_contracts_verified": 810,
+  "exact_signed_restore_verified": true,
+  "recovery_kit_sha256": "5530ad2e8df9f75d882aa16033e4dd78be404d985ee89dbf4c6faa23f803d881",
+  "recovery_backup_ref": "backup/everyone-5.0.18-20261024",
+  "host_checks": {
+    "conversation_retry": 30,
+    "journey": 56
+  },
+  "source_base": "5fcb8ca626e61da62223bf62fa25ef6a198f6914"
+}

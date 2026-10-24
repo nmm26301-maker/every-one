@@ -123,10 +123,13 @@ public final class JourneyActivity extends Activity {
  }
  private void progress(){view("progress","用交流任务检验进步");card("训练记录",state.completed()+" / 48 单元完成听辨、录音与自评回忆\n"+state.due(System.currentTimeMillis()).size()+" 句到期复习\n此记录不推断 CEFR 等级，也不代表发音已正确。");for(int i=0;i<6;i++){final int l=i;JSONObject v=levels.optJSONObject(i);LinearLayout c=card(v.optString("name")+" · 阶段挑战",v.optString("canDo")+"\n练法：不看稿换一个话题，回应至少五轮；检查是否能追问、澄清和总结。让真实交流对象反馈是否容易理解。");button(c,"开始阶段场景",()->{lesson=lessons.optJSONObject(l*8+7);conversation();},true);}line("进阶需要更多词汇、真实语速与不同说话人的输入。可在原有工作室导入自己的音视频，做听写与跟读，再把话题带入交流。应用不提供真人匹配，也不能保证所有场景零障碍。");}
  private void conversation(){
+  String draft="conversation".equals(screen)&&chatInput!=null?chatInput.getText().toString():"";
   view("conversation","把英语用起来");line(levels.optJSONObject(lesson.optInt("level")).optString("name")+" · "+lesson.optString("title"));card("本次任务",lesson.optString("task"));
   JSONArray messages=state.chat(id());for(int i=0;i<messages.length();i++){JSONObject m=messages.optJSONObject(i);String content=m.optString("content");LinearLayout c=card(m.optString("role").equals("user")?"我":"AI 练习伙伴",content);if(m.optString("role").equals("assistant"))button(c,"听这段回复",()->speak(content,1f),false);}
   status=text("可打字，也可录一句后确认文字再发送。AI 可能出错；文字反馈不评判发音。",16,MUTED);page.addView(status);chatInput=new EditText(this);chatInput.setTextColor(INK);chatInput.setTextSize(17);chatInput.setHint("说你自己的话，或先点“帮我开场”");chatInput.setMinLines(2);chatInput.setMaxLines(6);chatInput.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);page.addView(chatInput,new LinearLayout.LayoutParams(-1,-2));
+  chatInput.setText(draft);chatInput.setSelection(chatInput.length());
   button(page,"发送并继续对话",()->send(chatInput.getText().toString()),true);
+  if(!state.pendingMessage(id()).isEmpty())button("重试上一条 · 不重复追加消息",this::requestReply);
   button("● 录一句 · 最多 12 秒",()->record(true));button("■ 结束录音 / 停止生成",()->{if(recorder.busy())recorder.finish();else{stopTasks();status.setText("已停止，已保存的对话仍在。");}});
   button("帮我开场",()->send("Please start our role-play with one short question."));
   button("给我中文提示和一句示范",()->send("请用简短中文解释刚才的问题，并给我一句可以参考的英文回答。"));
@@ -138,10 +141,15 @@ public final class JourneyActivity extends Activity {
  private void send(String message)throws Exception{
   if(busy){Toast.makeText(this,"请先结束当前录音或处理",Toast.LENGTH_SHORT).show();return;}
   final String content=message.trim();if(content.isEmpty())return;if(content.length()>1500)throw new IOException("请把内容缩短到 1500 字以内，再分段交流。");
-  final String unit=id();state.message(unit,"user",content);conversation();JSONArray history=new JSONArray(state.chat(unit).toString());int level=lesson.optInt("level");
+  state.message(id(),"user",content);if(chatInput!=null&&chatInput.getText().toString().trim().equals(content))chatInput.setText("");conversation();requestReply();
+ }
+ private void requestReply()throws Exception{
+  if(busy){Toast.makeText(this,"请先停止当前处理",Toast.LENGTH_SHORT).show();return;}
+  final String unit=id(),pending=state.pendingMessage(unit);if(pending.isEmpty())throw new IOException("当前没有待重试的消息，请先输入内容。");
+  JSONArray history=new JSONArray(state.chat(unit).toString());int level=lesson.optInt("level");
   final String system="You are a supportive English role-play partner for a Chinese-speaking learner. Practice band: "+levels.optJSONObject(level).optString("name")+". Scenario: "+lesson.optString("scene")+". "+(level<=1?"Use short everyday sentences, 15-30 words per turn. Offer a brief Chinese hint when needed.":level<=3?"Use natural everyday English, 30-60 words per turn.":"Use varied natural English, 40-90 words per turn, including follow-up questions and clarification.")+" Respond to meaning first, gently recast at most one important language error, and ask one relevant question. Do not merely repeat the lesson. Adapt details and introduce a small unexpected change after several turns. If the learner asks for Chinese help or a recap, comply briefly. Never infer pronunciation, accent, CEFR proficiency, or a score from text. Never invent something the learner said.";
   final String localSystem=JourneyCore.tutorInstruction(level,lesson.optString("title"),sentence(0).optString("en"));
-  runJob(j->{if(LocalAI.enabled(this))return LocalAI.chatVoice(this,localSystem,history,j,delta->{});SharedPreferences p=getSharedPreferences("connection",0);return new CloudClient(this).chat(p.getString("base",""),p.getString("model",""),KeyVault.read(this,"connection"),system,history,j,delta->{});},result->{state.message(unit,"assistant",result.length()>12000?result.substring(0,12000):result);conversation();if(getSharedPreferences("journey_settings",0).getBoolean("autoplay",false))speak(result,1f);},"AI 正在回应，可停止；对话保留最近 30 条。");
+  runJob(j->{String reply;if(LocalAI.enabled(this))reply=LocalAI.chatVoice(this,localSystem,history,j,delta->{});else{SharedPreferences p=getSharedPreferences("connection",0);reply=new CloudClient(this).chat(p.getString("base",""),p.getString("model",""),KeyVault.read(this,"connection"),system,history,j,delta->{});}if(reply==null||reply.trim().isEmpty())throw new IOException("AI 没有返回内容，可点“重试上一条”；已发送的消息保留。");return reply;},result->{state.reply(unit,pending,result.length()>12000?result.substring(0,12000):result);conversation();if(getSharedPreferences("journey_settings",0).getBoolean("autoplay",false))speak(result,1f);},"AI 正在回应，可停止；对话保留最近 30 条。");
  }
  private void record(boolean forChat)throws Exception{
   if(busy||recorder.busy()){Toast.makeText(this,"当前录音或处理尚未结束",Toast.LENGTH_SHORT).show();return;}

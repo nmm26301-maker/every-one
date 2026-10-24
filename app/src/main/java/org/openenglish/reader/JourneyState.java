@@ -48,6 +48,12 @@ public final class JourneyState {
  public int completed(){int count=0;for(int i=1;i<=48;i++)if(complete(String.format(Locale.US,"u%02d",i)))count++;return count;}
  public boolean complete(String id){JSONObject u=unit(id);if(u.optInt("heard")!=7||u.optInt("spoken")!=7)return false;for(int i=0;i<3;i++){JSONObject c=card(id+"_"+i);if(c==null||!c.optBoolean("recall"))return false;}return true;}
  public JSONArray chat(String id){JSONArray a=data.optJSONObject("chats").optJSONArray(id);return a==null?new JSONArray():a;}
+ public String pendingMessage(String id){JSONArray a=chat(id);JSONObject last=a.optJSONObject(a.length()-1);return last!=null&&"user".equals(last.optString("role"))?last.optString("content"):"";}
+ public void reply(String id,String expected,String content)throws Exception{
+  if(expected==null||expected.isEmpty()||!pendingMessage(id).equals(expected))throw new JSONException("待回复的消息已经变化，请重新打开当前场景");
+  if(content==null||content.trim().isEmpty())throw new JSONException("AI 没有返回内容，请重试上一条消息");
+  message(id,"assistant",content);
+ }
  public void message(String id,String role,String content)throws Exception{
   JSONArray a=chat(id),next=new JSONArray();for(int i=Math.max(0,a.length()-29);i<a.length();i++)next.put(a.getJSONObject(i));next.put(new JSONObject().put("role",role).put("content",bounded(content)));data.getJSONObject("chats").put(id,next);save();
  }
