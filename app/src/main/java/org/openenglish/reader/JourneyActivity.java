@@ -59,7 +59,8 @@ public final class JourneyActivity extends Activity {
  }
  private int dp(int x){return (int)(getResources().getDisplayMetrics().density*x+.5f);}
  private GradientDrawable bg(int color,int radius){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));return d;}
- private void safely(Action a){try{a.run();}catch(Exception e){notice("操作未完成",safeError(e));}}
+ private void failure(Exception e){getSharedPreferences("journey_diagnostics",0).edit().putString("last",JourneyCore.diagnostic(e)).apply();}
+ private void safely(Action a){try{JourneyCore.engineCall(()->{a.run();return null;});}catch(Exception e){failure(e);notice("操作未完成",safeError(e));}}
  private String safeError(Exception e){String m=e.getMessage();if(m==null)return "请重试；原有学习进度保留。";if(m.contains("http")||m.length()>240)return "服务或文件处理失败，请检查配置与连接后重试。";return m;}
  private void notice(String title,String text){if(!isFinishing()&&!destroyed)new AlertDialog.Builder(this).setTitle(title).setMessage(text).setPositiveButton("知道了",null).show();}
  private TextView text(String s,int size,int color){TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);t.setLineSpacing(dp(3),1.08f);t.setPadding(0,dp(5),0,dp(7));t.setTextIsSelectable(true);return t;}
@@ -221,9 +222,9 @@ public final class JourneyActivity extends Activity {
  }
  private void runJob(Work work,Result result,String label){runJob(work,result,label,120000);}
  private void runJob(Work work,Result result,String label,long timeout){
-  if(busy)return;busy=true;getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);int token=++generation;CloudClient.Job task=new CloudClient.Job();job=task;status.setText(label);
+  if(busy)return;CloudClient.Job task=new CloudClient.Job();busy=true;getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);int token=++generation;job=task;status.setText(label);
   jobDeadline=()->{if(generation==token&&busy){stopTasks();if(status!=null)status.setText("处理超时，已取消。可重试或检查模型与网络设置。");}};main.postDelayed(jobDeadline,timeout);
-  new Thread(()->{try{String value=work.run(task);task.check();post(token,()->{finishJob();safely(()->result.accept(value));});}catch(Exception e){post(token,()->{finishJob();status.setText("没有完成："+safeError(e)+"\n可以重试，或前往设置检查服务 / 本地模型。");});}},"journey-work").start();
+  new Thread(()->{try{String value=JourneyCore.engineCall(()->work.run(task));task.check();post(token,()->{finishJob();safely(()->result.accept(value));});}catch(Exception e){post(token,()->{finishJob();failure(e);status.setText("没有完成："+safeError(e)+"\n可以重试，或前往设置检查服务 / 本地模型。");});}},"journey-work").start();
  }
  private void finishJob(){busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);if(jobDeadline!=null){main.removeCallbacks(jobDeadline);jobDeadline=null;}job=null;phoneControl=null;}
  private static void writeWav(File file,float[] pcm)throws Exception{try(DataOutputStream o=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))){int bytes=pcm.length*2;o.writeBytes("RIFF");o.writeInt(Integer.reverseBytes(36+bytes));o.writeBytes("WAVEfmt ");o.writeInt(Integer.reverseBytes(16));o.writeShort(Short.reverseBytes((short)1));o.writeShort(Short.reverseBytes((short)1));o.writeInt(Integer.reverseBytes(16000));o.writeInt(Integer.reverseBytes(32000));o.writeShort(Short.reverseBytes((short)2));o.writeShort(Short.reverseBytes((short)16));o.writeBytes("data");o.writeInt(Integer.reverseBytes(bytes));for(float v:pcm)o.writeShort(Short.reverseBytes((short)Math.max(-32768,Math.min(32767,Math.round(v*32767)))));}}
@@ -235,6 +236,10 @@ public final class JourneyActivity extends Activity {
  private EditText field(LinearLayout box,String label,String value,boolean secret){box.addView(text(label,14,MUTED));EditText e=new EditText(this);e.setTextSize(16);e.setTextColor(INK);e.setSingleLine(true);e.setText(value);e.setHint(secret?"留空保留已保存的密钥":"");if(secret)e.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);box.addView(e,new LinearLayout.LayoutParams(-1,dp(52)));return e;}
  private void settings(){
   view("settings","把练习方式配置好");SharedPreferences prefs=getSharedPreferences("journey_settings",0);
+  LinearLayout diagnostic=card("最近一次错误诊断","只保留最近一次错误的类型和代码位置，不记录错误原文、对话、录音或密钥。可复制这些信息帮助排查；原生崩溃和系统强制结束无法在此捕获。");
+  button(diagnostic,"查看最近错误",()->notice("最近错误",getSharedPreferences("journey_diagnostics",0).getString("last","暂无错误记录")),false);
+  button(diagnostic,"复制诊断",()->{String value=getSharedPreferences("journey_diagnostics",0).getString("last","");if(value.isEmpty())throw new IOException("暂无错误记录");((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Everyone 诊断", "Everyone 5.0.22\n"+value));Toast.makeText(this,"诊断已复制",Toast.LENGTH_SHORT).show();},false);
+  button(diagnostic,"清除诊断",()->{getSharedPreferences("journey_diagnostics",0).edit().remove("last").apply();Toast.makeText(this,"诊断已清除",Toast.LENGTH_SHORT).show();},false);
   LinearLayout open=card("开源纠音模型",(JourneyPhoneEngine.installed(this)?"模型已安装，可离线纠音。":"模型尚未安装。")+"\n约 357 MB，首次下载需联网；之后录音不上传。支持 Android 7+、64 位 ARM，建议 6 GB 以上内存；不同手机速度待实测。覆盖内置 144 句课程和 20 个单词/短语。下载时请留在本页，离开会停止。");
   status=text("",15,MUTED);open.addView(status);button(open,"下载并安装开源纠音模型",()->phoneDownload(null),true);button(open,"从文件导入纠音模型",()->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE),102),false);button(open,"停止模型下载",()->{stopTasks();status.setText("已停止，未完成的文件不会作为模型使用。");},false);
   button(open,"开源来源、许可证与局限",()->notice("开源纠音说明","OpenPronounce · MIT\nHalleck45/OpenPronounce @ 74bc17ea\nWav2Vec2 音素模型 · Apache-2.0\nfacebook/wav2vec2-lv-60-espeak-cv-ft\nAndroid 版复用模型、规范化和差异提示规则；对齐实现有适配。不能替代老师判断，不评重音/语调/流利度。\n\n"+read(getAssets().open("journey/OPENPRONOUNCE-LICENSE.txt"),10000)),false);

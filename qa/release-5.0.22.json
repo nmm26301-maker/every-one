@@ -1,0 +1,40 @@
+{
+  "base_sha256": "c88202a1dc42c6d835868875cc42a6985bb23fa351d5c87c251d4ec742cd5018",
+  "versionName": "5.0.22",
+  "versionCode": 81,
+  "preserved_classes": 1143,
+  "replaced_class_families": [
+    "JourneyActivity",
+    "JourneyPhoneEngine",
+    "JourneyState",
+    "JourneyCore"
+  ],
+  "retained_zip_entries": 353,
+  "bundled_models_and_media_unchanged": true,
+  "physical_device_tested": false,
+  "apk_signed": true,
+  "apk_sha256": "d608ae2cce053bf083b5f9d97fef546265ed358ff4540e70a9265937718db05b",
+  "apk_bytes": 428014525,
+  "original_signer_preserved": true,
+  "certificate_sha256": "716c06c3b5a7c4dc8a3a34c2baf445f56d62f075d91ab864156dc5ce48e88887",
+  "zip_alignment_16k_verified": true,
+  "runtime_method_contracts_verified": 907,
+  "source_base": "1409c9a21633ec07d3d9ccd29175b0108683ab83",
+  "host_checks": {
+    "engine_failures": 23,
+    "journey": 56,
+    "conversation_retry": 30,
+    "conversation_drafts": 52,
+    "backup_validation": 158,
+    "page_restoration": 75
+  },
+  "exact_signed_restore_verified": true,
+  "recovery_kit_bytes": 604515,
+  "recovery_kit_sha256": "17e03e03a564ae59382fc37ca1eb2e0eda679cebdc0bd1ab4bdfeff3566d188a",
+  "recovery_kit_git_blob": "e81378451cbf934a03620cfd2556744d35a27217",
+  "recovery_backup_ref": "backup/everyone-5.0.22-20261025",
+  "reported_crash_reproduced": false,
+  "emulator_ui_checks": 29,
+  "emulator_test_variant": "x86_64 test-signed copies without ARM libraries and large assets; original DEX, manifest, resources and curriculum retained",
+  "full_arm_runtime_tested": false
+}

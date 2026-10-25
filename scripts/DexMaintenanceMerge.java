@@ -6,10 +6,10 @@ import org.jf.dexlib2.iface.reference.*;
 import org.jf.dexlib2.immutable.*;
 import org.jf.dexlib2.writer.pool.DexPool;
 
-/** Replace only the three reviewed maintenance class families. */
+/** Replace only the reviewed maintenance class families. */
 public final class DexMaintenanceMerge {
  static final String OWNER="Lorg/openenglish/reader/";
- static final String[] ROOTS={"JourneyActivity","JourneyPhoneEngine","JourneyState"};
+ static final String[] ROOTS={"JourneyActivity","JourneyPhoneEngine","JourneyState","JourneyCore"};
  static final Map<String,ClassDef> types=new HashMap<>();
  static boolean selected(String type){for(String root:ROOTS)if(type.equals(OWNER+root+";")||type.startsWith(OWNER+root+"$"))return true;return false;}
  static boolean matches(MethodReference a,MethodReference b){return a.getName().equals(b.getName())&&a.getReturnType().equals(b.getReturnType())&&a.getParameterTypes().toString().equals(b.getParameterTypes().toString());}

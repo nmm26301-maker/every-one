@@ -5,7 +5,7 @@ BASE_SHA = '7039d0b41cd4b5bc5245bf25dc6011d4793365d9a61ced075ed31d629ef30d01'
 VERSION_NAME = '5.0.16'
 VERSION_CODE = 75
 BUILD_DIR = 'maintenance516'
-ROOTS = ('JourneyActivity', 'JourneyPhoneEngine', 'JourneyState')
+ROOTS = ('JourneyActivity', 'JourneyPhoneEngine', 'JourneyState', 'JourneyCore')
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 

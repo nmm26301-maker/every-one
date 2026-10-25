@@ -1,0 +1,40 @@
+{
+  "sdk": 33,
+  "abi": "x86_64",
+  "software_emulation": true,
+  "full_arm_apk_installed": false,
+  "native_arm_tested": false,
+  "test_copies": [
+    {
+      "version": "5.0.21",
+      "dex_sha256": "d933cca96d8ac035c6703a1bb95ffd85419248629833a94f62956cb7ac788185",
+      "dex_manifest_resources_and_curriculum_identical": true,
+      "arm_libraries_and_large_assets_removed": true,
+      "test_signature": true
+    },
+    {
+      "version": "5.0.22",
+      "dex_sha256": "1cd9064a844da27b958b147ccc59a3368ca2e637364f8b738e5279f0d2209956",
+      "dex_manifest_resources_and_curriculum_identical": true,
+      "arm_libraries_and_large_assets_removed": true,
+      "test_signature": true
+    }
+  ],
+  "baseline_ui": {
+    "checks": [
+      "每天开口",
+      "把英语用起来",
+      "发送并继续对话",
+      "没有完成：",
+      "重试上一条"
+    ],
+    "passed": true,
+    "native_arm_tested": false
+  },
+  "updated_instrumentation": {
+    "checks": 29,
+    "result": "PASS",
+    "evidence": "INSTRUMENTATION_RESULT: checks=29\nINSTRUMENTATION_RESULT: native_arm_tested=false\nINSTRUMENTATION_RESULT: result=PASS\nINSTRUMENTATION_CODE: -1\n"
+  },
+  "original_handset_crash_reproduced": false
+}

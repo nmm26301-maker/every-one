@@ -4,6 +4,20 @@ import java.util.*;
 
 /** Platform independent learning rules. Recognition agreement is never a pronunciation score. */
 public final class JourneyCore {
+ /** Native/binary load failures become ordinary UI-reportable task errors. VM failures remain fatal. */
+ public static <T> T engineCall(java.util.concurrent.Callable<T> work)throws Exception{
+  try{return work.call();}
+  catch(LinkageError error){throw new java.io.IOException("AI 或音频引擎无法加载，请安装完整新版 APK，或切换已配置的云端服务。学习记录和待回复问题保留。",error);}
+ }
+ /** Exclude exception messages, request bodies, local paths and user text from diagnostics. */
+ public static String diagnostic(Throwable error){
+  StringBuilder out=new StringBuilder();Set<Throwable> seen=Collections.newSetFromMap(new IdentityHashMap<Throwable,Boolean>());
+  for(int cause=0;error!=null&&cause<3&&seen.add(error);cause++,error=error.getCause()){
+   out.append(error.getClass().getName()).append('\n');StackTraceElement[] frames=error.getStackTrace();
+   for(int i=0;i<Math.min(6,frames.length);i++)out.append(frames[i].getClassName()).append('.').append(frames[i].getMethodName()).append(':').append(frames[i].getLineNumber()).append('\n');
+  }
+  return out.substring(0,Math.min(3000,out.length()));
+ }
  public static final long DAY=86400000L;
  public static final int[] INTERVALS={0,1,3,7,14,30};
  public static int nextStage(int old, boolean recalled, boolean due) {
