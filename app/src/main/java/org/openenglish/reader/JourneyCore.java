@@ -4,6 +4,10 @@ import java.util.*;
 
 /** Platform independent learning rules. Recognition agreement is never a pronunciation score. */
 public final class JourneyCore {
+ public static String assessmentMode(String stored){return Arrays.asList("manual","recognition","azure","openpronounce").contains(stored)?stored:"manual";}
+ public static String sampleKey(String unit,int phrase){if(unit==null||!unit.matches("u(0[1-9]|[1-3][0-9]|4[0-8])")||phrase<0||phrase>2)throw new IllegalArgumentException("未知课程音频");return unit+"_"+phrase;}
+ public static String samplePack(String key){if(key==null||!key.matches("u(0[1-9]|[1-3][0-9]|4[0-8])_[0-2]"))throw new IllegalArgumentException("未知课程音频");return "level"+((Integer.parseInt(key.substring(1,3))-1)/8)+".zip";}
+ public static boolean loopReady(int step,boolean played,boolean revealed,boolean recorded,boolean replayed){return (step==0||step==2)?played&&revealed:(step==1||step==3)&&recorded&&replayed;}
  /** Native/binary load failures become ordinary UI-reportable task errors. VM failures remain fatal. */
  public static <T> T engineCall(java.util.concurrent.Callable<T> work)throws Exception{
   try{return work.call();}

@@ -35,7 +35,7 @@ public final class JourneyRuntimeProbe extends Instrumentation {
    check(before.equals(getTargetContext().getSharedPreferences("journey_progress_v1",0).getString("data","")),"failure preserves pending conversation");
    job(false,replies);check(replies.get()==1,"new task succeeds after linker failure");
    click("首页");click("设置、模型与备份");main(()->check(find("查看最近错误")!=null,"diagnostic controls render"));click("复制诊断");
-   main(()->{ClipboardManager c=(ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE);String text=c.getPrimaryClip().getItemAt(0).getText().toString();check(text.contains("Everyone 5.0.22")&&text.contains("UnsatisfiedLinkError")&&!text.contains("PROBE_PRIVATE_MESSAGE"),"explicit copy is bounded diagnostic");});
+   main(()->{ClipboardManager c=(ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE);String text=c.getPrimaryClip().getItemAt(0).getText().toString();check(text.contains("Everyone "+activity.getPackageManager().getPackageInfo(activity.getPackageName(),0).versionName)&&text.contains("UnsatisfiedLinkError")&&!text.contains("PROBE_PRIVATE_MESSAGE"),"explicit copy is bounded diagnostic");});
    click("清除诊断");check(diagnostic().isEmpty(),"diagnostic cleared");
   }
   out.putString("result","PASS");out.putInt("checks",checks);out.putBoolean("native_arm_tested",false);finish(Activity.RESULT_OK,out);

@@ -1,0 +1,1017 @@
+{
+  "voice": "en_US-ljspeech-high",
+  "engine": "piper-tts 1.8.0 (build-time GPL-3.0)",
+  "model_sha256": "5d4f08ba6a2a48c44592eed3ce56bf85e9de3dd4e20df90541ae68a8310c029a",
+  "config_sha256": "7e1f4634af596d83cca997fb7a931ba80b70f8a316a2655ee69c55365e0ace14",
+  "telemetry_disabled_before_runtime_import": true,
+  "samples": [
+    {
+      "key": "u01_0",
+      "text": "Hi, I'm Mei.",
+      "pack": "level0.zip",
+      "sha256": "f0fb4d4e8d07106886f02ea1d1501bf81fbef17952e0929a24c9e5201a508733",
+      "bytes": 5321
+    },
+    {
+      "key": "u01_1",
+      "text": "What's your name?",
+      "pack": "level0.zip",
+      "sha256": "7120dc373f5882c4a7af1e3e92c52824c4cc6367260b0edb87e579f180cd8949",
+      "bytes": 5190
+    },
+    {
+      "key": "u01_2",
+      "text": "Nice to meet you.",
+      "pack": "level0.zip",
+      "sha256": "3c04357049da0e36f6905e36b2ccddb2f4c4bcde1dd6bad47d473a92838dd4ee",
+      "bytes": 5843
+    },
+    {
+      "key": "u02_0",
+      "text": "I'm from China.",
+      "pack": "level0.zip",
+      "sha256": "df944c5fbf0d726f7626d82f45114f50af149a8a526b787af683cacbc44b2f26",
+      "bytes": 5451
+    },
+    {
+      "key": "u02_1",
+      "text": "Where are you from?",
+      "pack": "level0.zip",
+      "sha256": "ccffc5b3837ef7febcc8cf1cbb363912a6e516f4bd7d3880155349c2048689c1",
+      "bytes": 6235
+    },
+    {
+      "key": "u02_2",
+      "text": "I live in Beijing.",
+      "pack": "level0.zip",
+      "sha256": "06201fdd758d109d22b0aac387afc25be068d080c4f79cd90d6d2dc544248754",
+      "bytes": 5974
+    },
+    {
+      "key": "u03_0",
+      "text": "I need some water.",
+      "pack": "level0.zip",
+      "sha256": "e529a4c1b68f9e550a749cb77568543030a97d6449576ff78d97ad3fbad2137e",
+      "bytes": 6627
+    },
+    {
+      "key": "u03_1",
+      "text": "Water, please.",
+      "pack": "level0.zip",
+      "sha256": "678e7b229dc555578edfa49572b22cd3b9f0f4bb52246c18f96297a0f0fcd017",
+      "bytes": 5713
+    },
+    {
+      "key": "u03_2",
+      "text": "Thank you very much.",
+      "pack": "level0.zip",
+      "sha256": "64e749b22de1a64e0475e4c80170badd4fa0a149ffd234ef58d6d997270ccb0d",
+      "bytes": 6888
+    },
+    {
+      "key": "u04_0",
+      "text": "Yes, that's right.",
+      "pack": "level0.zip",
+      "sha256": "8c731bd68c1a021cd357b3f3ad310f0e6dd40299d09204504331723f2fb8a007",
+      "bytes": 7019
+    },
+    {
+      "key": "u04_1",
+      "text": "No, thank you.",
+      "pack": "level0.zip",
+      "sha256": "441f4628dc6986a40a14d7fcf67403513124d07968addc4379937923ec8b2cf9",
+      "bytes": 5451
+    },
+    {
+      "key": "u04_2",
+      "text": "Is this yours?",
+      "pack": "level0.zip",
+      "sha256": "837790ee40cb64a112be1e0b9c6805f2df76e3bbe8c6ebb4d8a914e24f274117",
+      "bytes": 6104
+    },
+    {
+      "key": "u05_0",
+      "text": "Sorry, I don't understand.",
+      "pack": "level0.zip",
+      "sha256": "9e57df23ccd2ea407830456ab031dc7f58e78f3afd3b10ee110bcae42043e9e1",
+      "bytes": 10023
+    },
+    {
+      "key": "u05_1",
+      "text": "Could you say that again?",
+      "pack": "level0.zip",
+      "sha256": "242c5a8b27a77aa1838606908e588a027554cbf0b183d55aa3c0a3bb8d3207dd",
+      "bytes": 7541
+    },
+    {
+      "key": "u05_2",
+      "text": "Please speak more slowly.",
+      "pack": "level0.zip",
+      "sha256": "9bc89daf50656ffa3914682bb5e6f3a263f909f20080d8b634cc339f1a168324",
+      "bytes": 8455
+    },
+    {
+      "key": "u06_0",
+      "text": "One, two, three.",
+      "pack": "level0.zip",
+      "sha256": "795a1b9ce68a590895b124e3365e6c5a5216e42921a33527ea2adac75f5a63ec",
+      "bytes": 6496
+    },
+    {
+      "key": "u06_1",
+      "text": "How much is this?",
+      "pack": "level0.zip",
+      "sha256": "47e801a4e615038c65536e67ffc7bcba085732be01f5354e85b42ff73e8979dd",
+      "bytes": 6104
+    },
+    {
+      "key": "u06_2",
+      "text": "It's ten dollars.",
+      "pack": "level0.zip",
+      "sha256": "85dbf61b92fe2f1e54f666715c0898144b2ea23f06935dcb5aebe7e6640debf4",
+      "bytes": 6235
+    },
+    {
+      "key": "u07_0",
+      "text": "Where is my phone?",
+      "pack": "level0.zip",
+      "sha256": "2cb2a0eb482a198d7b817fc0cfea777e34ac27e0672ed5c033f8994c13033d1f",
+      "bytes": 6888
+    },
+    {
+      "key": "u07_1",
+      "text": "It's right here.",
+      "pack": "level0.zip",
+      "sha256": "54307dae88c73381b5e9eb7b36bd6cab430f20ad16143f6ab80bbfda1f3a99a2",
+      "bytes": 5060
+    },
+    {
+      "key": "u07_2",
+      "text": "Is it over there?",
+      "pack": "level0.zip",
+      "sha256": "50292dd43ec9201e6159c0ca47ab72e7bd27d053edc28fde2c6e5effa7ba6bf6",
+      "bytes": 5713
+    },
+    {
+      "key": "u08_0",
+      "text": "Hi, I'm Mei, and I'm a student.",
+      "pack": "level0.zip",
+      "sha256": "cc4b21b031cccb3e29215c4940a99255002e33fe851a03cd0e8f86d3fee1c936",
+      "bytes": 9762
+    },
+    {
+      "key": "u08_1",
+      "text": "I speak a little English.",
+      "pack": "level0.zip",
+      "sha256": "c6e53d1500813f573b7c7b25ff4c48784426555026e1f70dfcee96eee6e0277c",
+      "bytes": 8586
+    },
+    {
+      "key": "u08_2",
+      "text": "Can you help me, please?",
+      "pack": "level0.zip",
+      "sha256": "82747052546d98428b7b9f44682d4159650948a90ddc7f910ecd080eb231d868",
+      "bytes": 7280
+    },
+    {
+      "key": "u09_0",
+      "text": "I work in a shop.",
+      "pack": "level1.zip",
+      "sha256": "394e152a6a3993c1aacaf297b6b082323da6bc3d1cf871d5012f038de624d12f",
+      "bytes": 7541
+    },
+    {
+      "key": "u09_1",
+      "text": "What do you do?",
+      "pack": "level1.zip",
+      "sha256": "e6dc5616ef340a5984373fd04f744ae9e6643202b477c80a4f15138c9613e545",
+      "bytes": 4537
+    },
+    {
+      "key": "u09_2",
+      "text": "I study English every day.",
+      "pack": "level1.zip",
+      "sha256": "0cd5e9c4ab04d4a0a00cdc2b9d3145db95b4057aeb9676ccd1f9277bc925a099",
+      "bytes": 10415
+    },
+    {
+      "key": "u10_0",
+      "text": "This is my sister.",
+      "pack": "level1.zip",
+      "sha256": "6983340e8855106dfaccfc977ac2c6cf1352b8f375a4bd8136188991e2d6db05",
+      "bytes": 6627
+    },
+    {
+      "key": "u10_1",
+      "text": "She lives near me.",
+      "pack": "level1.zip",
+      "sha256": "f8e04053f99f20e450c91846c67a9fde28eb451b294c659b84d74272fb4b85c1",
+      "bytes": 6496
+    },
+    {
+      "key": "u10_2",
+      "text": "Do you have any brothers?",
+      "pack": "level1.zip",
+      "sha256": "bcd0fde4f840897f5265dcdd27fc47cdcd874dd1d7549f0daba3f31849d87e0f",
+      "bytes": 7280
+    },
+    {
+      "key": "u11_0",
+      "text": "I get up at seven.",
+      "pack": "level1.zip",
+      "sha256": "db7230339ec8055f40375119f8e511df311dca352692c88a576d9301d5ea82bd",
+      "bytes": 6627
+    },
+    {
+      "key": "u11_1",
+      "text": "I go to work at eight.",
+      "pack": "level1.zip",
+      "sha256": "cabf2887fd4dbec93fe4f0691574bbe84ab6e98c8b9e630f12a932ff7410e6ec",
+      "bytes": 7411
+    },
+    {
+      "key": "u11_2",
+      "text": "What time do you finish?",
+      "pack": "level1.zip",
+      "sha256": "a82ab669d14cd7fc29f3caac5a0863edc2eccd4e344e940bad7b6197fbe2b52e",
+      "bytes": 7280
+    },
+    {
+      "key": "u12_0",
+      "text": "I'd like a coffee, please.",
+      "pack": "level1.zip",
+      "sha256": "01dff01bae97f7ea78ccddde91e42e02563d41e8c595e90b7b926e6bfb6e0af8",
+      "bytes": 8847
+    },
+    {
+      "key": "u12_1",
+      "text": "Can I have it without sugar?",
+      "pack": "level1.zip",
+      "sha256": "6d7a033fca537654ede79f79f866fc3964d372034532ecd1d4862a120b1ea356",
+      "bytes": 7541
+    },
+    {
+      "key": "u12_2",
+      "text": "That's all, thank you.",
+      "pack": "level1.zip",
+      "sha256": "f23fc263c6e8458f2187682e736d4530510c27e17fd78c94921eb60ead30d938",
+      "bytes": 8455
+    },
+    {
+      "key": "u13_0",
+      "text": "How do I get to the station?",
+      "pack": "level1.zip",
+      "sha256": "c2e8358c91763925cb90bb031cb667ed138a9351d8057208108947058cdd3199",
+      "bytes": 8847
+    },
+    {
+      "key": "u13_1",
+      "text": "Turn left at the next street.",
+      "pack": "level1.zip",
+      "sha256": "43d2537e11f673c1745e951d92555def9bbaaba981a8a42a432f6e3d22ad04c1",
+      "bytes": 9762
+    },
+    {
+      "key": "u13_2",
+      "text": "Is it far from here?",
+      "pack": "level1.zip",
+      "sha256": "a4fb0a9dd223f02a843102ffd290dbd595bc3b3a4abbbf8b910782020e94c924",
+      "bytes": 6496
+    },
+    {
+      "key": "u14_0",
+      "text": "Do you have this in blue?",
+      "pack": "level1.zip",
+      "sha256": "d4f57a7d26e5cdce2391824024a3210b32d16f8826e16a4fd7abec81cddf34e3",
+      "bytes": 7411
+    },
+    {
+      "key": "u14_1",
+      "text": "Can I try it on?",
+      "pack": "level1.zip",
+      "sha256": "8ab507007abcfe9c3065c2ed481c62f52e56124b134e3ea1ef1ff5bc5047775c",
+      "bytes": 4929
+    },
+    {
+      "key": "u14_2",
+      "text": "I'll take this one.",
+      "pack": "level1.zip",
+      "sha256": "d7f457abe3bb505ff91470a8878d4dfbab59bf4f98f3398a42ede6962331bd27",
+      "bytes": 6235
+    },
+    {
+      "key": "u15_0",
+      "text": "Are you free on Friday?",
+      "pack": "level1.zip",
+      "sha256": "914658092d882f224c13581b95577cdd03570446b285f4589c8d6a2a9f72efa9",
+      "bytes": 8455
+    },
+    {
+      "key": "u15_1",
+      "text": "Let's meet at three.",
+      "pack": "level1.zip",
+      "sha256": "1a34dda43f4b5737d671809bbcc897c9ae58dc46e8a5a1c98217821476497398",
+      "bytes": 7280
+    },
+    {
+      "key": "u15_2",
+      "text": "See you then.",
+      "pack": "level1.zip",
+      "sha256": "bc61232b282dd51793977fcf07d1bdb7ca854879cfa10d81c95fd8762bbe2a53",
+      "bytes": 4406
+    },
+    {
+      "key": "u16_0",
+      "text": "I like reading and swimming.",
+      "pack": "level1.zip",
+      "sha256": "39d6593ab2853904b5da36e77fcbf5ffcd48d4a2cae3ebd2633a66ca72d67761",
+      "bytes": 8586
+    },
+    {
+      "key": "u16_1",
+      "text": "What do you do for fun?",
+      "pack": "level1.zip",
+      "sha256": "53228d64bb900782bcb219ea5946ee1332357a2aa1fb8b5581f36cbdc8540a84",
+      "bytes": 6888
+    },
+    {
+      "key": "u16_2",
+      "text": "How about you?",
+      "pack": "level1.zip",
+      "sha256": "f0d3656d45e1c1eb6f1ec91e8d3c2045aae77370aae88041a4fdad50477bdb1e",
+      "bytes": 5190
+    },
+    {
+      "key": "u17_0",
+      "text": "I visited a friend yesterday.",
+      "pack": "level2.zip",
+      "sha256": "14a7b104d20dfa74d715eb016824ca7ff27edfc0af6c25b476e94843bb229567",
+      "bytes": 8586
+    },
+    {
+      "key": "u17_1",
+      "text": "We had lunch together.",
+      "pack": "level2.zip",
+      "sha256": "0613bc017e3f0b4fadf25db9dccf3680b577048d85feccc4a95244a876c70f0a",
+      "bytes": 6757
+    },
+    {
+      "key": "u17_2",
+      "text": "What did you do yesterday?",
+      "pack": "level2.zip",
+      "sha256": "bf5b80712e067d45a5fcd330e2e4801c14794eb9a49adb3498100feac02cfb8c",
+      "bytes": 7541
+    },
+    {
+      "key": "u18_0",
+      "text": "I'm going to visit my parents.",
+      "pack": "level2.zip",
+      "sha256": "fc2d8937f12ce9a76bcd8150449eb79ed2811b43792d123df381e2496a25068c",
+      "bytes": 9370
+    },
+    {
+      "key": "u18_1",
+      "text": "What are your plans for the weekend?",
+      "pack": "level2.zip",
+      "sha256": "3ddbf9d821948cc4263800d05cb983ffcd292a57193484ae40ed5396dd38f175",
+      "bytes": 10415
+    },
+    {
+      "key": "u18_2",
+      "text": "We might go for a walk.",
+      "pack": "level2.zip",
+      "sha256": "6da0c2ebec0a4d112e8659de2ab300d5804f57968c5d66bce220b5a530989f11",
+      "bytes": 7802
+    },
+    {
+      "key": "u19_0",
+      "text": "I have a reservation under Chen.",
+      "pack": "level2.zip",
+      "sha256": "e888740889fa844a49fcc1afd01c72b6fe1f0d7d0f8ac5b77d19ea27359b7744",
+      "bytes": 10545
+    },
+    {
+      "key": "u19_1",
+      "text": "What time is breakfast?",
+      "pack": "level2.zip",
+      "sha256": "066b0ad296534ed3e50be55bd57717689893756698ea174c9c8aa547c3a081b9",
+      "bytes": 7541
+    },
+    {
+      "key": "u19_2",
+      "text": "Could I have a quiet room?",
+      "pack": "level2.zip",
+      "sha256": "67866c9411e27daf5b68829f0efbd4f1ff214e511619d0d503f6fda832eca2ae",
+      "bytes": 7541
+    },
+    {
+      "key": "u20_0",
+      "text": "I'm allergic to peanuts.",
+      "pack": "level2.zip",
+      "sha256": "ee22ab8482f24e6f113cfaba0ce7c2c565cd59017d4d4b64430832a2841d7ded",
+      "bytes": 8455
+    },
+    {
+      "key": "u20_1",
+      "text": "Does this dish contain nuts?",
+      "pack": "level2.zip",
+      "sha256": "3f82323ffebd54a4073f9f3b4d20e61d3758549e48d3863428d8860b5fa626af",
+      "bytes": 9631
+    },
+    {
+      "key": "u20_2",
+      "text": "Could we have the bill, please?",
+      "pack": "level2.zip",
+      "sha256": "8d604e1e5a04776afee4dc2f08a6554b3879a404da4e504140ca88e949f91059",
+      "bytes": 10023
+    },
+    {
+      "key": "u21_0",
+      "text": "I think I missed my stop.",
+      "pack": "level2.zip",
+      "sha256": "89a84957cf8435bf7f710db9cba023430ad22d97a7e5d5ba36e9006ff64f2d64",
+      "bytes": 8325
+    },
+    {
+      "key": "u21_1",
+      "text": "When is the next train?",
+      "pack": "level2.zip",
+      "sha256": "35b13fa0e45291087f5f2187018a8c1514298ec3a3f4a33c4df7246cfbf7690b",
+      "bytes": 7802
+    },
+    {
+      "key": "u21_2",
+      "text": "Does this bus go to the airport?",
+      "pack": "level2.zip",
+      "sha256": "3d3e0288b8a1850cf7eb7ac2a55674e6105ff6a6b8f58883533733f148991dbb",
+      "bytes": 10676
+    },
+    {
+      "key": "u22_0",
+      "text": "I'd like to book an appointment.",
+      "pack": "level2.zip",
+      "sha256": "f19dbb6413777ee58968e0434b8dd49b9d73fbb1c4c8d55c16ba2ec0b63fa04a",
+      "bytes": 9762
+    },
+    {
+      "key": "u22_1",
+      "text": "Could we move it to Monday?",
+      "pack": "level2.zip",
+      "sha256": "a022232b1dccc488a02a0822e35648736f7ce46ec634f439d8d3d96e56ae47d0",
+      "bytes": 8586
+    },
+    {
+      "key": "u22_2",
+      "text": "Is there anything available in the afternoon?",
+      "pack": "level2.zip",
+      "sha256": "9e97852399b0ff58f37cf4a072cdd4401419ecebae7fa43e36b67465e5f49f5f",
+      "bytes": 13157
+    },
+    {
+      "key": "u23_0",
+      "text": "I've had a headache since yesterday.",
+      "pack": "level2.zip",
+      "sha256": "3847f9a0ef6b59b780edf0819d0d954c332de98f2f61a3e1ef7079cc0b7ab0f5",
+      "bytes": 9762
+    },
+    {
+      "key": "u23_1",
+      "text": "My throat hurts when I swallow.",
+      "pack": "level2.zip",
+      "sha256": "0f885ec5e8afd67f941ca32460a310967c37946d2d276906cabded8a2c04c76d",
+      "bytes": 9370
+    },
+    {
+      "key": "u23_2",
+      "text": "Where is the nearest pharmacy?",
+      "pack": "level2.zip",
+      "sha256": "3b2ed9c87d500ba411110f8854aa1197cc69706e7e45617a86487ecfee7a5a81",
+      "bytes": 10153
+    },
+    {
+      "key": "u24_0",
+      "text": "This doesn't seem to work.",
+      "pack": "level2.zip",
+      "sha256": "125d344bf208b6cee4b4df2f8c44e472ae3387e84082ce82e6e2bfe04d3f2a4d",
+      "bytes": 7933
+    },
+    {
+      "key": "u24_1",
+      "text": "Could I exchange it for another one?",
+      "pack": "level2.zip",
+      "sha256": "f58f81d054d60271fa4a8dbb2cff3ffe9a619cbebb5da93cac03bec4a474d11a",
+      "bytes": 9500
+    },
+    {
+      "key": "u24_2",
+      "text": "I bought it here yesterday.",
+      "pack": "level2.zip",
+      "sha256": "cb9d082b2148e2075a91506fd9880018ac6c33b6d1b61adb084f4fdbbf1e4ab7",
+      "bytes": 7933
+    },
+    {
+      "key": "u25_0",
+      "text": "I was walking home when it started raining.",
+      "pack": "level3.zip",
+      "sha256": "2e02b2e415ae9b274fb7cea69757903405a9f7b3d56c83b8cf1bdeaf8ab924c7",
+      "bytes": 11721
+    },
+    {
+      "key": "u25_1",
+      "text": "Luckily, a friend offered me a ride.",
+      "pack": "level3.zip",
+      "sha256": "5f96feeee256bd542e9daa761bbe82bbe5a6c1adb2b7e80a32c6410c36b5defd",
+      "bytes": 13419
+    },
+    {
+      "key": "u25_2",
+      "text": "It turned out to be a memorable day.",
+      "pack": "level3.zip",
+      "sha256": "9a04c3a086488782ae486df04ea62456dded68a3593fb54a26b146f30e2ef717",
+      "bytes": 10284
+    },
+    {
+      "key": "u26_0",
+      "text": "I think working from home can save time.",
+      "pack": "level3.zip",
+      "sha256": "1c42212eff5b6c1b58b57d4e57cb3d9804d3c6034f7ea45c50f6fe7bb7cc5e1b",
+      "bytes": 13288
+    },
+    {
+      "key": "u26_1",
+      "text": "It depends on the kind of work you do.",
+      "pack": "level3.zip",
+      "sha256": "9ff8ebd38686d8a113d49e0b5adc684c5da95ac9b4fb1da175fbcb74a4388c18",
+      "bytes": 11460
+    },
+    {
+      "key": "u26_2",
+      "text": "For example, I spend less time commuting.",
+      "pack": "level3.zip",
+      "sha256": "84d5deb1c2cccfe6f64dff1467ef4b1bb5359c1071073b26a6f2b8fb16b8ec7c",
+      "bytes": 14202
+    },
+    {
+      "key": "u27_0",
+      "text": "You could try taking a short break.",
+      "pack": "level3.zip",
+      "sha256": "d518868809770c41b09366f6bce98a87a5c3190dede9b73e67e376d609e3e5bb",
+      "bytes": 10284
+    },
+    {
+      "key": "u27_1",
+      "text": "Why don't we ask someone for advice?",
+      "pack": "level3.zip",
+      "sha256": "a15d6985359a13ac6f0d453652698bcc0b62647bca0f6c3d1cd7bfc1965b2af7",
+      "bytes": 12766
+    },
+    {
+      "key": "u27_2",
+      "text": "What would you suggest?",
+      "pack": "level3.zip",
+      "sha256": "7877920a2c1d95b0743b95da4d69edbf14c5522176f48eaa4fcb95fa9e0c8ede",
+      "bytes": 6888
+    },
+    {
+      "key": "u28_0",
+      "text": "That's not quite what I meant.",
+      "pack": "level3.zip",
+      "sha256": "11a7227674f7d7e724c756083f29a1cada9c175e9c1731866766b9631d2048c8",
+      "bytes": 9109
+    },
+    {
+      "key": "u28_1",
+      "text": "Let me explain it another way.",
+      "pack": "level3.zip",
+      "sha256": "1e2e0c1c38bc579604cfd1c0e75f2efbffe55d7980d3bbf36f48eecf6afa51b2",
+      "bytes": 9500
+    },
+    {
+      "key": "u28_2",
+      "text": "Do you mean we should wait until tomorrow?",
+      "pack": "level3.zip",
+      "sha256": "0269c9350f297046e80c3969c047caf165b787e3ffcd22492e5c1cff0a8bba46",
+      "bytes": 11460
+    },
+    {
+      "key": "u29_0",
+      "text": "I've finished the first part of the project.",
+      "pack": "level3.zip",
+      "sha256": "4f1e1077db6315f8eaff3ecab25e237d9d657f99f7b48a1c18f5621f6d92c813",
+      "bytes": 14202
+    },
+    {
+      "key": "u29_1",
+      "text": "I'm still waiting for some information.",
+      "pack": "level3.zip",
+      "sha256": "c2c37d3b815a4333ee803ed9a2865c877d0c2611441ca2533364c78113034f5f",
+      "bytes": 10415
+    },
+    {
+      "key": "u29_2",
+      "text": "I'll send you an update by Friday.",
+      "pack": "level3.zip",
+      "sha256": "4f30251d955ec0f5f23ddb11b036438d5334f85bc61cc41a771f3b90a0e7493f",
+      "bytes": 10806
+    },
+    {
+      "key": "u30_0",
+      "text": "How's your week been so far?",
+      "pack": "level3.zip",
+      "sha256": "b18b97bf88be44b055e9a0dde187bf104a4d171c657b97ab71e0cf5c29cc1e89",
+      "bytes": 8978
+    },
+    {
+      "key": "u30_1",
+      "text": "That sounds interesting. How did you get into it?",
+      "pack": "level3.zip",
+      "sha256": "79f4481ebdadd75d86af414e55c154586ea8bd4a751d3611f7682a4d927c29f6",
+      "bytes": 14855
+    },
+    {
+      "key": "u30_2",
+      "text": "I've always wanted to try that.",
+      "pack": "level3.zip",
+      "sha256": "b574529cdcebdc2d71502d52f112cc0afe37cd584edaef6dd9aa5baef540dfe1",
+      "bytes": 11068
+    },
+    {
+      "key": "u31_0",
+      "text": "I don't know the word, but it's used for cooking.",
+      "pack": "level3.zip",
+      "sha256": "e77d85b1f0bfa66ffe25a2f9cccab8ceca9a51cc94b1f486bce6cc6f308103f7",
+      "bytes": 14072
+    },
+    {
+      "key": "u31_1",
+      "text": "It's similar to a small oven.",
+      "pack": "level3.zip",
+      "sha256": "cb2e9ad3b5defbb1a16e2f8eb03f59a469d545d7faa9f7c982a50bababea9f60",
+      "bytes": 8847
+    },
+    {
+      "key": "u31_2",
+      "text": "What do you call that in English?",
+      "pack": "level3.zip",
+      "sha256": "54df5e9fbfbf594b1ee26f6c22ac77d87c35b24b2d850dc43a43086d5f3c1435",
+      "bytes": 9762
+    },
+    {
+      "key": "u32_0",
+      "text": "Our plans have changed at the last minute.",
+      "pack": "level3.zip",
+      "sha256": "98bf4920a28dfe67a1354db7f541719f346fb948516d85b3f4034d6b6c7c440e",
+      "bytes": 14202
+    },
+    {
+      "key": "u32_1",
+      "text": "Would it be possible to meet online instead?",
+      "pack": "level3.zip",
+      "sha256": "40859bcafb860a877feb139a1c43718311b8ee8714a0568bb7c82b93a17b070d",
+      "bytes": 12766
+    },
+    {
+      "key": "u32_2",
+      "text": "Let me know what works best for you.",
+      "pack": "level3.zip",
+      "sha256": "8d116bdd629fe0fd3bfea6b29a0dc8a6cfb2519a89a2156de8370714046270d7",
+      "bytes": 10415
+    },
+    {
+      "key": "u33_0",
+      "text": "The cheaper option may cost more in the long run.",
+      "pack": "level4.zip",
+      "sha256": "ba9b9ab1a992faaae839bacc999343d73128a6c0c8f23c51e733a540c558d3c8",
+      "bytes": 14464
+    },
+    {
+      "key": "u33_1",
+      "text": "We need to weigh the benefits against the risks.",
+      "pack": "level4.zip",
+      "sha256": "7b20dfa482bc6b2c01ced5109b8a9275527b46d7e4da0699841e52e592581df0",
+      "bytes": 14986
+    },
+    {
+      "key": "u33_2",
+      "text": "What matters most is whether it meets our needs.",
+      "pack": "level4.zip",
+      "sha256": "e6a202f0d095088c99826c8231d5184c2809a87aafdb1c7d01f29bd2b2aa5c94",
+      "bytes": 15117
+    },
+    {
+      "key": "u34_0",
+      "text": "I see your point, but I'm not entirely convinced.",
+      "pack": "level4.zip",
+      "sha256": "9d638a53c303642317ebd93a89f6baf397e30393e36f8f2696a84b86a04570b1",
+      "bytes": 16815
+    },
+    {
+      "key": "u34_1",
+      "text": "My main concern is how this would work in practice.",
+      "pack": "level4.zip",
+      "sha256": "86141a9b82770a44096a54458065affc36ca5325f65af11a8fbfdf7e429b3b98",
+      "bytes": 16423
+    },
+    {
+      "key": "u34_2",
+      "text": "Could we look at it from another perspective?",
+      "pack": "level4.zip",
+      "sha256": "f9f817f0cba783f02e946cf21f76c122d3ef05da2daf769a3d1aa541ef6d3745",
+      "bytes": 11590
+    },
+    {
+      "key": "u35_0",
+      "text": "If we extend the deadline, we could improve the quality.",
+      "pack": "level4.zip",
+      "sha256": "23cb726f593d349183dab734bea3fc2462da6364cecb7ce4378baba690994b07",
+      "bytes": 17468
+    },
+    {
+      "key": "u35_1",
+      "text": "Would you be willing to consider a compromise?",
+      "pack": "level4.zip",
+      "sha256": "69c558be5d17ca8252d0196fd74dc4a36c1d8dfcdee6035bb89cf41f37f1c840",
+      "bytes": 12766
+    },
+    {
+      "key": "u35_2",
+      "text": "Let's agree on the next steps before we finish.",
+      "pack": "level4.zip",
+      "sha256": "e72a7a85a87bca7fdecf089e46e02ae71e1a1a6d8d917893714d44a5da5ce948",
+      "bytes": 15770
+    },
+    {
+      "key": "u36_0",
+      "text": "The process consists of three main stages.",
+      "pack": "level4.zip",
+      "sha256": "0a415aebb811cc0006816cb35ff318f5ffd440fcc5b963df7e60b00efdb4f487",
+      "bytes": 14594
+    },
+    {
+      "key": "u36_1",
+      "text": "Once you've completed this step, you can move on.",
+      "pack": "level4.zip",
+      "sha256": "9c87ae320da998e42333770e09c5ee8b472826394fa1e6394afdd5740bc141c5",
+      "bytes": 14072
+    },
+    {
+      "key": "u36_2",
+      "text": "Would it help if I walked you through an example?",
+      "pack": "level4.zip",
+      "sha256": "a2a9d5e2a255401506b5704d45b790eba04cca3797b846fc87c414aa0d9caf5f",
+      "bytes": 11590
+    },
+    {
+      "key": "u37_0",
+      "text": "I'm not sure how reliable that source is.",
+      "pack": "level4.zip",
+      "sha256": "a765573e73751f1c4fffdbb5bb5fd0dd91e80dc8b7f64b5c5413103eae51511d",
+      "bytes": 13941
+    },
+    {
+      "key": "u37_1",
+      "text": "The evidence seems to support a different conclusion.",
+      "pack": "level4.zip",
+      "sha256": "2ba14745c7e68ba4d67db614e9bf625180b6372ba6d60e313fff2159a2d727d1",
+      "bytes": 14986
+    },
+    {
+      "key": "u37_2",
+      "text": "We should distinguish between facts and opinions.",
+      "pack": "level4.zip",
+      "sha256": "1614495e523f7784bd6625dbce019ee60d776b28d4443bd351f18818d2003eec",
+      "bytes": 14202
+    },
+    {
+      "key": "u38_0",
+      "text": "In my experience, expectations vary from place to place.",
+      "pack": "level4.zip",
+      "sha256": "1a020dd6e338ee4a10d2ab79068b79c70be646e70862fafd2011c24ae62bcfae",
+      "bytes": 19035
+    },
+    {
+      "key": "u38_1",
+      "text": "I wouldn't want to make a generalization.",
+      "pack": "level4.zip",
+      "sha256": "e6e800f1244c4bf3ae4c39362cd95d44e73a44d2aa46b3b7c67e3e416d1c74c2",
+      "bytes": 12635
+    },
+    {
+      "key": "u38_2",
+      "text": "How is that usually handled where you live?",
+      "pack": "level4.zip",
+      "sha256": "6d264b218cd7801a42341270a2c1b6ddcf075620e29bebf22e35d3114b2314ba",
+      "bytes": 12635
+    },
+    {
+      "key": "u39_0",
+      "text": "I appreciated how clearly you explained the problem.",
+      "pack": "level4.zip",
+      "sha256": "50c24e4dac20d04b51142d1a8d27a37ccebfee0b3839590042a43d7c9c0a2ed5",
+      "bytes": 16031
+    },
+    {
+      "key": "u39_1",
+      "text": "One thing we could improve is the handover process.",
+      "pack": "level4.zip",
+      "sha256": "4d120b11cfc2a83d287b8163b670ca8f6502ac7c1ae0c15d648089e9c8d64d8e",
+      "bytes": 17076
+    },
+    {
+      "key": "u39_2",
+      "text": "Could we set aside some time to discuss this?",
+      "pack": "level4.zip",
+      "sha256": "71531d82956354ce92fc80f0587dc896ec87807451d07b257a3c93d4ffa92e8b",
+      "bytes": 13811
+    },
+    {
+      "key": "u40_0",
+      "text": "What led you to that conclusion?",
+      "pack": "level4.zip",
+      "sha256": "99afe6eac3b4a98217ab183af7ed0589d798729715f4cbca34bf1247bee3d3e6",
+      "bytes": 10415
+    },
+    {
+      "key": "u40_1",
+      "text": "Could you give me a concrete example?",
+      "pack": "level4.zip",
+      "sha256": "e0a87ba1b3587dc1bc30d4bf1335167c702e7e078ae9fd8927b88d74e024079b",
+      "bytes": 10415
+    },
+    {
+      "key": "u40_2",
+      "text": "How would your view change if the situation were different?",
+      "pack": "level4.zip",
+      "sha256": "ab05fc8455686d268dfc5dfafff8132e5da55b6af2968630ef5cf592e1f19de7",
+      "bytes": 14725
+    },
+    {
+      "key": "u41_0",
+      "text": "Are you suggesting that we should reconsider?",
+      "pack": "level5.zip",
+      "sha256": "6dde13e490d50c95d4452a7651facecb9cc1ea1218628d1314e6b971c150de99",
+      "bytes": 12766
+    },
+    {
+      "key": "u41_1",
+      "text": "I get the impression that you have some reservations.",
+      "pack": "level5.zip",
+      "sha256": "49a9a6c52e741d52c02a8b9ca62d7828384152d739d3f1427c06380e78db7070",
+      "bytes": 14986
+    },
+    {
+      "key": "u41_2",
+      "text": "Please correct me if I've misunderstood.",
+      "pack": "level5.zip",
+      "sha256": "ac183652da8a9154207479a239d96913836d219623422d58ed72c0e6390ffae5",
+      "bytes": 12766
+    },
+    {
+      "key": "u42_0",
+      "text": "Sorry to jump in, but could I clarify one point?",
+      "pack": "level5.zip",
+      "sha256": "84aeb91832c73e0ac09e27b029e71ec36225dfcbf194a4b73394b19ba7ecdb71",
+      "bytes": 15639
+    },
+    {
+      "key": "u42_1",
+      "text": "Please go ahead. I'll come back to that later.",
+      "pack": "level5.zip",
+      "sha256": "51aeacc031e943c41ffaa78db7292d6f8721865549fcca217a99ee45f1e55337",
+      "bytes": 13941
+    },
+    {
+      "key": "u42_2",
+      "text": "Returning to what we were discussing earlier...",
+      "pack": "level5.zip",
+      "sha256": "6b52f1ff61f8e18f3bde87f18cf4607b8c3456c6b95f6e002f77e21644d8da1f",
+      "bytes": 12113
+    },
+    {
+      "key": "u43_0",
+      "text": "As far as I can tell, the situation hasn't changed.",
+      "pack": "level5.zip",
+      "sha256": "8f572564935e4a60d5580759e53348dce00563e850021d93be5c55acd8018556",
+      "bytes": 18513
+    },
+    {
+      "key": "u43_1",
+      "text": "That's plausible, though we don't have enough evidence yet.",
+      "pack": "level5.zip",
+      "sha256": "ab2ee460a650723fd1ba7b63a8e269f7e8bf49313b73e0a3502ee83f322c0beb",
+      "bytes": 16031
+    },
+    {
+      "key": "u43_2",
+      "text": "I'd be hesitant to draw a firm conclusion at this stage.",
+      "pack": "level5.zip",
+      "sha256": "122d2eb13d0e007b9a70d1af4d7550b540987c20c4fe2b2c44253f7c3da4b73b",
+      "bytes": 17468
+    },
+    {
+      "key": "u44_0",
+      "text": "What I hadn't realized was that we'd met before.",
+      "pack": "level5.zip",
+      "sha256": "29edff08b2ee488f7a9a2b06d6d9d1f0419c0658718819d2f5fcb5493122e76a",
+      "bytes": 14986
+    },
+    {
+      "key": "u44_1",
+      "text": "Just when I thought it was over, something unexpected happened.",
+      "pack": "level5.zip",
+      "sha256": "b9d52f67c25e2dfbae356c303acdac43529e24371e8674dcd35cb409e40b394d",
+      "bytes": 15509
+    },
+    {
+      "key": "u44_2",
+      "text": "Looking back, that's what made the experience worthwhile.",
+      "pack": "level5.zip",
+      "sha256": "96286b2d92001c709ca8a7350554b1aab74402a1938ce90b3980cfcfbdecc293",
+      "bytes": 17468
+    },
+    {
+      "key": "u45_0",
+      "text": "Could you send me the details when you have a moment?",
+      "pack": "level5.zip",
+      "sha256": "df54d9b16f7c784183db043768ca86890792ed42f72fb4c176326e5b330d9578",
+      "bytes": 13549
+    },
+    {
+      "key": "u45_1",
+      "text": "I'd appreciate it if you could confirm receipt.",
+      "pack": "level5.zip",
+      "sha256": "3d85b8b2217bd2dd38b99376407fa3bd76a4346af4affd8f3fd3ba42f6c431a6",
+      "bytes": 13027
+    },
+    {
+      "key": "u45_2",
+      "text": "Just checking whether you got my message.",
+      "pack": "level5.zip",
+      "sha256": "b717f6c7f15fc762b74e6df583d5c9fbdc2ddaf97d2dd71004f4b1812807cfe9",
+      "bytes": 11721
+    },
+    {
+      "key": "u46_0",
+      "text": "I caught the first part, but missed the last detail.",
+      "pack": "level5.zip",
+      "sha256": "e13f2a97329d01e8d39f22b6cc49537e32bca8ebb17fab0a8ad56e5b8d1dc779",
+      "bytes": 16031
+    },
+    {
+      "key": "u46_1",
+      "text": "Could you rephrase the bit about the schedule?",
+      "pack": "level5.zip",
+      "sha256": "65e3e2b501488b48d13adc15e547d28ffb097a7f4541b27feb299c864aed087b",
+      "bytes": 13027
+    },
+    {
+      "key": "u46_2",
+      "text": "So, if I've understood correctly, we're meeting at noon.",
+      "pack": "level5.zip",
+      "sha256": "6bf72d26bee006901876670d3911191b10a0534d5cfe0c897b9224b8b4d4093c",
+      "bytes": 19819
+    },
+    {
+      "key": "u47_0",
+      "text": "I can see why this matters to you.",
+      "pack": "level5.zip",
+      "sha256": "31c06802caf1e7e572538758bd277799ed2ede7e21b9c1b55b0401899e6e1d54",
+      "bytes": 11068
+    },
+    {
+      "key": "u47_1",
+      "text": "We may disagree on the approach, but we share the same goal.",
+      "pack": "level5.zip",
+      "sha256": "d0054b3874ec9d719b62fa93c71cb954eb3bd1e4e30ae033b9a3abe5b211fbbc",
+      "bytes": 22170
+    },
+    {
+      "key": "u47_2",
+      "text": "What would a fair outcome look like to you?",
+      "pack": "level5.zip",
+      "sha256": "4e0d4fc059a382a0ac7de643495026cb2e339d6d167256a8699c47719ad30c43",
+      "bytes": 10937
+    },
+    {
+      "key": "u48_0",
+      "text": "Let me make sure we're on the same page.",
+      "pack": "level5.zip",
+      "sha256": "218c284ca9fc8d267cac7cbcdead2870b6de081be1e19f8ffb36df38d27ac2e6",
+      "bytes": 12766
+    },
+    {
+      "key": "u48_1",
+      "text": "Is there anything important that we haven't covered?",
+      "pack": "level5.zip",
+      "sha256": "054023eb1ac1564ccc24fdd2d71e548e6bc059341e7379610d029d2d54ff2106",
+      "bytes": 16553
+    },
+    {
+      "key": "u48_2",
+      "text": "It's been great talking with you. Let's stay in touch.",
+      "pack": "level5.zip",
+      "sha256": "e6127e8699c6e5f85b5bcbffd3458d6a6a804b444bddcad39b72a15eeaace685",
+      "bytes": 16162
+    }
+  ]
+}

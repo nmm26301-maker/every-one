@@ -6,6 +6,7 @@ VERSION_NAME = '5.0.16'
 VERSION_CODE = 75
 BUILD_DIR = 'maintenance516'
 ROOTS = ('JourneyActivity', 'JourneyPhoneEngine', 'JourneyState', 'JourneyCore')
+EXTRA_ASSETS = ()
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
@@ -38,6 +39,11 @@ def main():
     base, output, tools = map(lambda x: pathlib.Path(x).resolve(), (a.base, a.output, a.tools))
     if hashlib.sha256(base.read_bytes()).hexdigest() != BASE_SHA:
         raise ValueError('Unexpected base APK; no build files written')
+    for name in EXTRA_ASSETS:
+        if not name.startswith('journey/course-audio/') or '..' in pathlib.PurePosixPath(name).parts:
+            raise ValueError('Unreviewed extra asset')
+        if not (ROOT / 'app/src/main/assets' / name).is_file():
+            raise ValueError('Missing reviewed asset: ' + name)
     work = pathlib.Path(a.build_dir).resolve()
     if work.exists():
         raise ValueError('Build directory exists; choose a new --build-dir')
@@ -80,7 +86,12 @@ def main():
                 data = (work / 'merged.dex').read_bytes()
             elif entry.filename == 'AndroidManifest.xml':
                 data = shell.read(entry.filename)
+            elif entry.filename in {'assets/' + n for n in EXTRA_ASSETS}:
+                data = (ROOT / 'app/src/main' / entry.filename).read_bytes()
             out.writestr(entry, data)
+        for name in EXTRA_ASSETS:
+            if 'assets/' + name not in old.namelist():
+                out.writestr('assets/' + name, (ROOT / 'app/src/main/assets' / name).read_bytes())
     run(tools / 'zipalign', '-f', '-P', '16', '4', work / 'unsigned.apk', output)
     for dex, folder in [('base.dex', 'old-smali'), ('merged.dex', 'new-smali')]:
         run('java', '-cp', a.dex_classpath, 'org.jf.baksmali.Main', 'disassemble', work / dex, '-o', work / folder)
@@ -90,15 +101,18 @@ def main():
     assert all(current.get(k) == v for k, v in preserved.items()), 'Unrelated compiled class changed'
     assert not any(not selected(k) for k in current.keys() - original.keys()), 'Unexpected new class'
     with zipfile.ZipFile(base) as old, zipfile.ZipFile(output) as new:
-        retained = [n for n in old.namelist() if not n.startswith('META-INF/') and n not in ('classes.dex', 'AndroidManifest.xml')]
+        retained = [n for n in old.namelist() if not n.startswith('META-INF/') and n not in ('classes.dex', 'AndroidManifest.xml') and n not in {'assets/' + a for a in EXTRA_ASSETS}]
         assert all(old.read(n) == new.read(n) for n in retained), 'Bundled content changed'
-        assert set(new.namelist()) == {n for n in old.namelist() if not n.startswith('META-INF/')}, 'Unexpected ZIP entry'
+        assert set(new.namelist()) == {n for n in old.namelist() if not n.startswith('META-INF/')} | {'assets/' + n for n in EXTRA_ASSETS}, 'Unexpected ZIP entry'
+        for name in EXTRA_ASSETS:
+            assert new.read('assets/'+name) == (ROOT/'app/src/main/assets'/name).read_bytes()
     badging = run(tools / 'aapt2', 'dump', 'badging', output, capture=True)
     assert f"name='org.openenglish.reader' versionCode='{VERSION_CODE}' versionName='{VERSION_NAME}'" in badging
     report = dict(base_sha256=BASE_SHA, versionName=VERSION_NAME, versionCode=VERSION_CODE,
                   preserved_classes=len(preserved), replaced_class_families=list(ROOTS),
                   retained_zip_entries=len(retained), bundled_models_and_media_unchanged=True,
                   physical_device_tested=False)
+    report['reviewed_extra_assets'] = {name: dict(bytes=(ROOT/'app/src/main/assets'/name).stat().st_size, sha256=hashlib.sha256((ROOT/'app/src/main/assets'/name).read_bytes()).hexdigest()) for name in EXTRA_ASSETS}
     (work / 'verification.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report))
 

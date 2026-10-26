@@ -12,9 +12,9 @@ public final class JourneyState {
   private Page(String screen,String unit,int phrase,boolean review,String word){this.screen=screen;this.unit=unit;this.phrase=phrase;this.review=review;this.word=word;}
   private static Page home(){return new Page("home","",0,false,"");}
   public static Page of(String screen,String unit,int phrase,boolean review,String word){
-   if(!Arrays.asList("home","route","placement","unit","listen","practice","review","lab","progress","conversation","settings","drill").contains(screen))return home();
+   if(!Arrays.asList("home","route","placement","unit","listen","practice","loop","review","lab","progress","conversation","settings","drill").contains(screen))return home();
    if(unit==null||(!unit.isEmpty()&&!unit.matches("u(0[1-9]|[1-3][0-9]|4[0-8])"))||phrase<0||phrase>2||word==null||word.length()>120)return home();
-   if(Arrays.asList("unit","listen","practice","conversation").contains(screen)&&unit.isEmpty())return home();
+   if(Arrays.asList("unit","listen","practice","loop","conversation").contains(screen)&&unit.isEmpty())return home();
    if(screen.equals("drill")&&word.trim().isEmpty())return home();
    return new Page(screen,unit,phrase,screen.equals("practice")&&review,screen.equals("drill")?word:"");
   }
@@ -48,7 +48,7 @@ public final class JourneyState {
    JSONObject drafts=d.optJSONObject("drafts");if(drafts==null||drafts.length()>48)throw new JSONException("草稿记录不正确");
    Iterator<String> it=drafts.keys();while(it.hasNext()){String id=it.next();Object value=drafts.get(id);checkDraft(id,value instanceof String?(String)value:null);}
   }
-  Iterator<String> units=d.getJSONObject("units").keys();while(units.hasNext()){String k=units.next();scene(k);JSONObject u=d.getJSONObject("units").getJSONObject(k);integer(u,"heard",0,7,false);integer(u,"spoken",0,7,false);}
+  Iterator<String> units=d.getJSONObject("units").keys();while(units.hasNext()){String k=units.next();scene(k);JSONObject u=d.getJSONObject("units").getJSONObject(k);integer(u,"heard",0,7,false);integer(u,"spoken",0,7,false);for(int n=0;n<3;n++)integer(u,"loop"+n,0,4,false);}
   Iterator<String> keys=d.getJSONObject("cards").keys();while(keys.hasNext()){
    String k=keys.next();if(!k.matches("u(0[1-9]|[1-3][0-9]|4[0-8])_[0-2]"))throw new JSONException("未知复习句");JSONObject c=d.getJSONObject("cards").getJSONObject(k);
    integer(c,"stage",0,5,true);integer(c,"due",0,Long.MAX_VALUE,true);integer(c,"attempts",1,Integer.MAX_VALUE,true);
@@ -79,6 +79,23 @@ public final class JourneyState {
   data.getJSONObject("cards").put(key,c);JSONObject u=unit(id);u.put("spoken",u.optInt("spoken")|(1<<sentence));data.getJSONObject("units").put(id,u);save();
  }
  public JSONObject card(String key){return data.optJSONObject("cards").optJSONObject(key);}
+ /** Resume only completed steps. Audio and transient playback/recording flags are never exported. */
+ public int loopStage(String id,int n){JourneyCore.sampleKey(id,n);return unit(id).optInt("loop"+n);}
+ public void loopRestart(String id,int n)throws Exception{JourneyCore.sampleKey(id,n);JSONObject u=unit(id);u.put("loop"+n,0);data.getJSONObject("units").put(id,u);save();}
+ public void loopAdvance(String id,int n,int expected)throws Exception{
+  JourneyCore.sampleKey(id,n);if(expected<0||expected>2||loopStage(id,n)!=expected)throw new JSONException("训练步骤已经变化，请重新打开");
+  if(expected==1&&card(id+"_"+n)==null)throw new JSONException("请先完成跟读录音");
+  JSONObject u=unit(id);u.put("loop"+n,expected+1);if(expected==2)u.put("heard",u.optInt("heard")|(1<<n));data.getJSONObject("units").put(id,u);save();
+ }
+ public void loopRecall(String id,int n,boolean remembered,long now)throws Exception{
+  if(loopStage(id,n)!=3)throw new JSONException("请先完成精听、跟读与盲听");
+  JSONObject c=card(id+"_"+n);if(c==null)throw new JSONException("请先完成复述录音");
+  if(now<0||now>Long.MAX_VALUE-30*JourneyCore.DAY)throw new JSONException("无效复习时间");
+  int stage=JourneyCore.nextStage(c.optInt("stage"),remembered,c.optLong("due")<=now);
+  long due=remembered&&c.optLong("due")>now?c.optLong("due"):JourneyCore.nextDue(now,stage);
+  c.put("stage",stage).put("due",due).put("recall",remembered).put("rated",now);
+  JSONObject u=unit(id);u.put("loop"+n,remembered?4:0);data.getJSONObject("units").put(id,u);save();
+ }
  public void recall(String key,boolean remembered,long now)throws Exception{
   if(now<0||now>Long.MAX_VALUE-30*JourneyCore.DAY)throw new JSONException("无效复习时间");
   JSONObject c=card(key);if(c==null)throw new JSONException("请先完成一次开口练习");

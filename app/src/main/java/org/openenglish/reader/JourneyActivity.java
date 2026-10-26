@@ -17,6 +17,7 @@ import android.widget.*;
 import org.json.*;
 import java.io.*;
 import java.util.*;
+import java.util.zip.*;
 
 /** Integrated English pathway. Existing Studio and continuous conversation remain available. */
 public final class JourneyActivity extends Activity {
@@ -26,6 +27,7 @@ public final class JourneyActivity extends Activity {
  private JourneyState state;private JSONObject catalog,lesson;private JSONArray lessons,levels;
  private LinearLayout page;private TextView status;private TextToSpeech tts;private boolean ttsReady,busy,destroyed;
  private MediaPlayer player;private CloudClient.Job job;private Runnable jobDeadline;private int generation,phraseIndex;private String screen="home";
+ private boolean loopPlayed,loopRevealed,loopRecorded,loopReplayed;private Button loopNext;
  private File take;private EditText chatInput;private boolean review;private String chatUnit="";
  private final Map<String,String> unsavedDrafts=new HashMap<>();
  private JourneyPhoneEngine.Control phoneControl;private String drillText;private LinearLayout phoneResults;
@@ -38,7 +40,7 @@ public final class JourneyActivity extends Activity {
   if(Build.VERSION.SDK_INT<26)getWindow().setNavigationBarColor(INK);
   try{catalog=new JSONObject(read(getAssets().open("journey/course.json"),300000));lessons=catalog.getJSONArray("lessons");levels=catalog.getJSONArray("levels");state=new JourneyState(this);}
   catch(Exception e){new AlertDialog.Builder(this).setTitle("学习记录未能打开").setMessage("未覆盖原有记录。你仍可打开原有工作室。\n"+e.getMessage()).setPositiveButton("打开工作室",(d,w)->{startActivity(new Intent(this,StudioActivity.class));finish();}).setNegativeButton("关闭",(d,w)->finish()).show();return;}
-  tts=new TextToSpeech(this,result->main.post(()->{if(destroyed)return;if(result==TextToSpeech.SUCCESS){int lang=tts.setLanguage(Locale.US);ttsReady=lang>=TextToSpeech.LANG_AVAILABLE;}if(!ttsReady)Toast.makeText(this,"未找到英文朗读语音，请在系统文字转语音设置中安装英语语音",Toast.LENGTH_LONG).show();}));
+  tts=new TextToSpeech(this,result->main.post(()->{if(destroyed)return;if(result==TextToSpeech.SUCCESS){int lang=tts.setLanguage(Locale.US);ttsReady=lang>=TextToSpeech.LANG_AVAILABLE;}}));
   restorePage(saved);
  }
  private void restorePage(Bundle saved){
@@ -46,7 +48,7 @@ public final class JourneyActivity extends Activity {
   if(!p.unit.isEmpty())lesson=find(p.unit);phraseIndex=p.phrase;review=p.review;
   switch(p.screen){
    case "route":route();break;case "placement":placement();break;case "unit":unit();break;
-   case "listen":listenQuiz(phraseIndex);break;case "practice":practice();break;case "conversation":conversation();break;
+   case "loop":loopPractice();break;case "listen":listenQuiz(phraseIndex);break;case "practice":practice();break;case "conversation":conversation();break;
    case "review":reviewList();break;case "lab":lab();break;case "progress":progress();break;
    case "settings":settings();break;case "drill":drill(p.word);break;default:home();
   }
@@ -75,7 +77,7 @@ public final class JourneyActivity extends Activity {
   while(it.hasNext()){Map.Entry<String,String> e=it.next();try{state.draft(e.getKey(),e.getValue());it.remove();}catch(Exception error){Toast.makeText(this,"草稿暂未保存，请检查剩余空间；本次打开期间仍可继续编辑。",Toast.LENGTH_LONG).show();break;}}
  }
  private void view(String key,String heading){
-  rememberDraft();stopTasks();deleteTake();screen=key;drillText=null;phoneResults=null;chatUnit="";
+  rememberDraft();stopTasks();deleteTake();screen=key;loopPlayed=false;loopRevealed=false;loopRecorded=false;loopReplayed=false;loopNext=null;drillText=null;phoneResults=null;chatUnit="";
   LinearLayout root=new LinearLayout(this);root.setOrientation(1);root.setBackgroundColor(PAPER);root.setPadding(dp(18),dp(10),dp(18),0);
   LinearLayout bar=new LinearLayout(this);bar.setGravity(Gravity.CENTER_VERTICAL);
   TextView brand=text("EVERYONE  /  学会交流",13,ACCENT);brand.setTypeface(null,Typeface.BOLD);bar.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
@@ -87,8 +89,9 @@ public final class JourneyActivity extends Activity {
   JSONObject level=levels.optJSONObject(state.level());line(level.optString("name")+" · 已练习完成 "+state.completed()+" / 48 单元");
   int due=state.due(System.currentTimeMillis()).size();
   LinearLayout quick=card("马上开口 · 不用找视频或配置 API",
-      "点击语言，直接进入内置短句练习：听示范、慢速跟读、录音、回听。未安装对应系统语音包时仍能看句子和练习录音。");
-  button(quick,"粤语 · 立即跟读",()->openFastPractice("yue"),true);
+      "英语内置 144 句示范：精听 → 跟读 → 盲听 → 复述 → 间隔复习。无需账号、模型或 API；粤语和日语示范使用系统语音。");
+  button(quick,"英语 · 五步听说训练",this::openLoop,true);
+  button(quick,"粤语 · 立即跟读",()->openFastPractice("yue"),false);
   button(quick,"日语 · 影视口语速练",()->openFastPractice("ja"),false);
   button(quick,"英语 · 日常表达速练",()->openFastPractice("en"),false);
   LinearLayout c=card("今天的练习 · 约 20 分钟","先复习，再学新内容，最后脱稿交流。进度记录练习表现，不等于英语等级认证。");
@@ -107,22 +110,73 @@ public final class JourneyActivity extends Activity {
  }
  private JSONObject nextLesson(){for(int i=state.level()*8;i<(state.level()+1)*8;i++){JSONObject u=lessons.optJSONObject(i);if(!state.complete(u.optString("id")))return u;}return lessons.optJSONObject(state.level()*8);}
  private void openNext(){lesson=nextLesson();unit();}
+ private void openLoop(){for(int i=state.level()*8;i<(state.level()+1)*8;i++)for(int n=0;n<3;n++)if(state.loopStage(lessons.optJSONObject(i).optString("id"),n)<4){lesson=lessons.optJSONObject(i);phraseIndex=n;loopPractice();return;}lesson=nextLesson();unit();}
  private void route(){view("route","从第一句话到深入交流");line("可自由选择起点。每单元：听懂 → 跟读纠音 → 脱稿回忆 → 场景运用。48 单元是核心训练路线，需要持续扩展真实听说输入。");for(int l=0;l<6;l++){final int index=l;JSONObject lv=levels.optJSONObject(l);LinearLayout c=card(lv.optString("name"),lv.optString("goal"));button(c,"练习这一阶段",()->{state.level(index);openNext();},true);for(int j=0;j<8;j++){final JSONObject u=lessons.optJSONObject(l*8+j);button(c,(state.complete(u.optString("id"))?"✓ ":"")+String.format(Locale.US,"%02d",l*8+j+1)+"  "+u.optString("title"),()->{lesson=u;unit();},false);}}}
  private void placement(){view("placement","先选一个真实起点");line("不会英语请从零基础开始。如果已有基础，选择你能不看稿完成的任务的下一阶段。这是自选起点，不是测评证书；可以随时调整。");for(int i=0;i<6;i++){final int l=i;JSONObject v=levels.optJSONObject(i);LinearLayout c=card(v.optString("name"),v.optString("canDo"));button(c,"从这里开始",()->{state.level(l);openNext();},true);}}
  private String id(){return lesson.optString("id");}
  private JSONObject sentence(int n){return lesson.optJSONArray("sentences").optJSONObject(n);}
- private void unit(){view("unit",lesson.optString("title"));line(levels.optJSONObject(lesson.optInt("level")).optString("name"));card("先理解这个表达",lesson.optString("note"));card("今天的发音重点",lesson.optString("focus"));
+ private void unit(){view("unit",lesson.optString("title"));
+  LinearLayout flow=card("五步听说训练", "精听、跟读、盲听、复述，完成后自动安排复习。每句保留已完成的步骤。");
+  for(int i=0;i<3;i++){final int n=i;int step=state.loopStage(id(),n);button(flow,"第 "+(n+1)+" 句 · "+new String[]{"精听","跟读","盲听","复述","已完成，可回顾"}[step],()->{phraseIndex=n;loopPractice();},i==0);}line(levels.optJSONObject(lesson.optInt("level")).optString("name"));card("先理解这个表达",lesson.optString("note"));card("今天的发音重点",lesson.optString("focus"));
   for(int i=0;i<3;i++){final int n=i;JSONObject s=sentence(i);JSONObject c=state.card(id()+"_"+i);LinearLayout box=card((i+1)+"  "+s.optString("en"),s.optString("zh")+(c==null?"":"\n已开口 "+c.optInt("attempts")+" 次 · "+(c.optBoolean("assessed")?"最近有音频评测":"最近为识别/回听练习")));button(box,"听懂这句话",()->listenQuiz(n),false);button(box,"跟读、纠音和脱稿",()->{phraseIndex=n;review=false;practice();},true);}
   LinearLayout task=card("把句子变成自己的话",lesson.optString("task"));button(task,"进入场景对话",this::conversation,true);button("返回学习路线",this::route);
  }
- private void listenQuiz(int n){view("listen","先听，再选意思");phraseIndex=n;line("第 "+(n+1)+" 句 · 可以重复听。首次练习先正常速度，再用慢速确认。");String en=sentence(n).optString("en");button("播放英语",()->speak(en,1f));button("慢速听",()->speak(en,.78f));List<Integer> options=new ArrayList<>(Arrays.asList(0,1,2));Collections.shuffle(options);TextView feedback=text("选择你听到的意思。",16,MUTED);for(int x:options)button(sentence(x).optString("zh"),()->{if(x==n){state.mark(id(),"heard",1<<n);feedback.setText("听懂了。现在试着不看英文复述，再进入跟读。\n"+en);}else feedback.setText("再听一次，注意关键词。你还可以回到课程看解释。");});page.addView(feedback);button("进入跟读",()->{phraseIndex=n;review=false;practice();});button("返回本单元",this::unit);}
+ private void listenQuiz(int n){
+  view("listen","先听，再选意思");phraseIndex=n;String en=sentence(n).optString("en");line("第 "+(n+1)+" 句 · 请先完整听示范，再选择意思。");status=text("内置音频，无需系统语音或网络。",16,MUTED);page.addView(status);final boolean[] heard={false};
+  button("播放英语",()->playSample(en,1f,()->{heard[0]=true;status.setText("已听完，请选择意思。");}));button("慢速听",()->playSample(en,.78f,()->{heard[0]=true;status.setText("已听完，请选择意思。");}));List<Integer> options=new ArrayList<>(Arrays.asList(0,1,2));Collections.shuffle(options);
+  for(int x:options)button(sentence(x).optString("zh"),()->{if(!heard[0]){status.setText("请先完整播放示范，再作答。");return;}if(x==n){state.mark(id(),"heard",1<<n);status.setText("意思选对了。\n"+en+"\n接着进入跟读。");}else status.setText("再听一次，注意关键词。");});
+  button("进入跟读",()->{phraseIndex=n;review=false;practice();});button("返回本单元",this::unit);
+ }
+ /** Native guided loop, inspired by Echo-Loop's documented stages; no upstream code or SDK. */
+ private void loopPractice(){
+  final int step=state.loopStage(id(),phraseIndex);final String en=sentence(phraseIndex).optString("en"),zh=sentence(phraseIndex).optString("zh");
+  view("loop",new String[]{"1 / 5 · 精听","2 / 5 · 跟读","3 / 5 · 盲听","4 / 5 · 复述","5 / 5 · 间隔复习"}[step]);
+  line(lesson.optString("title")+" · 第 "+(phraseIndex+1)+" / 3 句");
+  line("精听 → 跟读 → 盲听 → 复述 → 复习 · 已完成的步骤自动保存");
+  if(step==4){
+   card("这一句已完成",en+"\n"+zh);JSONObject c=state.card(id()+"_"+phraseIndex);
+   card("按时再回忆",c==null?"可在间隔复习页查看计划。":"下次复习："+android.text.format.DateFormat.format("MM-dd HH:mm",c.optLong("due"))+"\n依据自评安排，不代表发音或理解通过自动测评。");
+   button(page,phraseIndex<2?"下一句 · 精听":"查看本单元进度",()->{if(phraseIndex<2){phraseIndex++;loopPractice();}else unit();},true);
+   button("查看到期复习",this::reviewList);button("返回本单元",this::unit);return;
+  }
+  if(step==3){line("用英文表达下面的意思，可以换细节；尽量不用背原句。");line(zh);line(lesson.optString("task"));}
+  TextView transcript=text(step==1?en+"\n"+zh:"文本已隐藏，先听或先尝试说出来。",23,INK);page.addView(transcript);
+  status=text(step==0?"先完整听一遍，再查看文本，确认词义与发音。":step==1?"听示范，录一句，再完整回听自己的声音。":step==2?"先不看任何文本，完整听一遍，在心里说出意思，再核对。":"不看英文录一句，完整回听，再诚实选择是否能表达。",16,MUTED);page.addView(status);
+  if(step!=3){
+   button(page,step==2?"播放 · 隐藏文本盲听":"播放完整示范",()->{if(step==2){transcript.setText("文本已隐藏，请专注听声音。");loopRevealed=false;loopPlayed=false;updateLoopNext();}playSample(en,1f,()->{loopPlayed=true;status.setText(step==2?"已听完，先想出意思，再查看文本核对。":"已听完，可查看文本或录音练习。");updateLoopNext();});},true);
+   button("慢速听 · 0.78 倍",()->{if(step==2){transcript.setText("文本已隐藏，请专注听声音。");loopRevealed=false;loopPlayed=false;updateLoopNext();}playSample(en,.78f,()->{loopPlayed=true;status.setText("慢速示范播放完成。");updateLoopNext();});});
+  }
+  if(step!=1)button(step==3?"需要提示 · 查看 / 隐藏原句":"查看 / 隐藏文本",()->{
+   if((step==0||step==2)&&!loopPlayed)throw new IOException("请先完整听一次示范，再查看文本");
+   boolean hidden=!transcript.getText().toString().equals(en+"\n"+zh);transcript.setText(hidden?en+"\n"+zh:"文本已隐藏，请尝试回忆。");if(hidden)loopRevealed=true;updateLoopNext();
+  });
+  if(step==1||step==3){
+   card(step==1?"本句发音重点":"复述检查",step==1?lesson.optString("focus"):"是否表达了主要意思？是否漏掉关键词？能否换一个人名、地点或时间再说？可回看原句学习，之后隐藏文本再试。");
+   line("仅使用本地录音回听，不上传，不需要纠音模型，不生成 AI 分数。每次最多 12 秒。");
+   button(page,"● 开始录音",()->record(false,true),true);
+   button("■ 结束录音 / 停止播放",()->{if(recorder.busy())recorder.finish();else{stopTasks();status.setText("已停止，可重新播放或录音。");}});
+   button("回听我的录音",this::playTake);
+  }
+  String label=new String[]{"已理解 · 进入跟读","已回听 · 进入盲听","已核对，能听懂 · 进入复述","不看原句能表达 · 安排复习"}[step];
+  loopNext=button(page,label,()->{
+   if(!loopReady(step))throw new IOException("请先完成本步骤的播放、核对或录音回听");
+   if(step==3)state.loopRecall(id(),phraseIndex,true,System.currentTimeMillis());else state.loopAdvance(id(),phraseIndex,step);loopPractice();
+  },true);updateLoopNext();
+  if(step==3)button("还说不出 · 10 分钟后重练",()->{if(!loopReady(step))throw new IOException("请先录一次并回听，再进行自评");state.loopRecall(id(),phraseIndex,false,System.currentTimeMillis());loopPractice();Toast.makeText(this,"已安排 10 分钟后复习；可以重新精听这句。",Toast.LENGTH_LONG).show();});
+  if(step==2)button("还没听懂 · 返回精听",()->{state.loopRestart(id(),phraseIndex);loopPractice();});
+  button("停止播放 / 取消录音",()->{stopTasks();status.setText("已停止。当前步骤保留，可再次开始。");});
+  line("文本核对、听懂与能表达由你自评；录音有声音不等于发音正确。自动纠音可从本单元的纠音练习另行启用。");
+  button("返回本单元",this::unit);
+ }
+ private boolean loopReady(int step){return JourneyCore.loopReady(step,loopPlayed,loopRevealed,loopRecorded,loopReplayed);}
+ private void updateLoopNext(){if(loopNext!=null){boolean ready=loopReady(state.loopStage(id(),phraseIndex));loopNext.setEnabled(ready);loopNext.setAlpha(ready?1f:.45f);}}
  private void practice(){
   view("practice",review?"到期复习 · 先回忆再看答案":"听示范，开口，再改进");
   JSONObject s=sentence(phraseIndex);String en=s.optString("en"),zh=s.optString("zh");line(lesson.optString("title")+" · 第 "+(phraseIndex+1)+" 句");line(zh);
   TextView target=text(review?"英文已隐藏，请先试着说出来。":en,26,INK);page.addView(target);
   button("显示 / 隐藏英文",()->target.setText(target.getText().toString().equals(en)?"英文已隐藏，请先试着说出来。":en));
   button("听正常示范",()->speak(en,1f));button("听慢速示范",()->speak(en,.78f));
-  card("发音提示",lesson.optString("focus"));String mode=getSharedPreferences("journey_settings",0).getString("assessment_mode","openpronounce");
+  card("发音提示",lesson.optString("focus"));String mode=assessmentMode();
   line(mode.equals("openpronounce")?"开源离线纠音：音频留在手机，识别疑似错音并给出练法。首次使用需安装约 357 MB 模型。":mode.equals("azure")?"音素评测已启用：录音将发送至你配置的 Azure Speech 服务。参考口音为美式英语。":mode.equals("manual")?"录音回听模式：不上传，不生成发音分数。":"识别对照模式：比较识别文本；识别一致不表示音素正确。" );
   status=text("每次最多录 12 秒。长句请正常语速说；录满会自动结束。",16,MUTED);page.addView(status);phoneResults=new LinearLayout(this);phoneResults.setOrientation(1);page.addView(phoneResults);
   button(page,"● 开始录音",()->record(false),true);button("■ 结束录音 / 停止处理",()->{if(recorder.busy())recorder.finish();else{stopTasks();status.setText("已停止，可重新录音。");}});
@@ -174,28 +228,32 @@ public final class JourneyActivity extends Activity {
   final String localSystem=JourneyCore.tutorInstruction(level,lesson.optString("title"),sentence(0).optString("en"));
   runJob(j->{String reply;if(LocalAI.enabled(this))reply=LocalAI.chatVoice(this,localSystem,history,j,delta->{});else{SharedPreferences p=getSharedPreferences("connection",0);reply=new CloudClient(this).chat(p.getString("base",""),p.getString("model",""),KeyVault.read(this,"connection"),system,history,j,delta->{});}if(reply==null||reply.trim().isEmpty())throw new IOException("AI 没有返回内容，可点“重试上一条”；已发送的消息保留。");return reply;},result->{state.reply(unit,pending,result.length()>12000?result.substring(0,12000):result);conversation();if(getSharedPreferences("journey_settings",0).getBoolean("autoplay",false))speak(result,1f);},"AI 正在回应，可停止；对话保留最近 30 条。");
  }
- private void record(boolean forChat)throws Exception{
+ private String assessmentMode(){return JourneyCore.assessmentMode(getSharedPreferences("journey_settings",0).getString("assessment_mode",""));}
+ private void record(boolean forChat)throws Exception{record(forChat,false);}
+ private void record(boolean forChat,boolean manual)throws Exception{
+  final String selectedMode=manual?"manual":assessmentMode();
   if(busy||recorder.busy()){Toast.makeText(this,"当前录音或处理尚未结束",Toast.LENGTH_SHORT).show();return;}
   if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},91);status.setText("允许权限后，请再次点击开始录音。");return;}
-  if(!forChat&&getSharedPreferences("journey_settings",0).getString("assessment_mode","openpronounce").equals("openpronounce")){JourneyPhoneEngine.supported();if(!JourneyPhoneEngine.installed(this))throw new IOException("请先在设置中安装开源纠音模型，约 357 MB；安装后可离线使用。");}
+  if(!forChat&&selectedMode.equals("openpronounce")){JourneyPhoneEngine.supported();if(!JourneyPhoneEngine.installed(this))throw new IOException("请先在设置中安装开源纠音模型，约 357 MB；安装后可离线使用。");}
+  if("loop".equals(screen)){loopRecorded=false;loopReplayed=false;updateLoopNext();}
   if(phoneResults!=null)phoneResults.removeAllViews();if(tts!=null)tts.stop();releasePlayer();deleteTake();busy=true;getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);int token=++generation;status.setText("正在启动麦克风，请等开始提示…");
   boolean started=recorder.start(new LessonRecorder.Listener(){
    public void ready(){post(token,()->status.setText("正在录音，请开始说话。说完点结束，最多 12 秒。"));}
    public void meter(double rms,int ms){post(token,()->status.setText("录音 "+(ms/1000)+" / 12 秒 · "+(rms<.003?"声音较轻，请靠近麦克风":"已收到声音")));}
-   public void done(float[] pcm){post(token,()->{finishJob();if(!LocalWav.hasSignal(pcm)){status.setText("没有收到足够清楚的声音，请检查麦克风后重录。");return;}safely(()->processTake(pcm,forChat));});}
+   public void done(float[] pcm){post(token,()->{finishJob();if(!LocalWav.hasSignal(pcm)){status.setText("没有收到足够清楚的声音，请检查麦克风后重录。");return;}safely(()->processTake(pcm,forChat,selectedMode));});}
    public void error(String error){post(token,()->{finishJob();status.setText(error);});}
   });if(!started){finishJob();status.setText("上次录音正在结束，请稍后再试。");}
  }
  private void post(int token,Runnable r){main.post(()->{if(!destroyed&&generation==token&&!isFinishing())r.run();});}
- private void processTake(float[] pcm,boolean forChat)throws Exception{
+ private void processTake(float[] pcm,boolean forChat)throws Exception{processTake(pcm,forChat,assessmentMode());}
+ private void processTake(float[] pcm,boolean forChat,String mode)throws Exception{
   File file=File.createTempFile("journey-",".wav",getCacheDir());take=file;writeWav(file,pcm);
   final String unit=drillText==null?id():"";final int n=phraseIndex;final String reference=drillText==null?sentence(n).optString("en"):drillText;
-  String mode=getSharedPreferences("journey_settings",0).getString("assessment_mode","openpronounce");
   if(!forChat&&mode.equals("openpronounce")){
    final JourneyPhoneEngine.Control control=new JourneyPhoneEngine.Control();phoneControl=control;
    runJob(j->JourneyPhoneEngine.assess(this,pcm,reference,control).toString(),value->{phoneControl=null;JSONObject report=new JSONObject(value);String feedback=JourneyPhones.feedback(report);if(!unit.isEmpty())state.practice(unit,n,feedback,report.optBoolean("usable"));status.setText(feedback);showPhoneWords(report);},"正在离线分析录音中的音素…可随时停止。首次加载模型可能较慢。");return;
   }
-  if(!forChat&&mode.equals("manual")){String feedback="已完成录音回听练习，未进行自动音素评测。\n"+(drillText==null?lesson.optString("focus"):"听示范、回听，再重录这个词。");if(!unit.isEmpty())state.practice(unit,n,feedback,false);status.setText(feedback);return;}
+  if(!forChat&&mode.equals("manual")){String feedback="已完成录音回听练习，未进行自动音素评测。\n"+(drillText==null?lesson.optString("focus"):"听示范、回听，再重录这个词。");if(!unit.isEmpty())state.practice(unit,n,feedback,false);status.setText(feedback);if("loop".equals(screen)){loopRecorded=true;loopReplayed=false;updateLoopNext();}return;}
   final boolean assessment=!forChat&&mode.equals("azure");
   runJob(j->{try{if(assessment){SharedPreferences p=getSharedPreferences("assessment",0);JSONObject result=new CloudClient(this).assess(p.getString("region",""),KeyVault.read(this,"assessment"),file,reference,j);JourneyFeedback f=JourneyFeedback.parse(result);if(!f.usable)throw new IOException(f.text);return f.text;}
    SharedPreferences p=getSharedPreferences("speech",0);JSONObject result=new CloudClient(this).transcribe(p.getString("base",""),p.getString("model",""),KeyVault.read(this,"speech"),file,false,j);String heard=result.optString("text").trim();if(heard.isEmpty())throw new IOException("没有识别到文字。请重录，或在设置切换为录音回听模式。");return heard;
@@ -228,8 +286,31 @@ public final class JourneyActivity extends Activity {
  }
  private void finishJob(){busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);if(jobDeadline!=null){main.removeCallbacks(jobDeadline);jobDeadline=null;}job=null;phoneControl=null;}
  private static void writeWav(File file,float[] pcm)throws Exception{try(DataOutputStream o=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))){int bytes=pcm.length*2;o.writeBytes("RIFF");o.writeInt(Integer.reverseBytes(36+bytes));o.writeBytes("WAVEfmt ");o.writeInt(Integer.reverseBytes(16));o.writeShort(Short.reverseBytes((short)1));o.writeShort(Short.reverseBytes((short)1));o.writeInt(Integer.reverseBytes(16000));o.writeInt(Integer.reverseBytes(32000));o.writeShort(Short.reverseBytes((short)2));o.writeShort(Short.reverseBytes((short)16));o.writeBytes("data");o.writeInt(Integer.reverseBytes(bytes));for(float v:pcm)o.writeShort(Short.reverseBytes((short)Math.max(-32768,Math.min(32767,Math.round(v*32767)))));}}
- private void playTake()throws Exception{if(busy)throw new IOException("请先结束录音和处理再回听");if(take==null||!take.isFile())throw new IOException("本页还没有录音，请先录一句");if(tts!=null)tts.stop();releasePlayer();player=new MediaPlayer();player.setDataSource(take.getAbsolutePath());player.setOnCompletionListener(p->releasePlayer());player.prepare();player.start();}
- private void speak(String text,float speed)throws Exception{if(busy)throw new IOException("请先结束录音或处理再播放");if(!ttsReady)throw new IOException("请在系统文字转语音设置中安装英语语音，再重开应用");releasePlayer();tts.setSpeechRate(speed);int max=TextToSpeech.getMaxSpeechInputLength();if(text.length()>max)text=text.substring(0,max);if(tts.speak(text,TextToSpeech.QUEUE_FLUSH,null,"journey")==TextToSpeech.ERROR)throw new IOException("朗读未能启动，请检查系统英语语音");}
+ private void playTake()throws Exception{
+  if(busy)throw new IOException("请先结束录音和处理再回听");if(take==null||!take.isFile())throw new IOException("本页还没有录音，请先录一句");
+  playFile(take,1f,()->{if("loop".equals(screen)&&loopRecorded){loopReplayed=true;status.setText("已完整回听。对照示范，检查是否漏词、停顿是否自然；这不是自动发音评测。");updateLoopNext();}});
+ }
+ private String sampleFor(String text){for(int i=0;i<lessons.length();i++){JSONObject u=lessons.optJSONObject(i);JSONArray sentences=u.optJSONArray("sentences");for(int n=0;n<sentences.length();n++)if(text.equals(sentences.optJSONObject(n).optString("en")))return JourneyCore.sampleKey(u.optString("id"),n);}return null;}
+ private File sampleFile(String key,CloudClient.Job task)throws Exception{
+  String pack=JourneyCore.samplePack(key);File dir=new File(getCacheDir(),"course-audio-523");if(!dir.isDirectory()&&!dir.mkdirs())throw new IOException("无法保存课程音频，请检查剩余空间");File file=new File(dir,key+".mp3");if(file.isFile()&&file.length()>100)return file;
+  File temp=File.createTempFile("sample-",".tmp",dir);
+  try(ZipInputStream in=new ZipInputStream(getAssets().open("journey/course-audio/"+pack))){ZipEntry e;while((e=in.getNextEntry())!=null){task.check();if(!e.getName().equals(key+".mp3"))continue;try(OutputStream out=new FileOutputStream(temp)){byte[] b=new byte[8192];int count=0,n;while((n=in.read(b))!=-1){task.check();count+=n;if(count>2000000)throw new IOException("课程音频超出大小限制");out.write(b,0,n);}}task.check();if(!temp.renameTo(file))throw new IOException("课程音频保存失败，请重试");return file;}throw new IOException("未找到这句示范，请重新安装完整 APK");}finally{temp.delete();}
+ }
+ private void playSample(String text,float speed,Runnable completed)throws Exception{
+  if(busy)throw new IOException("请先结束当前录音或处理");String key=sampleFor(text);if(key==null)throw new IOException("本句没有内置音频");if(status==null){status=text("",16,MUTED);page.addView(status);}
+  releasePlayer();runJob(j->sampleFile(key,j).getAbsolutePath(),path->playFile(new File(path),speed,completed),"正在准备内置示范…");
+ }
+ private void playFile(File file,float speed,Runnable completed)throws Exception{
+  if(tts!=null)tts.stop();releasePlayer();MediaPlayer current=new MediaPlayer();player=current;int token=generation;
+  try{current.setDataSource(file.getAbsolutePath());current.setOnPreparedListener(p->{if(player!=current||generation!=token)return;safely(()->{if(speed!=1f)p.setPlaybackParams(new android.media.PlaybackParams().setPitch(1f).setSpeed(speed));p.start();if(status!=null)status.setText("正在播放，可以随时停止。");});});
+   current.setOnCompletionListener(p->{if(player!=current||generation!=token)return;releasePlayer();if(status!=null)status.setText("播放完成。");if(completed!=null)safely(()->completed.run());});
+   current.setOnErrorListener((p,what,extra)->{if(player==current){releasePlayer();if(file.getParentFile().getName().equals("course-audio-523"))file.delete();if(status!=null)status.setText("音频未能播放，请重试；仍失败请重新安装完整 APK。");}return true;});current.prepareAsync();
+  }catch(Exception e){releasePlayer();throw e;}
+ }
+ private void speak(String text,float speed)throws Exception{
+  if(sampleFor(text)!=null){playSample(text,speed,null);return;}
+  if(busy)throw new IOException("请先结束录音或处理再播放");if(!ttsReady)throw new IOException("这段文字需系统英语语音，请安装后重开；课程内置示范可直接播放");releasePlayer();tts.setSpeechRate(speed);int max=TextToSpeech.getMaxSpeechInputLength();if(text.length()>max)text=text.substring(0,max);if(tts.speak(text,TextToSpeech.QUEUE_FLUSH,null,"journey")==TextToSpeech.ERROR)throw new IOException("朗读未能启动，请检查系统英语语音");
+ }
  private void releasePlayer(){if(player!=null){try{player.release();}catch(Exception ignored){}player=null;}}
  private void deleteTake(){if(take!=null){take.delete();take=null;}}
  private void stopTasks(){generation++;if(phoneControl!=null)phoneControl.cancel();if(job!=null)job.cancel();finishJob();recorder.cancel();if(tts!=null)tts.stop();releasePlayer();}
@@ -238,7 +319,7 @@ public final class JourneyActivity extends Activity {
   view("settings","把练习方式配置好");SharedPreferences prefs=getSharedPreferences("journey_settings",0);
   LinearLayout diagnostic=card("最近一次错误诊断","只保留最近一次错误的类型和代码位置，不记录错误原文、对话、录音或密钥。可复制这些信息帮助排查；原生崩溃和系统强制结束无法在此捕获。");
   button(diagnostic,"查看最近错误",()->notice("最近错误",getSharedPreferences("journey_diagnostics",0).getString("last","暂无错误记录")),false);
-  button(diagnostic,"复制诊断",()->{String value=getSharedPreferences("journey_diagnostics",0).getString("last","");if(value.isEmpty())throw new IOException("暂无错误记录");((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Everyone 诊断", "Everyone 5.0.22\n"+value));Toast.makeText(this,"诊断已复制",Toast.LENGTH_SHORT).show();},false);
+  button(diagnostic,"复制诊断",()->{String value=getSharedPreferences("journey_diagnostics",0).getString("last","");if(value.isEmpty())throw new IOException("暂无错误记录");((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Everyone 诊断", "Everyone "+getPackageManager().getPackageInfo(getPackageName(),0).versionName+"\n"+value));Toast.makeText(this,"诊断已复制",Toast.LENGTH_SHORT).show();},false);
   button(diagnostic,"清除诊断",()->{getSharedPreferences("journey_diagnostics",0).edit().remove("last").apply();Toast.makeText(this,"诊断已清除",Toast.LENGTH_SHORT).show();},false);
   LinearLayout open=card("开源纠音模型",(JourneyPhoneEngine.installed(this)?"模型已安装，可离线纠音。":"模型尚未安装。")+"\n约 357 MB，首次下载需联网；之后录音不上传。支持 Android 7+、64 位 ARM，建议 6 GB 以上内存；不同手机速度待实测。覆盖内置 144 句课程和 20 个单词/短语。下载时请留在本页，离开会停止。");
   status=text("",15,MUTED);open.addView(status);button(open,"下载并安装开源纠音模型",()->phoneDownload(null),true);button(open,"从文件导入纠音模型",()->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE),102),false);button(open,"停止模型下载",()->{stopTasks();status.setText("已停止，未完成的文件不会作为模型使用。");},false);
@@ -246,10 +327,10 @@ public final class JourneyActivity extends Activity {
   button(open,"查看模型 Apache-2.0 许可证",()->notice("模型许可证",read(getAssets().open("journey/PHONE-MODEL-LICENSE.txt"),20000)),false);
   LinearLayout mode=card("纠音方式","推荐开源离线纠音：复用 OpenPronounce 的音素模型与比对方法，无需付费 API。它提供疑似差异和练法，可能误报。Azure 为可选的联网评测；识别对照和回听不判断音素。");
   String[] labels={"开源离线纠音 · OpenPronounce","识别对照 · 本地或已配置的转写服务","真实音素评测 · 上传录音至 Azure Speech","仅录音回听 · 无自动分数"};String[] modes={"openpronounce","recognition","azure","manual"};
-  RadioGroup options=new RadioGroup(this);int selected=0;String stored=prefs.getString("assessment_mode","openpronounce");for(int i=0;i<modes.length;i++){RadioButton b=new RadioButton(this);b.setText(labels[i]);b.setTextSize(16);b.setTextColor(INK);b.setId(200+i);b.setMinHeight(dp(48));options.addView(b);if(stored.equals(modes[i]))selected=i;}options.check(200+selected);mode.addView(options);
+  RadioGroup options=new RadioGroup(this);int selected=0;String stored=assessmentMode();for(int i=0;i<modes.length;i++){RadioButton b=new RadioButton(this);b.setText(labels[i]);b.setTextSize(16);b.setTextColor(INK);b.setId(200+i);b.setMinHeight(dp(48));options.addView(b);if(stored.equals(modes[i]))selected=i;}options.check(200+selected);mode.addView(options);
   SharedPreferences ap=getSharedPreferences("assessment",0);EditText region=field(mode,"Azure 区域，例如 eastasia",ap.getString("region",""),false),key=field(mode,"Azure Speech 密钥（加密保存）","",true);
   button(mode,"保存纠音设置",()->{String r=region.getText().toString().trim();String k=key.getText().toString().trim();int choice=options.getCheckedRadioButtonId()-200;if(choice==2){if(!r.matches("[a-z0-9-]{3,40}"))throw new IOException("请填写有效的 Azure Speech 区域");if(k.isEmpty()&&KeyVault.read(this,"assessment").trim().isEmpty())throw new IOException("请填写 Azure Speech 密钥");}if(!k.isEmpty())KeyVault.save(this,"assessment",k);ap.edit().putString("region",r).apply();prefs.edit().putString("assessment_mode",modes[choice]).apply();key.setText("");notice("已保存",choice==2?"此后点击课程录音会把该段音频发往你配置的 Azure Speech 服务用于评测。":"纠音练习方式已更新。");},true);
-  button(mode,"清除音素评测密钥",()->new AlertDialog.Builder(this).setTitle("清除评测密钥？").setMessage("将切换为识别对照模式，学习记录保留。").setPositiveButton("清除",(d,w)->safely(()->{KeyVault.save(this,"assessment","");prefs.edit().putString("assessment_mode","recognition").apply();settings();})).setNegativeButton("取消",null).show(),false);
+  button(mode,"清除音素评测密钥",()->new AlertDialog.Builder(this).setTitle("清除评测密钥？").setMessage("将切换为录音回听模式，学习记录保留。").setPositiveButton("清除",(d,w)->safely(()->{KeyVault.save(this,"assessment","");prefs.edit().putString("assessment_mode","manual").apply();settings();})).setNegativeButton("取消",null).show(),false);
   LinearLayout engine=card("识别与 AI 对话","本地模式需要相应的英语语音识别与对话模型。云端模式会把录音发送到转写服务，把对话文字发送到聊天服务；仅使用你自己配置的 HTTPS 接口。");
   Switch local=new Switch(this);local.setText("使用本地模型（识别和对话）");local.setTextColor(INK);local.setMinHeight(dp(50));local.setChecked(LocalAI.enabled(this));engine.addView(local);
   button(engine,"保存模型模式",()->{getSharedPreferences("local_ai",0).edit().putBoolean("enabled",local.isChecked()).apply();notice("已保存",local.isChecked()?"识别和对话使用本地模型；开源纠音始终离线，Azure 评测仍需联网。":"识别和对话使用下方配置的云端服务。");},false);
@@ -270,5 +351,5 @@ public final class JourneyActivity extends Activity {
  @Override public void onRequestPermissionsResult(int request,String[] permissions,int[] results){super.onRequestPermissionsResult(request,permissions,results);if(request==91&&status!=null)status.setText(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED?"麦克风已允许，点击开始录音即可。":"未获得麦克风权限。可以继续听读、打字对话，或到系统设置允许麦克风。");}
  @Override protected void onPause(){super.onPause();rememberDraft();boolean wasBusy=busy;stopTasks();deleteTake();if(wasBusy&&status!=null)status.setText("已暂停录音或处理，请重新开始。");}
  @Override protected void onDestroy(){destroyed=true;stopTasks();main.removeCallbacksAndMessages(null);deleteTake();if(tts!=null)tts.shutdown();super.onDestroy();}
- @Override public void onBackPressed(){if("home".equals(screen)){super.onBackPressed();return;}if(Arrays.asList("practice","listen","conversation").contains(screen)&&lesson!=null)unit();else home();}
+ @Override public void onBackPressed(){if("home".equals(screen)){super.onBackPressed();return;}if(Arrays.asList("practice","listen","loop","conversation").contains(screen)&&lesson!=null)unit();else home();}
 }

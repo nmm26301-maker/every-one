@@ -11,4 +11,7 @@ java -cp "build/journey-tests:$json_jar" JourneyDraftTest
 java -cp "build/journey-tests:$json_jar" JourneyBackupTest
 java -cp "build/journey-tests:$json_jar" JourneyPageTest
 java -cp "build/journey-tests:$json_jar" JourneyEngineFailureTest
+java --add-modules jdk.compiler com.sun.tools.javac.Main -encoding UTF-8 -cp "build/journey-tests:$json_jar" -d build/journey-tests tests/JourneyLoopTest.java
+java -cp "build/journey-tests:$json_jar" JourneyLoopTest
 python3 tests/journey-content.py
+python3 tests/test-course-audio.py

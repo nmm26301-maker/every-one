@@ -1,0 +1,7 @@
+Built-in course sample speech: en_US-ljspeech-high.
+Voice: https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/high
+Voice repository MIT; individual model card identifies LJ Speech dataset as public domain.
+Generator: https://github.com/OHF-Voice/piper1-gpl (GPL-3.0), build-time only.
+Piper engine, ONNX Runtime and voice weights are not distributed in the APK.
+Generated Everyone curriculum audio: CC0-1.0 to the extent we hold rights.
+Synthetic single-speaker samples; supplement with real speakers and varied accents.
