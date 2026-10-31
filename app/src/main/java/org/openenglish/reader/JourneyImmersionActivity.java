@@ -84,9 +84,11 @@ public final class JourneyImmersionActivity extends Activity {
   private TextView captionStatus;
   private JourneyCaptionService captionService = new JourneyCaptionService();
   private CloudClient.Job captionJob;
+  private CloudClient.Job translationJob;
   private AlertDialog captionDialog;
+  private AlertDialog translationDialog;
   private Runnable captionTimeout;
-  private int captionGeneration, captionLengthMs = 30000;
+  private int captionGeneration, translationGeneration, captionLengthMs = 30000;
   private Button quickRecordButton, advancedToggleButton;
   private LinearLayout advancedArea;
   private boolean quickRecordRequested;
@@ -325,6 +327,9 @@ public final class JourneyImmersionActivity extends Activity {
     LinearLayout captions = row(advancedArea);
     button("生成片段字幕", captions, this::confirmCaptionClip);
     button("停止生成", captions, this::stopCaptionWork);
+    LinearLayout batchCaptions = row(advancedArea);
+    button("整片批量生成字幕", batchCaptions, this::confirmBatchCaption);
+    button("自动翻译原文字幕", batchCaptions, this::confirmCaptionTranslation);
     button("导出 SRT", captions, this::exportSubtitles);
     LinearLayout captionSettings = row(advancedArea);
     button("字幕服务设置", captionSettings, () -> configureService(true));
@@ -1510,6 +1515,180 @@ public final class JourneyImmersionActivity extends Activity {
     return "逐句精听：观察省略、语气和说话人关系；暂不提供自动逐词解析。";
   }
 
+  private void confirmBatchCaption() {
+    if (captionJob != null || translationJob != null) { toast("已有字幕任务正在运行"); return; }
+    if (videoUri == null || !videoReady || player.getDuration() <= 0) {
+      toast("请先选择可播放的视频"); return;
+    }
+    if (practice.isRecording()) { toast("请先停止跟读录音"); return; }
+    try {
+      SharedPreferences service = getSharedPreferences("speech", 0);
+      String base = service.getString("base", "").trim(), model = service.getString("model", "").trim();
+      if (base.isEmpty() || model.isEmpty()) { configureService(true); return; }
+      CloudClient.endpoint(base, "audio/transcriptions");
+      String key = KeyVault.read(this, "speech");
+      int duration = player.getDuration();
+      List<JourneyBatchCaption.Chunk> chunks = JourneyBatchCaption.plan(duration, 120000);
+      player.pause(); practice.stopPlayback();
+      if (speechGuide != null) speechGuide.stop();
+      captionDialog = new AlertDialog.Builder(this).setTitle("生成整片字幕？")
+          .setMessage("视频时长：" + JourneyCaptionDraft.time(duration)
+              + "\n将分成 " + chunks.size() + " 个音频片段依次转写。"
+              + "\n服务：" + base + "\n模型：" + model
+              + "\n仅发送临时音轨，不发送视频；全部生成后先预览，确认应用才替换原文字幕。")
+          .setPositiveButton("发送音轨并生成", (d,n) -> runBatchCaption(videoUri, duration, base, model, key, language))
+          .setNegativeButton("取消", null).create();
+      captionDialog.show();
+    } catch (Exception e) { captionStatus.setText("无法准备整片字幕，请检查视频和语音服务配置。"); }
+  }
+
+  private void runBatchCaption(Uri selected, int duration, String base, String model,
+                               String key, String lang) {
+    stopCaptionWork();
+    final int generation = captionGeneration;
+    final CloudClient.Job job = new CloudClient.Job();
+    captionJob = job;
+    captionStatus.setText("正在按片段生成整片字幕……可随时停止，已应用字幕不会丢失。\n0% ");
+    new Thread(() -> {
+      List<JourneySubtitles.Cue> generated = new ArrayList<>();
+      try {
+        List<JourneyBatchCaption.Chunk> chunks = JourneyBatchCaption.plan(duration, 120000);
+        for (int i = 0; i < chunks.size(); i++) {
+          job.check();
+          JourneyBatchCaption.Chunk chunk = chunks.get(i);
+          File audio = null;
+          try {
+            audio = JourneyVideoClip.extract(this, selected, chunk.startMs, chunk.durationMs(), getCacheDir(), job);
+            JourneyCaptionDraft draft = captionService.transcribe(
+                base, model, key, lang, audio, chunk.startMs, chunk.durationMs(), job);
+            generated.addAll(draft.cues);
+          } finally { if (audio != null) audio.delete(); }
+          final int done = i + 1;
+          handler.post(() -> {
+            if (captionJob == job && captionGeneration == generation)
+              captionStatus.setText("正在生成整片字幕…… " + (done * 100 / chunks.size()) + "%（"
+                  + done + "/" + chunks.size() + "）");
+          });
+        }
+        List<JourneySubtitles.Cue> clean = JourneyBatchCaption.normalize(generated);
+        job.check();
+        handler.post(() -> {
+          if (captionGeneration != generation || captionJob != job || isDestroyed()) return;
+          captionJob = null;
+          String preview = JourneyCaptionDraft.srt(clean);
+          if (preview.length() > 6000) preview = preview.substring(0, 6000) + "\n（预览截断，应用包含全部分段）";
+          captionStatus.setText("整片字幕已生成 " + clean.size() + " 条，确认后才应用。");
+          captionDialog = new AlertDialog.Builder(this).setTitle("预览整片字幕 · " + clean.size() + " 条")
+              .setMessage(preview)
+              .setPositiveButton("应用整片字幕", (d,n) -> {
+                if (captionGeneration == generation) applyBatchCaption(clean);
+              }).setNegativeButton("放弃草稿", null).create();
+          captionDialog.show();
+        });
+      } catch (Exception e) {
+        handler.post(() -> {
+          if (captionGeneration != generation || captionJob != job || isDestroyed()) return;
+          captionJob = null;
+          captionStatus.setText("整片字幕未完成，原字幕保留。请检查音轨、网络和模型时间轴支持后重试。");
+        });
+      }
+    }, "everyone-batch-captions").start();
+  }
+
+  private void applyBatchCaption(List<JourneySubtitles.Cue> generated) {
+    try {
+      List<JourneySubtitles.Cue> merged = JourneyBatchCaption.merge(source, generated);
+      List<JourneySubtitles.Cue> clean = JourneyBatchCaption.normalize(merged);
+      String text = JourneyCaptionDraft.srt(clean);
+      cacheSubtitle("source", text);
+      source.clear(); source.addAll(clean); activeIndex = -1; pausedAt = -1;
+      showCue(-1); renderTranscript(0);
+      captionStatus.setText("已应用整片字幕，共 " + clean.size() + " 条，可继续精听或自动翻译。");
+    } catch (Exception e) { captionStatus.setText("整片字幕应用失败，原字幕保留。"); }
+  }
+
+  private void confirmCaptionTranslation() {
+    if (translationJob != null || captionJob != null) { toast("已有字幕任务正在运行"); return; }
+    if (source.isEmpty()) { toast("请先导入或生成原文字幕"); return; }
+    SharedPreferences connection = getSharedPreferences("connection", 0);
+    String base = connection.getString("base", "").trim();
+    String model = connection.getString("model", "").trim();
+    if (base.isEmpty() || model.isEmpty()) { configureLineService(); return; }
+    try {
+      CloudClient.endpoint(base, "chat/completions");
+      String[] targets = new String[]{"简体中文", "English", "日本語", "繁體中文"};
+      new AlertDialog.Builder(this).setTitle("选择目标语言")
+          .setItems(targets, (d, which) -> startCaptionTranslation(targets[which], base, model))
+          .setNegativeButton("取消", null).show();
+    } catch (Exception e) { toast("请检查 AI 服务设置"); }
+  }
+
+  private void startCaptionTranslation(String target, String base, String model) {
+    try {
+      final List<JourneySubtitles.Cue> snapshot = Collections.unmodifiableList(
+          new ArrayList<>(source));
+      if (snapshot.isEmpty()) throw new IOException("请先导入或生成原文字幕");
+      List<JourneyBatchCaption.Chunk> ignored = JourneyBatchCaption.plan(
+          Math.max(1000, snapshot.get(snapshot.size() - 1).endMs), 120000);
+      final String key = KeyVault.read(this, "connection");
+      if (player != null && player.isPlaying()) player.pause();
+      if (speechGuide != null) speechGuide.stop();
+      final int generation = ++translationGeneration;
+      final CloudClient.Job job = new CloudClient.Job();
+      translationJob = job;
+      captionStatus.setText("正在翻译原文字幕……只发送字幕文字，不发送视频或录音。");
+      new Thread(() -> {
+        List<String> all = new ArrayList<>();
+        try {
+          for (int offset = 0; offset < snapshot.size(); offset += JourneyCaptionTranslation.MAX_CUES_PER_REQUEST) {
+            job.check();
+            int end = Math.min(snapshot.size(), offset + JourneyCaptionTranslation.MAX_CUES_PER_REQUEST);
+            List<JourneySubtitles.Cue> part = new ArrayList<>(snapshot.subList(offset, end));
+            String prompt = JourneyCaptionTranslation.prompt(part, target);
+            JSONArray history = new JSONArray().put(new JSONObject().put("role", "user").put("content", prompt));
+            String response = lineClient.chat(base, model, key,
+                "你是严谨的影视字幕翻译器。严格遵守用户要求，只返回 JSON。", history, job, text -> {});
+            all.addAll(JourneyCaptionTranslation.parse(response, part.size()));
+            final int done = end;
+            handler.post(() -> {
+              if (translationJob == job && translationGeneration == generation)
+                captionStatus.setText("正在翻译原文字幕…… " + (done * 100 / snapshot.size()) + "%");
+            });
+          }
+          List<JourneySubtitles.Cue> result = JourneyCaptionTranslation.apply(snapshot, all);
+          job.check();
+          handler.post(() -> {
+            if (translationJob != job || translationGeneration != generation || isDestroyed()) return;
+            translationJob = null;
+            String preview = JourneyCaptionDraft.srt(result);
+            if (preview.length() > 6000) preview = preview.substring(0, 6000) + "\n（预览截断，应用包含全部译文）";
+            captionDialog = new AlertDialog.Builder(this).setTitle("预览自动翻译 · " + target)
+                .setMessage(preview)
+                .setPositiveButton("应用译文", (d,n) -> applyTranslatedCaptions(result))
+                .setNegativeButton("放弃翻译", null).create();
+            captionDialog.show();
+          });
+        } catch (Exception e) {
+          handler.post(() -> {
+            if (translationJob != job || translationGeneration != generation || isDestroyed()) return;
+            translationJob = null;
+            captionStatus.setText("自动翻译未完成，原文和已有译文保留。请检查服务或模型 JSON 输出。");
+          });
+        }
+      }, "everyone-caption-translation").start();
+    } catch (Exception e) { captionStatus.setText("无法准备自动翻译，请先检查字幕和服务设置。"); }
+  }
+
+  private void applyTranslatedCaptions(List<JourneySubtitles.Cue> result) {
+    try {
+      String text = JourneyCaptionDraft.srt(result);
+      cacheSubtitle("translation", text);
+      translated.clear(); translated.addAll(result);
+      renderTranscript(Math.max(0, activeIndex));
+      captionStatus.setText("自动翻译已应用，共 " + result.size() + " 条译文。");
+    } catch (Exception e) { captionStatus.setText("译文应用失败，已有译文保留。"); }
+  }
+
   private void confirmCaptionClip() {
     if (captionJob != null) { toast("正在生成字幕，可先停止"); return; }
     if (videoUri == null || !videoReady || player.getDuration() <= 0) { toast("请先选择可播放的视频"); return; }
@@ -1599,7 +1778,10 @@ public final class JourneyImmersionActivity extends Activity {
   private void stopCaptionWork() {
     captionGeneration++; clearCaptionTimeout();
     if (captionJob != null) { captionJob.cancel(); captionJob = null; }
+    translationGeneration++;
+    if (translationJob != null) { translationJob.cancel(); translationJob = null; }
     if (captionDialog != null) { captionDialog.dismiss(); captionDialog = null; }
+    if (translationDialog != null) { translationDialog.dismiss(); translationDialog = null; }
     if (captionStatus != null) captionStatus.setText("已停止生成，已应用的字幕保留。");
   }
 
