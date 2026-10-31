@@ -29,12 +29,27 @@ public final class JourneyBatchCaptionTest {
     List<String> translations = JourneyCaptionTranslation.parse(
         "[{\"index\":1,\"text\":\"旧字幕\"}]", 1);
     yes("旧字幕".equals(translations.get(0)), "parse translation");
+    translations = JourneyCaptionTranslation.parse(
+        "```json\n[{\"index\":1,\"text\":\"\\u65e7\\u5b57\\u5e55 \\\"A\\\"\"}]\n```", 1);
+    yes("旧字幕 \"A\"".equals(translations.get(0)), "decode escaped translation");
     yes(JourneyCaptionTranslation.apply(Arrays.asList(old), translations).get(0).startMs == 0,
         "preserve timing");
     boolean rejected = false;
     try { JourneyCaptionTranslation.parse("[{\"index\":1,\"text\":\"a\"}]", 2); }
     catch (java.io.IOException expected) { rejected = true; }
     yes(rejected, "reject incomplete translation");
+    rejected = false;
+    try { JourneyCaptionTranslation.parse("[{\"index\":1,\"text\":\"a\"},]", 1); }
+    catch (java.io.IOException expected) { rejected = true; }
+    yes(rejected, "reject trailing comma");
+    rejected = false;
+    try { JourneyCaptionTranslation.parse("[{\"index\":1,\"text\":\"a\"},{\"index\":1,\"text\":\"b\"}]", 2); }
+    catch (java.io.IOException expected) { rejected = true; }
+    yes(rejected, "reject duplicate index");
+    rejected = false;
+    try { JourneyBatchCaption.normalize(Arrays.asList((JourneySubtitles.Cue) null)); }
+    catch (java.io.IOException expected) { rejected = true; }
+    yes(rejected, "reject null cue");
     System.out.println("JourneyBatchCaption: OK");
   }
 }
