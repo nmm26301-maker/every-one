@@ -78,6 +78,7 @@ public final class JourneyCaptionTranslation {
     List<String> result = new ArrayList<>();
     boolean quoted = false, escaped = false;
     int depth = 0, start = -1;
+    boolean expectObject = true;
     for (int i = 0; i < array.length(); i++) {
       char c = array.charAt(i);
       if (quoted) {
@@ -86,11 +87,25 @@ public final class JourneyCaptionTranslation {
         else if (c == '"') quoted = false;
         continue;
       }
+      if (depth == 0) {
+        if (Character.isWhitespace(c)) continue;
+        if (c == ',') {
+          if (expectObject) throw new IOException("翻译回复数组格式无效");
+          expectObject = true;
+          continue;
+        }
+        if (c != '{' || !expectObject) throw new IOException("翻译回复数组包含非对象项");
+        start = i;
+        depth = 1;
+        expectObject = false;
+        continue;
+      }
       if (c == '"') { quoted = true; continue; }
-      if (c == '{') { if (depth++ == 0) start = i; }
-      else if (c == '}' && depth > 0 && --depth == 0) result.add(array.substring(start, i + 1));
+      if (c == '{') depth++;
+      else if (c == '}' && --depth == 0) result.add(array.substring(start, i + 1));
     }
-    if (quoted || depth != 0) throw new IOException("翻译回复 JSON 不完整");
+    if (quoted || depth != 0 || escaped || expectObject && !result.isEmpty())
+      throw new IOException("翻译回复 JSON 不完整");
     return result;
   }
 
@@ -105,6 +120,8 @@ public final class JourneyCaptionTranslation {
     int start = end;
     while (end < object.length() && Character.isDigit(object.charAt(end))) end++;
     if (start == end) throw new IOException("翻译编号无效");
+    if (end < object.length() && !Character.isWhitespace(object.charAt(end))
+        && object.charAt(end) != ',') throw new IOException("翻译编号格式无效");
     try { return Integer.parseInt(object.substring(start, end)); }
     catch (NumberFormatException e) { throw new IOException("翻译编号过大"); }
   }
@@ -126,7 +143,20 @@ public final class JourneyCaptionTranslation {
         if (c == 'n') text.append('\n');
         else if (c == 'r') text.append('\r');
         else if (c == 't') text.append('\t');
-        else text.append(c);
+        else if (c == 'b') text.append('\b');
+        else if (c == 'f') text.append('\f');
+        else if (c == '"' || c == '\\' || c == '/') text.append(c);
+        else if (c == 'u') {
+          if (i + 4 >= object.length()) throw new IOException("翻译文字 Unicode 转义不完整");
+          int value = 0;
+          for (int j = 1; j <= 4; j++) {
+            int digit = Character.digit(object.charAt(i + j), 16);
+            if (digit < 0) throw new IOException("翻译文字 Unicode 转义无效");
+            value = (value << 4) | digit;
+          }
+          text.append((char) value);
+          i += 4;
+        } else throw new IOException("翻译文字包含未知转义");
         escaped = false;
       } else if (c == '\\') escaped = true;
       else if (c == '"') return text.toString();
