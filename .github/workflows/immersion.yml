@@ -116,7 +116,7 @@ jobs:
           mkdir -p build/immersion-classes
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
             scripts/journey-stubs/org/openenglish/reader/*.java \
-            app/src/main/java/org/openenglish/reader/Journey*.java
+            $(find app/src/main/java/org/openenglish/reader -name 'Journey*.java' ! -name 'JourneyPhoneEngine.java' -print)
 
       - name: Validate all compiled Journey sources and overlay scripts
         run: |
@@ -158,7 +158,7 @@ jobs:
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" \
             -d build/immersion-preview/classes \
             scripts/journey-stubs/org/openenglish/reader/*.java \
-            app/src/main/java/org/openenglish/reader/Journey*.java
+            $(find app/src/main/java/org/openenglish/reader -name 'Journey*.java' ! -name 'JourneyPhoneEngine.java' -print)
           mapfile -t classes < <(find build/immersion-preview/classes -name '*.class' -print)
           "$buildtools/d8" --min-api 23 --lib "$jar" --output build/immersion-preview/dex "${classes[@]}"
           "$buildtools/aapt2" link \
