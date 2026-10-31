@@ -71,6 +71,9 @@ public final class JourneyBatchCaption {
   public static List<JourneySubtitles.Cue> normalize(List<JourneySubtitles.Cue> cues)
       throws IOException {
     if (cues == null) return Collections.emptyList();
+    for (JourneySubtitles.Cue cue : cues) {
+      if (cue == null) throw new IOException("生成字幕包含空分段");
+    }
     List<JourneySubtitles.Cue> sorted = sorted(cues);
     List<JourneySubtitles.Cue> out = new ArrayList<>();
     for (JourneySubtitles.Cue cue : sorted) {
