@@ -1625,8 +1625,11 @@ public final class JourneyImmersionActivity extends Activity {
 
   private void startCaptionTranslation(String target, String base, String model) {
     try {
+      final List<JourneySubtitles.Cue> snapshot = Collections.unmodifiableList(
+          new ArrayList<>(source));
+      if (snapshot.isEmpty()) throw new IOException("请先导入或生成原文字幕");
       List<JourneyBatchCaption.Chunk> ignored = JourneyBatchCaption.plan(
-          Math.max(1000, source.get(source.size() - 1).endMs), 120000);
+          Math.max(1000, snapshot.get(snapshot.size() - 1).endMs), 120000);
       final String key = KeyVault.read(this, "connection");
       if (player != null && player.isPlaying()) player.pause();
       if (speechGuide != null) speechGuide.stop();
@@ -1637,10 +1640,10 @@ public final class JourneyImmersionActivity extends Activity {
       new Thread(() -> {
         List<String> all = new ArrayList<>();
         try {
-          for (int offset = 0; offset < source.size(); offset += JourneyCaptionTranslation.MAX_CUES_PER_REQUEST) {
+          for (int offset = 0; offset < snapshot.size(); offset += JourneyCaptionTranslation.MAX_CUES_PER_REQUEST) {
             job.check();
-            int end = Math.min(source.size(), offset + JourneyCaptionTranslation.MAX_CUES_PER_REQUEST);
-            List<JourneySubtitles.Cue> part = new ArrayList<>(source.subList(offset, end));
+            int end = Math.min(snapshot.size(), offset + JourneyCaptionTranslation.MAX_CUES_PER_REQUEST);
+            List<JourneySubtitles.Cue> part = new ArrayList<>(snapshot.subList(offset, end));
             String prompt = JourneyCaptionTranslation.prompt(part, target);
             JSONArray history = new JSONArray().put(new JSONObject().put("role", "user").put("content", prompt));
             String response = lineClient.chat(base, model, key,
@@ -1649,10 +1652,10 @@ public final class JourneyImmersionActivity extends Activity {
             final int done = end;
             handler.post(() -> {
               if (translationJob == job && translationGeneration == generation)
-                captionStatus.setText("正在翻译原文字幕…… " + (done * 100 / source.size()) + "%");
+                captionStatus.setText("正在翻译原文字幕…… " + (done * 100 / snapshot.size()) + "%");
             });
           }
-          List<JourneySubtitles.Cue> result = JourneyCaptionTranslation.apply(source, all);
+          List<JourneySubtitles.Cue> result = JourneyCaptionTranslation.apply(snapshot, all);
           job.check();
           handler.post(() -> {
             if (translationJob != job || translationGeneration != generation || isDestroyed()) return;
