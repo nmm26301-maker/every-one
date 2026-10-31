@@ -16,6 +16,12 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyToneCompare.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyBatchCaption.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCaptionTranslation.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCaptionDraft.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCaptionService.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyVideoClip.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyLineCoach.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
       - 'app/src/main/AndroidManifest.xml'
       - 'preview/AndroidManifest.xml'
@@ -43,6 +49,12 @@ on:
       - 'app/src/main/java/org/openenglish/reader/JourneyToneCompare.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java'
       - 'app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyBatchCaption.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCaptionTranslation.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCaptionDraft.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyCaptionService.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyVideoClip.java'
+      - 'app/src/main/java/org/openenglish/reader/JourneyLineCoach.java'
       - 'app/src/main/java/org/openenglish/reader/JourneyActivity.java'
       - 'app/src/main/AndroidManifest.xml'
       - 'preview/AndroidManifest.xml'
@@ -103,18 +115,8 @@ jobs:
           fi
           mkdir -p build/immersion-classes
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" -d build/immersion-classes \
-            app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
-            app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
-            app/src/main/java/org/openenglish/reader/JourneyQuickStart.java \
-            app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
-            app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
-            app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
-            app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
-            app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
-            app/src/main/java/org/openenglish/reader/JourneyToneCompare.java \
-            app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java \
-            app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java \
-            app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
+            scripts/journey-stubs/org/openenglish/reader/*.java \
+            app/src/main/java/org/openenglish/reader/Journey*.java
 
       - name: Validate all compiled Journey sources and overlay scripts
         run: |
@@ -155,18 +157,8 @@ jobs:
           mkdir -p build/immersion-preview/classes build/immersion-preview/dex
           javac -encoding UTF-8 -source 8 -target 8 -cp "$jar" \
             -d build/immersion-preview/classes \
-            app/src/main/java/org/openenglish/reader/JourneySubtitles.java \
-            app/src/main/java/org/openenglish/reader/JourneyCantonese.java \
-            app/src/main/java/org/openenglish/reader/JourneyQuickStart.java \
-            app/src/main/java/org/openenglish/reader/JourneyJyutping.java \
-            app/src/main/java/org/openenglish/reader/JourneyCantoneseAsr.java \
-            app/src/main/java/org/openenglish/reader/JourneyPracticeAudio.java \
-            app/src/main/java/org/openenglish/reader/JourneyToneAudio.java \
-            app/src/main/java/org/openenglish/reader/JourneyToneContour.java \
-            app/src/main/java/org/openenglish/reader/JourneyToneCompare.java \
-            app/src/main/java/org/openenglish/reader/JourneyTonePlotView.java \
-            app/src/main/java/org/openenglish/reader/JourneySpeechGuide.java \
-            app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
+            scripts/journey-stubs/org/openenglish/reader/*.java \
+            app/src/main/java/org/openenglish/reader/Journey*.java
           mapfile -t classes < <(find build/immersion-preview/classes -name '*.class' -print)
           "$buildtools/d8" --min-api 23 --lib "$jar" --output build/immersion-preview/dex "${classes[@]}"
           "$buildtools/aapt2" link \
