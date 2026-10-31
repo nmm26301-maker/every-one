@@ -131,6 +131,7 @@ jobs:
             app/src/main/java/org/openenglish/reader/JourneyCaptionService.java \
             app/src/main/java/org/openenglish/reader/JourneyCaptionTranslation.java \
             app/src/main/java/org/openenglish/reader/JourneyBatchCaption.java \
+            app/src/main/java/org/openenglish/reader/JourneyMp4Timeline.java \
             app/src/main/java/org/openenglish/reader/JourneyVideoClip.java \
             app/src/main/java/org/openenglish/reader/JourneyLineCoach.java \
             app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
@@ -190,6 +191,7 @@ jobs:
             app/src/main/java/org/openenglish/reader/JourneyCaptionService.java \
             app/src/main/java/org/openenglish/reader/JourneyCaptionTranslation.java \
             app/src/main/java/org/openenglish/reader/JourneyBatchCaption.java \
+            app/src/main/java/org/openenglish/reader/JourneyMp4Timeline.java \
             app/src/main/java/org/openenglish/reader/JourneyVideoClip.java \
             app/src/main/java/org/openenglish/reader/JourneyLineCoach.java \
             app/src/main/java/org/openenglish/reader/JourneyImmersionActivity.java
